@@ -12,6 +12,7 @@
                                 @csrf
                                 <input type="hidden" name="sub_code" value="{{ $comp_mastdata->sub_code }}">
                                 <input type="hidden" name="sn" value="{{ $comp_mastdata->sn }}">
+                                <input type="hidden" value="0" name="pcount" id="pcount">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label class="col-form-label" for="name">Account Name</label>
@@ -208,38 +209,45 @@
                                                     <th>Rate</th>
                                                     <th>Plan</th>
                                                     <th>Plan Amount</th>
+                                                    <th>Tax Inc</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <td>
-                                                        <select name="roomcat[]" class="form-select roomcat">
+                                                        <select name="roomcat1" id="roomcat1" class="form-control roomcat">
                                                             <option value="">Select</option>
-                                                            @foreach($roomcat as $cat)
-                                                                <option value="{{ $cat->code }}">{{ $cat->name }}</option>
+                                                            @foreach ($roomcat as $cat)
+                                                                <option value="{{ $cat->cat_code }}">{{ $cat->name }}</option>
                                                             @endforeach
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <select name="adult[]" class="form-select">
-                                                            @for($i = 1; $i <= 5; $i++)
+                                                        <select name="adult1" id="adult1" class="form-control">
+                                                            @for ($i = 1; $i <= 5; $i++)
                                                                 <option value="{{ $i }}">{{ $i }}</option>
                                                             @endfor
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <input type="number" name="rate[]" class="form-control rate"
-                                                            step="0.01">
+                                                        <input type="number" name="rate1" id="rate1"
+                                                            class="form-control rate" step="0.01">
                                                     </td>
                                                     <td>
-                                                        <select name="plan[]" class="form-select plan">
+                                                        <select name="plan1" id="plan1" class="form-control plan">
                                                             <option value="">Select Plan</option>
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <input type="number" name="planamt[]" class="form-control planamt"
-                                                            step="0.01">
+                                                        <input type="number" name="planamt1" id="planamt1"
+                                                            class="form-control planamt" step="0.01">
+                                                    </td>
+                                                    <td>
+                                                        <select name="taxinc1" id="taxinc1" class="form-control">
+                                                            <option value="Y">Yes</option>
+                                                            <option value="N">No</option>
+                                                        </select>
                                                     </td>
                                                     <td>
                                                         <button type="button"
@@ -267,7 +275,7 @@
         </div>
     </div>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('#myloader').removeClass('none');
             setTimeout(() => {
                 $('#myloader').addClass('none');
@@ -276,8 +284,8 @@
     </script>
 
     <script>
-        $(document).ready(function () {
-            $('#companymasterupdate').on('submit', function (e) {
+        $(document).ready(function() {
+            $('#companymasterupdate').on('submit', function(e) {
                 let gstin = $('#gstin').val();
                 if (gstin !== '' && gstin.length < 15) {
                     e.preventDefault();
@@ -286,25 +294,79 @@
             });
         });
 
-        $(document).ready(function () {
+        $(document).ready(function() {
 
             // Add Row
-            $("#addRow").click(function () {
-                let row = $("#roomTable tbody tr:first").clone();
-                row.find("input").val("");
-                row.find("select").val("");
-                $("#roomTable tbody").append(row);
+            $("#addRow").click(function() {
+                let index = $('#roomTable tbody tr').length + 1;
+                $('#pcount').val(index);
+                let newtr = `<tr>
+                                <td>
+                                    <select name="roomcat${index}" id="roomcat${index}" class="form-control roomcat">
+                                        <option value="">Select</option>
+                                                @foreach ($roomcat as $cat)
+                                                    <option value="{{ $cat->cat_code }}">{{ $cat->name }}</option>
+                                                @endforeach
+                                     </select>
+                                </td>
+                                <td>
+                                    <select name="adult${index}" id="adult${index}" class="form-control">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name="rate${index}" id="rate${index}"
+                                        class="form-control rate" step="0.01">
+                                </td>
+                                <td>
+                                    <select name="plan${index}" id="plan${index}" class="form-control plan">
+                                        <option value="">Select Plan</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name="planamt${index}" id="planamt${index}"
+                                        class="form-control planamt" step="0.01">
+                                </td>
+                                <td>
+                                    <select name="taxinc1" id="taxinc1" class="form-control">
+                                        <option value="Y">Yes</option>
+                                        <option value="N">No</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm removerow">X</button>
+                                </td>
+                        </tr>`;
+
+                $('#roomTable tbody').append(newtr);
             });
 
             // Remove Row
-            $(document).on("click", ".removerow", function () {
-                if ($("#roomTable tbody tr").length > 1) {
-                    $(this).closest("tr").remove();
-                }
+            $('#roomTable tbody').on('click', '.removerow', function() {
+                let row = $(this).closest('tr');
+                let rowIndex = row.index();
+                row.remove();
+
+                $('#roomTable tbody tr').each(function(index) {
+                    let adjustedIndex = index + 1;
+                    $(this).find('select, input').each(function() {
+                        let originalName = $(this).attr('name');
+                        let originalId = $(this).attr('id');
+                        let newName = originalName.replace(/\d+$/, adjustedIndex);
+                        let newId = originalId.replace(/\d+$/, adjustedIndex);
+                        $(this).attr('name', newName);
+                        $(this).attr('id', newId);
+                    });
+                });
             });
 
             // Fetch Plans on Room Category change
-            $(document).on("change", ".roomcat", function () {
+            $(document).on("change", ".roomcat", function() {
                 let row = $(this).closest("tr");
                 let roomcat = $(this).val();
                 let planSelect = row.find(".plan");
@@ -317,9 +379,9 @@
                             roomcat: roomcat,
                             _token: "{{ csrf_token() }}"
                         },
-                        success: function (data) {
+                        success: function(data) {
                             planSelect.empty().append('<option value="">Select Plan</option>');
-                            $.each(data, function (i, plan) {
+                            $.each(data, function(i, plan) {
                                 planSelect.append('<option value="' + plan.code + '">' + plan.name + '</option>');
                             });
                         }
@@ -330,7 +392,7 @@
             });
 
             // Validation: if Rate is filled → disable Plan & Plan Amount
-            $(document).on("input", ".rate", function () {
+            $(document).on("input", ".rate", function() {
                 let row = $(this).closest("tr");
                 let rate = $(this).val();
 
@@ -344,8 +406,5 @@
             });
 
         });
-
     </script>
-
-
 @endsection

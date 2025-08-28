@@ -4348,6 +4348,7 @@ class CompanyController extends Controller
         ]);
 
         try {
+            
             $existingName = DB::table('subgroup')
                 ->where('propertyid', $this->propertyid)
                 ->whereNot('sub_code', $request->input('sub_code'))
