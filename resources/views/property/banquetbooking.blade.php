@@ -1,0 +1,442 @@
+@extends('property.layouts.main')
+@section('main-container')
+    @include('cdns.select')
+    <style>
+        .table td,
+        .table th {
+            padding: 5px;
+        }
+    </style>
+    <div class="content-body">
+
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+
+                            <h6 class="mb-3 text-center">Function Prospected No. <span class="font-weight-bold ADA">{{ maxvno('AD', 'paychargeh') }}</span></h6>
+                            <form id="banquetbookingform" name="banquetbookingform" action="{{ url('banquetbookingsubmit') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="totalrows" value="1" id="totalrows">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-1">
+                                                <label for="booking_date">Booking Date</label>
+                                                <input type="date" value="{{ ncurdate() }}" class="form-control" id="booking_date" name="booking_date" readonly>
+                                            </div>
+                                            <div class="col-md-6 mb-1">
+                                                <label for="day">Day</label>
+                                                <input type="text" value="{{ getDayNameFromDate(ncurdate()) }}" class="form-control" id="day" name="day" readonly>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-1">
+                                                <label for="party">Party</label>
+                                                <input type="text" class="form-control" id="party" name="party" required>
+                                            </div>
+                                            <div class="col-md-6 mb-1">
+                                                <label for="address">Address</label>
+                                                <input type="text" class="form-control" id="address" name="address">
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-1">
+                                                <label for="city_name">City Name</label>
+                                                <select class="form-control select2-multiple" name="city_name" id="city_name" required>
+                                                    <option value="">Select</option>
+                                                    @foreach (allcities() as $col)
+                                                        <option value="{{ $col->city_code }}">{{ $col->cityname }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-1">
+                                                <label for="mobile_no">Mobile No.</label>
+                                                <input type="text" class="form-control" id="mobile_no" name="mobile_no">
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-1">
+                                                <label for="mobile_no2">Mobile No 2.</label>
+                                                <input type="text" class="form-control" id="mobile_no2" name="mobile_no2">
+                                            </div>
+
+                                            <div class="col-md-6 mb-1">
+                                                <label for="pan_no">PAN No.</label>
+                                                <input type="text" class="form-control" id="pan_no" name="pan_no" {{ banquetparameter()->panrequiredyn == 'Y' ? 'required' : '' }}>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-1">
+                                                <label for="company_name">Company Name</label>
+                                                <select class="form-control select2-multiple" name="company_name" id="company_name">
+                                                    <option value="">Select</option>
+                                                    @foreach (companiessubgroup() as $col)
+                                                        <option value="{{ $col->sub_code }}">{{ $col->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6 mb-1">
+                                                <label for="booking_agent">Booking Agent</label>
+                                                <select class="form-control select2-multiple" name="booking_agent" id="booking_agent">
+                                                    <option value="">Select</option>
+                                                    @foreach (travelagents() as $col)
+                                                        <option value="{{ $col->sub_code }}">{{ $col->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-1">
+                                                <label for="function_type">Function Type</label>
+                                                <select class="form-control select2-multiple" name="function_type" id="function_type" required>
+                                                    <option value="">Select</option>
+                                                    @foreach (functiontypes() as $col)
+                                                        <option value="{{ $col->code }}">{{ $col->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-1">
+                                                <label for="exp_pax">Expected Pax</label>
+                                                <input type="text" class="form-control" id="exp_pax" name="exp_pax" required>
+                                            </div>
+                                            <div class="col-md-6 mb-1">
+                                                <label for="gurr_pax">Guaranteed Pax</label>
+                                                <input type="text" class="form-control" id="gurr_pax" name="gurr_pax" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-1">
+                                                <label for="rate_pax">Rate/Pax</label>
+                                                <input type="text" class="form-control" id="rate_pax" name="rate_pax">
+                                            </div>
+                                            <div class="col-md-6 mb-1">
+                                                <label for="remark">Remark</label>
+                                                <input type="text" class="form-control" id="remark" name="remark">
+                                            </div>
+                                        </div>
+
+                                        <h5 class="mt-4">Venue Selection</h5>
+                                        <table class="table table-bordered" id="venueTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Venue Name</th>
+                                                    <th>From Date</th>
+                                                    <th>From Time</th>
+                                                    <th>To Date</th>
+                                                    <th>To Time</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="venueTbody">
+                                                <tr>
+                                                    <td>
+                                                        <select class="form-control select2-multiple" name="venue_name1" id="venue_name1" required>
+                                                            <option value="">Select</option>
+                                                            @foreach (venuemast() as $col)
+                                                                <option value="{{ $col->code }}" {{ isset($venuecode) && $venuecode == $col->code ? 'selected' : '' }}>
+                                                                    {{ $col->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td><input type="date" class="form-control" value="{{ $fromdate }}" name="from_date1" id="from_date1" required></td>
+                                                    <td><input type="text" class="form-control timeinput" value="{{ $clicktime }}" name="from_time1" id="from_time1" required></td>
+                                                    <td><input type="date" class="form-control" value="{{ $fromdate }}" name="to_date1" id="to_date1" required></td>
+                                                    <td><input type="text" class="form-control timeinput" value="{{ isset($clicktime) ? '23:59:59' : '' }}" name="to_time1" id="to_time1" required></td>
+                                                    <td><button type="button" class="btn btn-danger remove-row">X</button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <button type="button" class="btn btn-primary" id="addVenueRow">Add More</button>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <h5 class="text-danger">Party Instructions</h5>
+                                        <div class="row align-items-center">
+                                            <label for="special_instruction1" class="col-md-4 col-form-label">Special Instruction 1</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="special_instruction1" id="special_instruction1">
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center">
+                                            <label for="special_instruction2" class="col-md-4 col-form-label">Special Instruction 2</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="special_instruction2" id="special_instruction2">
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center">
+                                            <label for="special_instruction3" class="col-md-4 col-form-label">Special Instruction 3</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="special_instruction3" id="special_instruction3">
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center">
+                                            <label for="special_instruction4" class="col-md-4 col-form-label">Special Instruction 4</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="special_instruction4" id="special_instruction4">
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center">
+                                            <label for="special_instruction5" class="col-md-4 col-form-label">Special Instruction 5</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="special_instruction5" id="special_instruction5">
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <h5 class="mt-2 text-danger">Instructions for Department</h5>
+                                        <div class="row align-items-center">
+                                            <label for="department_instruction1" class="col-md-4 text-green col-form-label">House Keeping</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="department_instruction1" id="department_instruction1">
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center">
+                                            <label for="department_instruction2" class="col-md-4 text-green col-form-label">Front Office</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="department_instruction2" id="department_instruction2">
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center">
+                                            <label for="department_instruction3" class="col-md-4 text-green col-form-label">Engineering</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="department_instruction3" id="department_instruction3">
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center">
+                                            <label for="department_instruction4" class="col-md-4 text-green col-form-label">Security</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="department_instruction4" id="department_instruction4">
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center">
+                                            <label for="department_instruction5" class="col-md-4 text-green col-form-label">Chef</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" name="department_instruction5" id="department_instruction5">
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center mt-2">
+                                            <label for="boardtoread" class="col-md-4 badge-success col-form-label">Board To Read</label>
+                                            <div class="col-md-8">
+                                                <textarea style="width: inherit;" rows="4" name="boardtoread" id="boardtoread"></textarea>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-3">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
+
+                            <div class="table-responsive mt-3">
+                                <table class="table table-hover table-download-with-search table-hover table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>From Dt.</th>
+                                            <th>To Dt.</th>
+                                            <th>FP No.</th>
+                                            <th>Party</th>
+                                            <th>Mobile</th>
+                                            <th>City</th>
+                                            <th>Advance</th>
+                                            <th>Venue</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+
+                                    @php
+                                        $colorClasses = ['table-primary', 'table-success', 'table-warning', 'table-danger', 'table-info', 'table-secondary', 'table-light', 'table-dark'];
+                                        $docidColorMap = [];
+                                        $colorIndex = 0;
+                                    @endphp
+
+                                    <tbody>
+                                        @foreach (hallbookvenue() as $item)
+                                            @php
+                                                if (!isset($docidColorMap[$item->docid])) {
+                                                    $docidColorMap[$item->docid] = $colorClasses[$colorIndex % count($colorClasses)];
+                                                    $colorIndex++;
+                                                }
+                                                $rowClass = $docidColorMap[$item->docid];
+                                            @endphp
+
+                                            <tr class="{{ $rowClass }}">
+                                                <td>{{ date('d-m-Y', strtotime($item->fromdate)) }} {{ date('H:i', strtotime($item->dfromtime)) }}</td>
+                                                <td>{{ date('d-m-Y', strtotime($item->todate)) }} {{ date('H:i', strtotime($item->totime)) }}</td>
+                                                <td>{{ $item->vno }}</td>
+                                                <td>{{ $item->partyname }}</td>
+                                                <th>{{ $item->mobileno }} {{ !empty($item->mobileno1) ? ',' . $item->mobileno1 : '' }}</th>
+                                                <td>{{ $item->cityname }}</td>
+                                                <td>{{ $item->advancesum }}</td>
+                                                <td>{{ $item->venuename }}</td>
+                                                <td class="ins">
+                                                    <a href="updatebanquet/{{ $item->docid }}">
+                                                        <button class="btn btn-success btn-sm"><i class="far fa-edit"></i>Edit</button>
+                                                    </a>
+                                                    <a href="advanceabanquet/{{ $item->docid }}">
+                                                        <button class="btn btn-warning btn-sm"><i class="far fa-edit"></i>Advance</button>
+                                                    </a>
+                                                    <a target="_blank" href="printfp/{{ $item->docid }}">
+                                                        <button class="btn btn-info btn-sm"><i class="far fa-print"></i>Print</button>
+                                                    </a>
+                                                    <a href="{{ url('deletebanquet/' . $item->docid) }}">
+                                                        <button class="btn btn-danger btn-sm">
+                                                            <i class="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            let rowCount = 1;
+
+            $(document).on('click', '#addVenueRow', function() {
+                rowCount++;
+
+                let row = `
+                        <tr>
+                            <td>
+                                <select class="form-control select2-multiple" name="venue_name${rowCount}" id="venue_name${rowCount}" required>
+                                <option value="">Select</option>
+                                    @foreach (venuemast() as $col)
+                                        <option value="{{ $col->code }}">{{ $col->name }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td><input type="date" class="form-control" name="from_date${rowCount}" id="from_date${rowCount}"></td>
+                            <td><input type="text" class="form-control timeinput" name="from_time${rowCount}" id="from_time${rowCount}"></td>
+                            <td><input type="date" class="form-control" name="to_date${rowCount}" id="to_date${rowCount}"></td>
+                            <td><input type="text" class="form-control timeinput" name="to_time${rowCount}" id="to_time${rowCount}"></td>
+                            <td><button type="button" class="btn btn-danger remove-row">X</button></td>
+                        </tr>`;
+
+                $('#venueTbody').append(row);
+                $(`#venue_name${rowCount}`).select2();
+                $('#totalrows').val(rowCount);
+            });
+
+            $(document).on('click', '.remove-row', function() {
+                let row = $(this).closest('tr');
+                let rowIndex = row.index();
+                row.remove();
+
+                $('#venueTbody tr').each(function(index) {
+                    let adjustedIndex = index + 1;
+                    $(this).find('select, input').each(function() {
+                        let originalName = $(this).attr('name');
+                        let originalId = $(this).attr('id');
+                        let newName = originalName.replace(/\d+$/, adjustedIndex);
+                        let newId = originalId.replace(/\d+$/, adjustedIndex);
+                        $(this).attr('name', newName);
+                        $(this).attr('id', newId);
+                    });
+                    $('#totalrows').val(adjustedIndex);
+                });
+            });
+            bindDateToDay('booking_date', 'day');
+
+            $(document).on('input', '#gurr_pax, #exp_pax', function() {
+                let gurr_pax = parseFloat($('#gurr_pax').val()) || 0;
+                let exp_pax = parseFloat($('#exp_pax').val()) || 0;
+
+                if (gurr_pax > exp_pax) {
+                    $('#gurr_pax').val(exp_pax);
+                }
+            });
+
+            $.ajaxSetup({
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                }
+            });
+
+            $('#banquetbookingform').on('submit', function(e) {
+                e.preventDefault();
+
+                let tbodylength = $('#venueTable tbody tr').length;
+
+                if (tbodylength < 1) {
+                    Swal.fire({
+                        title: 'Banquet Booking',
+                        text: 'Please Add Venue',
+                        icon: 'info'
+                    });
+                    return false;
+                }
+
+                let totalrows = $('#totalrows').val();
+                let bookings = [];
+
+                for (let i = 1; i <= totalrows; i++) {
+                    bookings.push({
+                        venue_name: $(`#venue_name${i}`).val(),
+                        from_date: $(`#from_date${i}`).val(),
+                        from_time: $(`#from_time${i}`).val(),
+                        to_date: $(`#to_date${i}`).val(),
+                        to_time: $(`#to_time${i}`).val()
+                    });
+                }
+
+                $.ajax({
+                    method: "POST",
+                    url: "{{ url('checkvenuduplicate') }}",
+                    data: {
+                        bookings: bookings
+                    },
+                    success: function(response) {
+                        if (response.error == '1') {
+                            Swal.fire({
+                                title: 'Banquet Booking',
+                                text: response.message,
+                                icon: 'info'
+                            });
+                        } else {
+                            $('#banquetbookingform')[0].submit();
+                        }
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            });
+
+        });
+    </script>
+@endsection

@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class ConfigController extends Controller
+{
+    public function config()
+    {
+        $maxInputVars = ini_get('max_input_vars');
+        $uploadMaxFilesize = ini_get('upload_max_filesize');
+        $maxMultipartBodyParts = ini_get('max_multipart_body_parts');
+        $phpIniPath = php_ini_loaded_file();
+        $memory_limit = ini_get('memory_limit');
+        $postMaxSize = ini_get('post_max_size');
+        $max_execution_time = ini_get('max_execution_time');
+        $max_input_time = ini_get('max_input_time');
+
+        return response()->json([
+            'upload_max_filesize' => $uploadMaxFilesize,
+            'max_input_vars' => $maxInputVars,
+            'max_multipart_body_parts' => $maxMultipartBodyParts,
+            'php_ini_path' => $phpIniPath,
+            'memory_limit' => $memory_limit,
+            'post_max_size' => $postMaxSize,
+            'max_execution_time' => $max_execution_time,
+            'max_input_time' => $max_input_time
+        ]);
+    }
+
+    public function phpinipath()
+    {
+        return response()->json([
+            'php_ini_path' => php_ini_loaded_file(),
+        ]);
+    }
+}
