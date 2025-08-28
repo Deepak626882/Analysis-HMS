@@ -4348,7 +4348,15 @@ class CompanyController extends Controller
         ]);
 
         try {
-            
+            $pcount = $request->pcount;
+            if($pcount > 0) {
+                for($i = 1; $i < $pcount; $i++) {
+                    if(!empty($request->input("roomcat$i"))) {
+                        
+                    }
+                }
+            }
+
             $existingName = DB::table('subgroup')
                 ->where('propertyid', $this->propertyid)
                 ->whereNot('sub_code', $request->input('sub_code'))

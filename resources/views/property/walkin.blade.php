@@ -1108,7 +1108,6 @@
     <!-- #/ container -->
 
     <script>
-
         let isResizing = false; // Flag to track if resizing is in progress
 
         // Function to enable dragging
@@ -1180,14 +1179,14 @@
                 document.removeEventListener('mouseup', stopResize);
             }
         }
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('#myloader').removeClass('none');
             setTimeout(() => {
                 $('#myloader').addClass('none');
             }, 500);
 
             let timer;
-            $(document).on('input', '.planrow', function () {
+            $(document).on('input', '.planrow', function() {
                 clearTimeout(timer);
                 let element = $(this);
 
@@ -1211,7 +1210,7 @@
                     $(`#roomrate${number}`).val(newroomrate.toFixed(2));
 
                     let sum = 0.00;
-                    $('.rowdamount').each(function () {
+                    $('.rowdamount').each(function() {
                         sum += parseFloat($(this).val()) || 0;
                     });
 
@@ -1220,13 +1219,15 @@
                 }, 500);
             });
 
-            $(document).on('change', '.roomselect', function () {
-                let index = $(this).closest('tr').index() + 1;
-                let catid = $(this).find('option:selected').data('catid');
-                $(`#cat_code${index}`).val(catid).change();
+            $(document).on('change', '.roomselect', function() {
+                if ($(`#cat_code${index}`).val() != '') {
+                    let index = $(this).closest('tr').index() + 1;
+                    let catid = $(this).find('option:selected').data('catid');
+                    $(`#cat_code${index}`).val(catid).change();
+                }
             });
 
-            $(document).on('input', '.rowdamount', function () {
+            $(document).on('input', '.rowdamount', function() {
                 clearTimeout(timer);
                 let element = $(this);
 
@@ -1249,7 +1250,7 @@
                     $(`#rowdplan_per${number}`).val(newsumpercentval.toFixed(2));
                     $(`#roomrate${number}`).val(newroomrate.toFixed(2));
                     let sum = 0.00;
-                    $('.rowdamount').each(function () {
+                    $('.rowdamount').each(function() {
                         sum += parseFloat($(this).val()) || 0;
                     });
 
@@ -1258,7 +1259,7 @@
                 }, 500);
             });
 
-            $(document).on('keypress', '.rowdamount, .planrow', function (e) {
+            $(document).on('keypress', '.rowdamount, .planrow', function(e) {
                 if (e.which == 13) {
                     e.preventDefault();
                     let element = $(this);
@@ -1267,21 +1268,21 @@
                 }
             });
 
-            $(document).on('focus', '.taxincplanroomrate', function () {
+            $(document).on('focus', '.taxincplanroomrate', function() {
                 $(this).data('curval', $(this).val());
             });
 
-            $(document).on('change', '.taxincplanroomrate', function () {
+            $(document).on('change', '.taxincplanroomrate', function() {
                 if ($(this).val() != $(this).data('curval')) {
                     $(this).val($(this).data('curval'));
                 }
             });
 
-            $(document).on('focus', '.taxchk', function () {
+            $(document).on('focus', '.taxchk', function() {
                 $(this).data('curval', $(this).val());
             });
 
-            $(document).on('change', '.taxchk', function () {
+            $(document).on('change', '.taxchk', function() {
                 let index = $(this).closest('tr').index() + 1;
                 if ($(`#planedit${index}`).val() == 'Y') {
                     if ($(this).val() != $(this).data('curval')) {
@@ -1290,7 +1291,7 @@
                 }
             });
 
-            $(document).on('click', '.okbtncls', function () {
+            $(document).on('click', '.okbtncls', function() {
                 let element = $(this);
                 let num = extractnum(element.attr('id'));
                 let netroomrate = $(`#netroomrate${num}`).val();
@@ -1304,7 +1305,7 @@
                 element.parents('div.hidedisp').removeClass('hidedisp');
             });
 
-            $(document).on('click', '.closebtncls', function () {
+            $(document).on('click', '.closebtncls', function() {
                 let element = $(this);
                 let num = extractnum(element.attr('id'));
                 let taxparent = $(`#tax_inc${num}`).parent();
@@ -1324,11 +1325,11 @@
             var csrftoken = '{{ csrf_token() }}';
             let outenviroxhr = new XMLHttpRequest();
             outenviroxhr.open('GET', '/enviroform', true);
-            outenviroxhr.onreadystatechange = function () {
+            outenviroxhr.onreadystatechange = function() {
                 if (outenviroxhr.readyState === 4 && outenviroxhr.status === 200) {
                     let envirodataout = JSON.parse(outenviroxhr.responseText);
                     let plancalc = envirodataout.plancalc;
-                    $(document).on('change', '.planmastclass', function () {
+                    $(document).on('change', '.planmastclass', function() {
                         let parenttag = $(this).parents('tr.data-row');
                         let plancode = $(this).val();
                         let rowindex = $(this).closest('tr').index() + 1;
@@ -1460,11 +1461,11 @@
                 }
             }
             outenviroxhr.send();
-            $('#walkinform').on('submit', function (event) {
+            $('#walkinform').on('submit', function(event) {
                 event.preventDefault();
                 let enviroxhr = new XMLHttpRequest();
                 enviroxhr.open('GET', '/enviroform', true);
-                enviroxhr.onreadystatechange = function () {
+                enviroxhr.onreadystatechange = function() {
                     if (enviroxhr.readyState === 4 && enviroxhr.status === 200) {
                         let envirodata = JSON.parse(enviroxhr.responseText);
                         let grcmandatory = envirodata.grcmandatory;
@@ -1514,13 +1515,13 @@
             });
 
             let offsetX, offsetY, isDragging = false;
-            $('.table-findhistory').on('mousedown', function (e) {
+            $('.table-findhistory').on('mousedown', function(e) {
                 isDragging = true;
                 offsetX = e.clientX - $(this).offset().left;
                 offsetY = e.clientY - $(this).offset().top;
             });
 
-            $(document).on('mousemove', function (e) {
+            $(document).on('mousemove', function(e) {
                 if (isDragging) {
                     $('.table-findhistory').css({
                         left: e.clientX - offsetX,
@@ -1529,17 +1530,17 @@
                 }
             });
 
-            $(document).on('mouseup', function () {
+            $(document).on('mouseup', function() {
                 isDragging = false;
             });
 
-            $(document).on('input', '#findname', function () {
+            $(document).on('input', '#findname', function() {
                 $('#findnum').val('');
                 let tbody = $('#findhistory tbody');
                 tbody.empty();
                 $('.table-findhistory').addClass('none');
             });
-            $(document).on('input', '#findnum', function () {
+            $(document).on('input', '#findnum', function() {
                 $('#findname').val('');
                 let tbody = $('#findhistory tbody');
                 tbody.empty();
@@ -1547,7 +1548,7 @@
             });
 
             var historydata = [];
-            $('#findby').click(function () {
+            $('#findby').click(function() {
                 const findname = $('#findname').val();
                 const findnum = $('#findnum').val();
                 const sendfor = findname || findnum;
@@ -1557,7 +1558,7 @@
                 let guesthistoryxhr = new XMLHttpRequest();
                 guesthistoryxhr.open('POST', '/guesthistory', true);
                 guesthistoryxhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                guesthistoryxhr.onreadystatechange = function () {
+                guesthistoryxhr.onreadystatechange = function() {
                     if (guesthistoryxhr.status === 200 && guesthistoryxhr.readyState === 4) {
                         let results = JSON.parse(guesthistoryxhr.responseText);
                         if (results.error == 'No data found') {
@@ -1585,7 +1586,7 @@
                                         planname: row.planname ?? '',
                                         planamt: row.planamt ?? 0.00
                                     };
-                                } else { }
+                                } else {}
                             });
 
                             let data = '';
@@ -1615,7 +1616,7 @@
                 guesthistoryxhr.send(`sendfor=${sendfor}&nameornum=${nameornum}&_token={{ csrf_token() }}`);
             });
 
-            $('#findhistory tbody').on('click', '.guestidhistory', function () {
+            $('#findhistory tbody').on('click', '.guestidhistory', function() {
                 let row = $(this).closest('tr');
                 let docid = row.data('id');
                 let n = historydata.filter(x => x.docid == docid);
@@ -1758,7 +1759,7 @@
         });
 
         // Delegate event handling to a static parent element
-        $(document).on('change', '[id^="cityname"]', function () {
+        $(document).on('change', '[id^="cityname"]', function() {
             var citycode = $(this).val();
             var cityId = $(this).attr('id');
             var stateId = cityId.replace('cityname', 'state');
@@ -1774,16 +1775,16 @@
                     _token: '{{ csrf_token() }}'
                 },
                 dataType: 'json',
-                success: function (result) {
+                success: function(result) {
                     $('#' + stateId).empty();
                     $('#' + countryId).empty();
                     $('#' + nationalityId).empty();
 
-                    $.each(result.states, function (index, state) {
+                    $.each(result.states, function(index, state) {
                         $('<option>').val(state.state_code).text(state.name).appendTo('#' + stateId);
                     });
 
-                    $.each(result.countries, function (index, country) {
+                    $.each(result.countries, function(index, country) {
                         $('<option>').val(country.country_code).text(country.country_name).appendTo('#' + countryId);
                         $('<option>').val(country.nationality).text(country.nationality).appendTo('#' + nationalityId);
                     });
@@ -1794,7 +1795,7 @@
         });
 
         // Delegate event handling to a static parent element
-        $(document).on('change', '[id^="cityguest"]', function () {
+        $(document).on('change', '[id^="cityguest"]', function() {
             var citycode = $(this).val();
             var cityId = $(this).attr('id');
             var stateId = cityId.replace('cityguest', 'stateguest');
@@ -1812,18 +1813,18 @@
                     _token: '{{ csrf_token() }}'
                 },
                 dataType: 'json',
-                success: function (result) {
+                success: function(result) {
                     $('#' + stateId).empty();
                     $('#' + countryId).empty();
                     $('#' + nationalityId).empty();
 
-                    $.each(result.states, function (index, state) {
+                    $.each(result.states, function(index, state) {
                         $('<option>').val(state.state_code).text(state.name).appendTo('#' + stateId);
                         $('#' + arrivalId).val(citycode);
                         $('#' + destinationId).val(citycode);
                     });
 
-                    $.each(result.countries, function (index, country) {
+                    $.each(result.countries, function(index, country) {
                         $('<option>').val(country.country_code).text(country.country_name).appendTo('#' + countryId);
                         $('<option>').val(country.nationality).text(country.nationality).appendTo('#' + nationalityId);
                     });
@@ -1834,7 +1835,7 @@
         });
 
         // Delegate event handling to a static parent element
-        $(document).on('change', '[id^="issuingcity"]', function () {
+        $(document).on('change', '[id^="issuingcity"]', function() {
             var citycode = $(this).val();
             var issuingcityId = $(this).attr('id');
             var issuingcountryId = issuingcityId.replace('issuingcity', 'issuingcountry');
@@ -1847,10 +1848,10 @@
                     _token: '{{ csrf_token() }}'
                 },
                 dataType: 'json',
-                success: function (result) {
+                success: function(result) {
                     $('#' + issuingcountryId).empty();
 
-                    $.each(result.countries, function (index, country) {
+                    $.each(result.countries, function(index, country) {
                         $('<option>').val(country.country_code).text(country.country_name).appendTo('#' + issuingcountryId);
                     });
                 }
@@ -1859,9 +1860,9 @@
     </script>
 
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             // Event listener for hardcoded select element
-            $(document).on('change', `#child1, #adult1, #planmaster1`, function () {
+            $(document).on('change', `#child1, #adult1, #planmaster1`, function() {
                 var cid = $(`#child1`).val();
                 var adult = $(`#adult1`).val();
                 var room_cat = $(`#cat_code1`).val();
@@ -1870,7 +1871,7 @@
                 var xhr = new XMLHttpRequest();
                 xhr.open('POST', '/getrate2', true);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.onreadystatechange = function () {
+                xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var result = xhr.responseText;
                         var rate = $(`#rate1`);
@@ -1880,7 +1881,7 @@
                 xhr.send(`data=${JSON.stringify(data)}&_token={{ csrf_token() }}`);
             });
 
-            $(document).on('change', `#child1, #adult1, #roommast1`, function () {
+            $(document).on('change', `#child1, #adult1, #roommast1`, function() {
                 var cid = $(`#roommast1`).val();
                 var adult = $(`#adult1`).val();
                 var room_category = $(`#cat_code1`).val();
@@ -1891,7 +1892,7 @@
                     var xhr = new XMLHttpRequest();
                     xhr.open('POST', '/getrate3', true);
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                    xhr.onreadystatechange = function () {
+                    xhr.onreadystatechange = function() {
                         if (xhr.readyState === 4 && xhr.status === 200) {
                             var result = xhr.responseText;
                             var rate = $(`#rate1`);
@@ -1902,7 +1903,7 @@
                 }
             });
 
-            $("#cat_code1").on('change', function () {
+            $("#cat_code1").on('change', function() {
                 var cid = this.value;
                 let index = $(this).closest('tr').index + 1;
 
@@ -1913,7 +1914,7 @@
                 var xhrRooms = new XMLHttpRequest();
                 xhrRooms.open('POST', '/getroomswalkin', true);
                 xhrRooms.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhrRooms.onreadystatechange = function () {
+                xhrRooms.onreadystatechange = function() {
                     if (xhrRooms.readyState === 4 && xhrRooms.status === 200) {
                         var result = xhrRooms.responseText;
                         var roomSelect = document.getElementById('roommast1');
@@ -1928,7 +1929,7 @@
                 var xhrPlans = new XMLHttpRequest();
                 xhrPlans.open('POST', '/getplans', true);
                 xhrPlans.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhrPlans.onreadystatechange = function () {
+                xhrPlans.onreadystatechange = function() {
                     if (xhrPlans.readyState === 4 && xhrPlans.status === 200) {
                         var result = xhrPlans.responseText;
                         var planSelect = document.getElementById(`planmaster1`);
@@ -1938,7 +1939,7 @@
                 xhrPlans.send(`cid=${cid}&_token={{ csrf_token() }}`);
             });
 
-            $(document).on('change', '.cat_code_class', function () {
+            $(document).on('change', '.cat_code_class', function() {
                 var cid = this.value;
                 var rowNumber = this.id.replace('cat_code', '');
                 document.getElementById(`roommast${rowNumber}`).value = '';
@@ -1948,7 +1949,7 @@
                 var xhrRooms = new XMLHttpRequest();
                 xhrRooms.open('POST', '/getroomswalkin', true);
                 xhrRooms.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhrRooms.onreadystatechange = function () {
+                xhrRooms.onreadystatechange = function() {
                     if (xhrRooms.readyState === 4 && xhrRooms.status === 200) {
                         var result = xhrRooms.responseText;
                         var roomSelect = document.getElementById(`roommast${rowNumber}`);
@@ -1960,7 +1961,7 @@
                 var xhrPlans = new XMLHttpRequest();
                 xhrPlans.open('POST', '/getplans', true);
                 xhrPlans.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhrPlans.onreadystatechange = function () {
+                xhrPlans.onreadystatechange = function() {
                     if (xhrPlans.readyState === 4 && xhrPlans.status === 200) {
                         var result = xhrPlans.responseText;
                         var planSelect = document.getElementById(`planmaster${rowNumber}`);
@@ -1970,7 +1971,7 @@
                 xhrPlans.send(`cid=${cid}&_token={{ csrf_token() }}`);
             });
 
-            $(document).on('change', '.leadercl', function () {
+            $(document).on('change', '.leadercl', function() {
                 let curcheck = $(this);
                 if (curcheck.is(':checked')) {
                     $('.leadercl').prop('checked', false);
@@ -1998,7 +1999,7 @@
                         checkindate: checkindate,
                         checkoutdate: checkoutdate
                     },
-                    success: function (response) {
+                    success: function(response) {
                         let roomlist = response;
                         let rdata = '<option value="">Select</option>';
                         response.forEach((tdata) => {
@@ -2006,7 +2007,7 @@
                         });
                         $('#roommast1').html(rdata);
                     },
-                    error: function (error) {
+                    error: function(error) {
                         console.error("Error fetching rooms:", error);
                     }
                 });
@@ -2017,15 +2018,15 @@
 
             fetchEmptyRooms(checkin, checkout);
 
-            $(document).on('change', '#checkindate', function () {
+            $(document).on('change', '#checkindate', function() {
                 fetchEmptyRooms($(this).val(), $('#checkoutdate').val());
             });
 
-            $(document).on('change', '#checkoutdate', function () {
+            $(document).on('change', '#checkoutdate', function() {
                 fetchEmptyRooms($('#checkindate').val(), $(this).val());
             });
 
-            $("#add_room").click(function (event) {
+            $("#add_room").click(function(event) {
                 event.preventDefault();
                 const table = document.getElementById("gridtaxstructure");
                 const newRow = table.insertRow(table.rows.length);
@@ -2100,7 +2101,7 @@
                 cell9.innerHTML = `<img src="admin/icons/flaticon/remove.gif" alt="remove icon" class="remove-icon">
                                                                     <img src="admin/icons/flaticon/copy.gif" alt="copy icon" class="copy-icon">`;
 
-                $(document).on('change', `#child${rowNumber}, #adult${rowNumber}, #planmaster${rowNumber}`, function () {
+                $(document).on('change', `#child${rowNumber}, #adult${rowNumber}, #planmaster${rowNumber}`, function() {
                     var cid = $(`#child${rowNumber}`).val();
                     var adult = $(`#adult${rowNumber}`).val();
                     var room_cat = $(`#cat_code${rowNumber}`).val();
@@ -2109,7 +2110,7 @@
                     var xhr = new XMLHttpRequest();
                     xhr.open('POST', '/getrate2', true);
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                    xhr.onreadystatechange = function () {
+                    xhr.onreadystatechange = function() {
                         if (xhr.readyState === 4 && xhr.status === 200) {
                             var result = xhr.responseText;
                             var rate = $(`#rate${rowNumber}`);
@@ -2119,7 +2120,7 @@
                     xhr.send(`data=${JSON.stringify(data)}&_token={{ csrf_token() }}`);
                 });
 
-                $(document).on('change', `#child${rowNumber}, #adult${rowNumber}, #roommast${rowNumber}`, function () {
+                $(document).on('change', `#child${rowNumber}, #adult${rowNumber}, #roommast${rowNumber}`, function() {
                     var cid = $(`#roommast${rowNumber}`).val();
                     var adult = $(`#adult${rowNumber}`).val();
                     var room_category = $(`#cat_code${rowNumber}`).val();
@@ -2130,7 +2131,7 @@
                         var xhr = new XMLHttpRequest();
                         xhr.open('POST', '/getrate3', true);
                         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                        xhr.onreadystatechange = function () {
+                        xhr.onreadystatechange = function() {
                             if (xhr.readyState === 4 && xhr.status === 200) {
                                 var result = xhr.responseText;
                                 var rate = $(`#rate${rowNumber}`);
@@ -2146,7 +2147,7 @@
                 xhr.open('GET', '{{ route('checkeditarrival') }}', true);
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-                xhr.onreadystatechange = function () {
+                xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var response = xhr.responseText;
                         var result = JSON.parse(response);
@@ -2180,13 +2181,13 @@
             });
         });
 
-        $(document).on('click', '.copy-icon', function () {
+        $(document).on('click', '.copy-icon', function() {
             var row = $(this).closest('tr');
             console.log(row.index() + 1);
             var nextRow = row.next('tr');
 
             if (nextRow.length > 0) {
-                row.find('td').each(function (index) {
+                row.find('td').each(function(index) {
                     var cell = $(this);
                     var nextCell = nextRow.find('td').eq(index);
                     var input = cell.find('input');
@@ -2205,7 +2206,7 @@
             }
         });
 
-        $(document).on('click', '.remove-icon', function () {
+        $(document).on('click', '.remove-icon', function() {
             var row = $(this).closest('tr');
             var rowIndex = row.index();
             document.getElementById('rooms').value = parseInt(document.getElementById('rooms').value) - 1;
@@ -2224,7 +2225,7 @@
             if (rowCount == 1) {
                 $('.leadercl').prop('checked', false);
             }
-            $('#gridtaxstructure tr').each(function (index) {
+            $('#gridtaxstructure tr').each(function(index) {
                 // console.log('index', index);
                 if (index >= rowIndex) {
                     var oldIndex = index + 1;
@@ -2235,7 +2236,7 @@
                         clonedDiv.id = 'cloneit' + newIndex;
                     }
 
-                    $(this).find('select, input').each(function () {
+                    $(this).find('select, input').each(function() {
                         var regex = new RegExp(oldIndex + "$");
                         this.id = this.id.replace(regex, newIndex);
                         this.name = this.name.replace(regex, newIndex);
@@ -2288,7 +2289,7 @@
         function fetchData(url, targetElement) {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
-            xhr.onreadystatechange = function () {
+            xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         var response = JSON.parse(xhr.responseText);
@@ -2308,7 +2309,7 @@
         xhr.open('GET', '{{ route('checkeditarrival') }}', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-        xhr.onreadystatechange = function () {
+        xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = xhr.responseText;
                 var result = JSON.parse(response);
@@ -2356,7 +2357,7 @@
         xhr.send();
 
         function updateGSTCode(selector, gstCodepId, gstCodeSpanId) {
-            $(selector).on('change', function () {
+            $(selector).on('change', function() {
                 var selectedOption = $(this).find('option:selected');
                 var gstCodep = $(gstCodepId);
                 var gstCodeSpan = $(gstCodeSpanId);
@@ -2374,7 +2375,7 @@
         updateGSTCode('#company', '#gstCodep', '#gstCode');
         updateGSTCode('#travel_agent', '#gstCodet', '#gstCodet');
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             var canvas = document.getElementById('signatureCanvas');
             var ctx = canvas.getContext('2d');
             var isDrawing = false;
@@ -2390,7 +2391,7 @@
 
             function redrawAllPaths() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                paths.forEach(function (path) {
+                paths.forEach(function(path) {
                     ctx.strokeStyle = path.color;
                     ctx.beginPath();
                     ctx.moveTo(path.points[0].x, path.points[0].y);
@@ -2484,14 +2485,14 @@
             canvas.addEventListener('mouseup', stopDrawing);
             canvas.addEventListener('mouseout', stopDrawing);
 
-            canvas.addEventListener('touchstart', function (e) {
+            canvas.addEventListener('touchstart', function(e) {
                 e.preventDefault();
                 startDrawing(e.touches[0]);
             }, {
                 passive: false
             });
 
-            canvas.addEventListener('touchmove', function (e) {
+            canvas.addEventListener('touchmove', function(e) {
                 e.preventDefault();
                 draw(e.touches[0]);
             }, {
@@ -2500,38 +2501,38 @@
 
             canvas.addEventListener('touchend', stopDrawing);
 
-            canvas.addEventListener('pointerdown', function (e) {
+            canvas.addEventListener('pointerdown', function(e) {
                 if (e.pointerType === 'pen') {
                     ctx.lineWidth = e.pressure * 3;
                 }
             });
 
-            $('#openModalBtn').click(function () {
+            $('#openModalBtn').click(function() {
                 $('#myModal').modal('show');
                 $('#imagePreview').hide();
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 paths = [];
             });
 
-            $('.btn-close').click(function () {
+            $('.btn-close').click(function() {
                 $('#myModal').modal('hide');
             });
 
-            $('#clearCanvasBtn').click(function () {
+            $('#clearCanvasBtn').click(function() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 paths = [];
                 points = [];
                 $('#signimage').val('');
             });
 
-            $('#previewBtn').click(function () {
+            $('#previewBtn').click(function() {
                 var dataUrl = canvas.toDataURL('image/png');
                 imagePreview.src = dataUrl;
                 $('#imagePreview').show();
                 $('#myModal').modal('hide');
             });
 
-            $('#downloadBtn').click(function () {
+            $('#downloadBtn').click(function() {
                 var dataUrl = canvas.toDataURL('image/png');
                 imagePreview.src = dataUrl;
                 $('#imagePreview').show();
@@ -2555,7 +2556,7 @@
 
                 newCtx.setTransform(scaleX, 0, 0, scaleY, -minX * scaleX, -minY * scaleY);
 
-                paths.forEach(function (path) {
+                paths.forEach(function(path) {
                     newCtx.strokeStyle = path.color;
                     newCtx.beginPath();
                     newCtx.moveTo(path.points[0].x, path.points[0].y);
@@ -2586,8 +2587,8 @@
         });
 
 
-        $(document).ready(function () {
-            $('#stay_days').on('input', function () {
+        $(document).ready(function() {
+            $('#stay_days').on('input', function() {
                 const checkinDate = new Date($('#checkindate').val());
                 const stayDays = +$('#stay_days').val();
                 const checkoutDateInput = $('#checkoutdate');

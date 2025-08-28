@@ -10,5 +10,9 @@ class CompanyDiscount extends Model
     use HasFactory;
     const CREATED_AT = 'u_entdt';
     const UPDATED_AT = 'u_updatedt';
-    protected $table = 'cities'; 
+    protected $table = 'cities';
+
+    protected $fillable = [
+        ''
+    ];
 }
