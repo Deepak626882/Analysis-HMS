@@ -166,7 +166,7 @@
                                                 <tr class="data-row">
                                                     <td>
                                                         <select id="cat_code1" name="cat_code1"
-                                                            class="form-control sl catselect" required>
+                                                            class="form-control sl catselect cat_code_class" required>
                                                             <option value="">Select</option>
                                                             @foreach ($roomcat as $list)
                                                                 <option value="{{ $list->cat_code }}">{{ $list->name }}</option>
@@ -1219,20 +1219,99 @@
                 }, 500);
             });
 
-            $(document).on('change', '.roomselect', function() {
-                localStorage.setItem('ssroomno', $(this).val());
-                let index = $(this).closest('tr').index() + 1;
-                let catid = $(this).find('option:selected').data('catid');
+            // -----------------------------
+            // Helper: trigger rate calculation
+            // -----------------------------
+            function triggerRateCalculation(index) {
+                const cid = $(`#roommast${index}`).val();
+                const adult = +($(`#adult${index}`).val() || 0);
+                const child = +($(`#child${index}`).val() || 0);
+                const room_category = $(`#cat_code${index}`).val();
+                const sumchildadult = adult + child;
 
-                if ($(`#cat_code${index}`).val() != '') {
-                    // $(`#cat_code${index}`).val(catid);
+                if (!$(`#planedit${index}`).val() || $(`#planedit${index}`).val() === 'N') {
+                    $.post('/getrate3', {
+                        data: JSON.stringify([room_category, cid, sumchildadult]),
+                        _token: '{{ csrf_token() }}'
+                    }, function(result) {
+                        $(`#rate${index}`).val(result);
+                    });
+                }
+            }
+
+
+            // -----------------------------
+            // When a room is chosen
+            // -----------------------------
+            $(document).on('change', '.roomselect', function() {
+                const index = this.id.match(/\d+$/)[0]; // e.g. roommast3 -> "3"
+                const roomNo = this.value;
+                const catid = $(this).find(':selected').data('catid');
+
+                if (!$(`#cat_code${index}`).val()) {
+                    // remember the desired room for later (after AJAX repopulate)
+                    $(`#roommast${index}`).data('preselect', roomNo);
+                    $(`#cat_code${index}`).val(catid).trigger('change');
                 } else {
-                    $(`#cat_code${index}`).val(catid).change();
-                    setTimeout(() => {
-                        $(`#roommast${index}`).val(localStorage.getItem('ssroomno'));
-                    }, 500);
+                    // category already set, just apply the room
+                    $(`#roommast${index}`).val(roomNo);
+                    triggerRateCalculation(index); // ✅ trigger rate immediately
                 }
             });
+
+
+            // -----------------------------
+            // When category changes
+            // (ALL categories must have class .cat_code_class and ids like cat_code1, cat_code2, ...)
+            // -----------------------------
+            $(document).on('change', '.cat_code_class', function() {
+                const index = this.id.match(/\d+$/)[0]; // e.g. cat_code3 -> "3"
+                const cid = this.value;
+                const checkindate = $('#checkindate').val();
+                const checkoutdate = $('#checkoutdate').val();
+
+                // Clear dropdowns while loading
+                $(`#roommast${index}`).empty().append('<option value="">Loading…</option>');
+                $(`#planmaster${index}`).empty().append('<option value="">Loading…</option>');
+
+                // ---- Fetch rooms ----
+                $.post('/getroomswalkin', {
+                    cid,
+                    checkindate,
+                    checkoutdate,
+                    _token: '{{ csrf_token() }}'
+                }, function(result) {
+                    $(`#roommast${index}`).html(result);
+
+                    // Reapply previously selected room if user had chosen one
+                    const want = $(`#roommast${index}`).data('preselect');
+                    if (want) {
+                        $(`#roommast${index}`).val(want);
+                        $(`#roommast${index}`).removeData('preselect');
+
+                        // ✅ Trigger rate calculation once after restore
+                        triggerRateCalculation(index);
+                    }
+                });
+
+                // ---- Fetch plans ----
+                $.post('/getplans', {
+                    cid,
+                    _token: '{{ csrf_token() }}'
+                }, function(result) {
+                    $(`#planmaster${index}`).html(result);
+                });
+            });
+
+
+            // -----------------------------
+            // Rate recalculation (child/adult/room changes)
+            // -----------------------------
+            $(document).on('change', '[id^="child"], [id^="adult"], [id^="roommast"]', function() {
+                const index = this.id.match(/\d+$/)[0];
+                triggerRateCalculation(index);
+            });
+
 
 
             $(document).on('input', '.rowdamount', function() {
@@ -1889,98 +1968,7 @@
                 xhr.send(`data=${JSON.stringify(data)}&_token={{ csrf_token() }}`);
             });
 
-            $(document).on('change', `#child1, #adult1, #roommast1`, function() {
-                var cid = $(`#roommast1`).val();
-                var adult = $(`#adult1`).val();
-                var room_category = $(`#cat_code1`).val();
-                var child = $(`#child1`).val();
-                var sumchildadult = parseInt(adult) + parseInt(child);
-                const data = [room_category, cid, sumchildadult];
-                if ($('#planedit1').val() == '' || $('#planedit1').val() == 'N') {
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('POST', '/getrate3', true);
-                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                    xhr.onreadystatechange = function() {
-                        if (xhr.readyState === 4 && xhr.status === 200) {
-                            var result = xhr.responseText;
-                            var rate = $(`#rate1`);
-                            rate.val(result);
-                        }
-                    };
-                    xhr.send(`data=${JSON.stringify(data)}&_token={{ csrf_token() }}`);
-                }
-            });
 
-            $("#cat_code1").on('change', function() {
-                var cid = this.value;
-                let index = $(this).closest('tr').index() + 1;
-
-                document.getElementById(`roommast${index}`).value = '';
-                document.getElementById(`planmaster${index}`).value = '';
-
-                let checkindate = $('#checkindate').val();
-                let checkoutdate = $('#checkoutdate').val();
-
-                var xhrRooms = new XMLHttpRequest();
-                xhrRooms.open('POST', '/getroomswalkin', true);
-                xhrRooms.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhrRooms.onreadystatechange = function() {
-                    if (xhrRooms.readyState === 4 && xhrRooms.status === 200) {
-                        var result = xhrRooms.responseText;
-                        var roomSelect = document.getElementById(`roommast${index}`);
-                        if ($(`#roommast${index}`).val() != '') {
-                            // do nothing
-                        } else {
-                            roomSelect.innerHTML = result;
-                        }
-                    }
-                };
-                xhrRooms.send(`cid=${cid}&checkindate=${checkindate}&checkoutdate=${checkoutdate}&_token={{ csrf_token() }}`);
-
-                var xhrPlans = new XMLHttpRequest();
-                xhrPlans.open('POST', '/getplans', true);
-                xhrPlans.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhrPlans.onreadystatechange = function() {
-                    if (xhrPlans.readyState === 4 && xhrPlans.status === 200) {
-                        var result = xhrPlans.responseText;
-                        var planSelect = document.getElementById(`planmaster${index}`);
-                        planSelect.innerHTML = result;
-                    }
-                };
-                xhrPlans.send(`cid=${cid}&_token={{ csrf_token() }}`);
-            });
-
-            $(document).on('change', '.cat_code_class', function() {
-                var cid = this.value;
-                var rowNumber = this.id.replace('cat_code', '');
-                document.getElementById(`roommast${rowNumber}`).value = '';
-                document.getElementById(`planmaster${rowNumber}`).value = '';
-                let checkindate = $('#checkindate').val();
-                let checkoutdate = $('#checkoutdate').val();
-                var xhrRooms = new XMLHttpRequest();
-                xhrRooms.open('POST', '/getroomswalkin', true);
-                xhrRooms.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhrRooms.onreadystatechange = function() {
-                    if (xhrRooms.readyState === 4 && xhrRooms.status === 200) {
-                        var result = xhrRooms.responseText;
-                        var roomSelect = document.getElementById(`roommast${rowNumber}`);
-                        roomSelect.innerHTML = result;
-                    }
-                };
-                xhrRooms.send(`cid=${cid}&checkindate=${checkindate}&checkoutdate=${checkoutdate}&_token={{ csrf_token() }}`);
-
-                var xhrPlans = new XMLHttpRequest();
-                xhrPlans.open('POST', '/getplans', true);
-                xhrPlans.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhrPlans.onreadystatechange = function() {
-                    if (xhrPlans.readyState === 4 && xhrPlans.status === 200) {
-                        var result = xhrPlans.responseText;
-                        var planSelect = document.getElementById(`planmaster${rowNumber}`);
-                        planSelect.innerHTML = result;
-                    }
-                };
-                xhrPlans.send(`cid=${cid}&_token={{ csrf_token() }}`);
-            });
 
             $(document).on('change', '.leadercl', function() {
                 let curcheck = $(this);
