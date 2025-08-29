@@ -1220,12 +1220,16 @@
             });
 
             $(document).on('change', '.roomselect', function() {
+                let index = $(this).closest('tr').index() + 1;
+                let catid = $(this).find('option:selected').data('catid');
+
                 if ($(`#cat_code${index}`).val() != '') {
-                    let index = $(this).closest('tr').index() + 1;
-                    let catid = $(this).find('option:selected').data('catid');
-                    $(`#cat_code${index}`).val(catid).change();
+                    // $(`#cat_code${index}`).val(catid);
+                } else {
+                    $(`#cat_code${index}`).val(catid);
                 }
             });
+
 
             $(document).on('input', '.rowdamount', function() {
                 clearTimeout(timer);
@@ -1905,36 +1909,37 @@
 
             $("#cat_code1").on('change', function() {
                 var cid = this.value;
-                let index = $(this).closest('tr').index + 1;
+                let index = $(this).closest('tr').index() + 1;
 
-                // document.getElementById('roommast1').value = '';
-                document.getElementById('planmaster1').value = '';
+                document.getElementById(`roommast${index}`).value = '';
+                document.getElementById(`planmaster${index}`).value = '';
+
                 let checkindate = $('#checkindate').val();
                 let checkoutdate = $('#checkoutdate').val();
+
                 var xhrRooms = new XMLHttpRequest();
                 xhrRooms.open('POST', '/getroomswalkin', true);
                 xhrRooms.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhrRooms.onreadystatechange = function() {
                     if (xhrRooms.readyState === 4 && xhrRooms.status === 200) {
                         var result = xhrRooms.responseText;
-                        var roomSelect = document.getElementById('roommast1');
-                        $('#roommast1').html();
-                        console.log('sagar');
+                        var roomSelect = document.getElementById(`roommast${index}`);
                         if ($(`#roommast${index}`).val() != '') {
-
+                            // do nothing
                         } else {
                             roomSelect.innerHTML = result;
                         }
                     }
                 };
                 xhrRooms.send(`cid=${cid}&checkindate=${checkindate}&checkoutdate=${checkoutdate}&_token={{ csrf_token() }}`);
+
                 var xhrPlans = new XMLHttpRequest();
                 xhrPlans.open('POST', '/getplans', true);
                 xhrPlans.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhrPlans.onreadystatechange = function() {
                     if (xhrPlans.readyState === 4 && xhrPlans.status === 200) {
                         var result = xhrPlans.responseText;
-                        var planSelect = document.getElementById(`planmaster1`);
+                        var planSelect = document.getElementById(`planmaster${index}`);
                         planSelect.innerHTML = result;
                     }
                 };
