@@ -2000,7 +2000,7 @@
                 }
             });
 
-            function fetchEmptyRooms(checkindate, checkoutdate) {
+            function fetchEmptyRooms(checkindate, checkoutdate, index) {
                 $.ajax({
                     url: "{{ url('fetchallemptyrooms') }}",
                     method: "POST",
@@ -2014,7 +2014,7 @@
                         response.forEach((tdata) => {
                             rdata += `<option data-catid="${tdata.room_cat}" value="${tdata.rcode}">${tdata.rcode}</option>`;
                         });
-                        $('#roommast1').html(rdata);
+                        $(`#roommast${index}`).html(rdata);
                     },
                     error: function(error) {
                         console.error("Error fetching rooms:", error);
@@ -2025,14 +2025,14 @@
             let checkin = $('#checkindate').val();
             let checkout = $('#checkoutdate').val();
 
-            fetchEmptyRooms(checkin, checkout);
+            fetchEmptyRooms(checkin, checkout, 1);
 
             $(document).on('change', '#checkindate', function() {
-                fetchEmptyRooms($(this).val(), $('#checkoutdate').val());
+                fetchEmptyRooms($(this).val(), $('#checkoutdate').val(), 1);
             });
 
             $(document).on('change', '#checkoutdate', function() {
-                fetchEmptyRooms($('#checkindate').val(), $(this).val());
+                fetchEmptyRooms($('#checkindate').val(), $(this).val(), 1);
             });
 
             $("#add_room").click(function(event) {
@@ -2060,6 +2060,8 @@
                 let totalrooms = parseInt($('#totalrooms').val());
 
                 $('#totalrooms').val(totalrooms + 1);
+
+                fetchEmptyRooms($('#checkindate').val(), $('#checkoutdate').val(), rowNumber);
 
                 cell1.innerHTML = `
                                                                 <select id="cat_code${rowNumber}" name="cat_code${rowNumber}" class="form-control sl cat_code_class catselect" required>
