@@ -1228,7 +1228,9 @@
                     // $(`#cat_code${index}`).val(catid);
                 } else {
                     $(`#cat_code${index}`).val(catid).change();
-                    $(`#roommast${index}`).val(localStorage.getItem('ssroomno'));
+                    setTimeout(() => {
+                        $(`#roommast${index}`).val(localStorage.getItem('ssroomno'));
+                    }, 500);
                 }
             });
 
