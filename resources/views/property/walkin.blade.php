@@ -1220,13 +1220,15 @@
             });
 
             $(document).on('change', '.roomselect', function() {
+                localStorage.setItem('ssroomno', $(this).val());
                 let index = $(this).closest('tr').index() + 1;
                 let catid = $(this).find('option:selected').data('catid');
 
                 if ($(`#cat_code${index}`).val() != '') {
-                    // $(`#cat_code${index}`).val(catid);
-                } else {
                     $(`#cat_code${index}`).val(catid);
+                } else {
+                    $(`#cat_code${index}`).val(catid).change();
+                    $(`#roommast${index}`).val(localStorage.getItem('ssroomno'));
                 }
             });
 
