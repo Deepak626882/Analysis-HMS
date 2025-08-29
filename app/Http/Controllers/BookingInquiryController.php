@@ -99,6 +99,7 @@ class BookingInquiryController extends Controller
             DB::table('bookinginquiry')->insert([
                 'propertyid' => $propertyid,
                 'inqno' => $inqno,
+                'contradocid' => '',
                 'cattype' => $request->cattype,
                 'partyname' => $request->partyname,
                 'add1' => $request->add1 ?? '',

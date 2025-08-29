@@ -1124,6 +1124,8 @@ Route::post('checkvenuduplicate', [Banquet::class, 'checkvenuduplicate'])->name(
 Route::post('checkvenuduplicateup', [Banquet::class, 'checkvenuduplicateup'])->name('checkvenuduplicateup');
 // Submit Banquet Booking
 Route::post('banquetbookingsubmit', [Banquet::class, 'banquetbookingsubmit'])->name('banquetbookingsubmit');
+// Booking Enquiry Fetch
+Route::post('banqenquieryfetch', [Banquet::class, 'banqenquieryfetch'])->name('banqenquieryfetch');
 // Open Banquet Parameter
 Route::get('banquetparameter', [Banquet::class, 'banquetparameter'])->name('banquetparameter');
 // Submit Banquet Parameter

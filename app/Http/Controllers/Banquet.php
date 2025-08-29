@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\WhatsappSend;
 use App\Models\BookingDetail;
+use App\Models\BookingInquiry;
 use App\Models\HallSale1;
 use App\Models\ItemMast;
 use App\Models\VenueMast;
@@ -97,11 +98,13 @@ class Banquet extends Controller
         $clicktime = $request->query('clicktime');
         $venuecode = $request->query('venuecode');
         $fromdate = $request->query('fromdate');
+        $bookinginquiry = BookingInquiry::where('propertyid', $this->propertyid)->where('contradocid', '')->orderByDesc('sn')->get();
 
         return view('property.banquetbooking', [
             'clicktime' => $clicktime,
             'venuecode' => $venuecode,
-            'fromdate' => $fromdate
+            'fromdate' => $fromdate,
+            'bookinginquiry' => $bookinginquiry
         ]);
     }
 
@@ -241,6 +244,14 @@ class Banquet extends Controller
             $vprefix = $chkvpf->prefix;
             $docid = $this->propertyid . $vtype . '‎ ‎ ' . $vprefix . '‎ ‎ ‎ ‎ ' . $start_srl_no;
 
+            $partyname = $request->party;
+            if (!empty($request->partysel)) {
+                $inquiry = BookingInquiry::where('propertyid', $this->propertyid)->where('inqno', $request->partysel)->first();
+                $partyname = $inquiry->partyname;
+
+                BookingInquiry::where('propertyid', $this->propertyid)->where('inqno', $request->partysel)->update(['contradocid' => $docid]);
+            }
+
             $booking = new HallBook();
             $booking->propertyid = $this->propertyid;
             $booking->docid = $docid;
@@ -249,7 +260,7 @@ class Banquet extends Controller
             $booking->vtime = date('H:i:s');
             $booking->vprefix = $vprefix;
             $booking->vdate = $request->booking_date;
-            $booking->partyname = $request->party;
+            $booking->partyname = $partyname;
             $booking->add1 = $request->address ?? '';
             $booking->city = $request->city_name;
             $booking->panno = $request->pan_no ?? '';
@@ -464,6 +475,12 @@ class Banquet extends Controller
     public function deletebanquet(Request $request, $docid)
     {
         $hallsale = HallSale1::where('propertyid', $this->propertyid)->where('bookdocid', $docid)->first();
+
+        $inquiry = BookingInquiry::where('propertyid', $this->propertyid)->where('contradocid', $docid)->first();
+
+        if (!is_null($inquiry)) {
+            BookingInquiry::where('propertyid', $this->propertyid)->where('contradocid', $docid)->update(['contradocid' => '']);
+        }
 
         if (!is_null($hallsale)) {
             return back()->with('error', 'Bill Submitted can not update');
@@ -2405,6 +2422,24 @@ class Banquet extends Controller
         return response()->json([
             'venuemast' => $venuemast,
             'repdata'   => $repdata
+        ]);
+    }
+
+    public function banqenquieryfetch(Request $request)
+    {
+        $inqno = $request->inqno;
+
+        $inquiry = BookingInquiry::where('propertyid', $this->propertyid)->where('contradocid', '')->where('inqno', $inqno)->first();
+
+        if (!$inquiry) {
+            return response()->json(['message' => 'Data Not Found', 'success' => false], 500);
+        }
+
+        $bookdetail = BookingDetail::where('propertyid', $this->propertyid)->where('inqno', $inquiry->inqno)->orderBY('sno')->get();
+
+        return response()->json([
+            'inquiry' => $inquiry,
+            'bookdetail' => $bookdetail
         ]);
     }
 }

@@ -19,6 +19,7 @@
                             <form id="banquetbookingform" name="banquetbookingform" action="{{ url('banquetbookingsubmit') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="totalrows" value="1" id="totalrows">
+                                <input type="hidden" value="N" name="partyinqyn" id="partyinqyn">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="row">
@@ -34,8 +35,24 @@
 
                                         <div class="row">
                                             <div class="col-md-6 mb-1">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="loadinqno" id="loadinqno">
+                                                    <label class="form-check-label font-weight-bold" for="loadinqno">
+                                                        Load Enquiry
+                                                    </label>
+                                                </div>
                                                 <label for="party">Party</label>
-                                                <input type="text" class="form-control" id="party" name="party" required>
+                                                <div id="partyinput">
+                                                    <input type="text" class="form-control" id="party" name="party" required>
+                                                </div>
+                                                <div style="display: none;" id="partyselect">
+                                                    <select name="partysel" id="partysel" class="form-control select2-multiple">
+                                                        <option value="">Select</option>
+                                                        @foreach ($bookinginquiry as $item)
+                                                            <option value="{{ $item->inqno }}">{{ $item->partyname }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             </div>
                                             <div class="col-md-6 mb-1">
                                                 <label for="address">Address</label>
@@ -381,10 +398,86 @@
                 }
             });
 
+            $(document).on('change', '#loadinqno', function() {
+                if ($(this).is(':checked')) {
+                    $('#partyinput').hide();
+                    $('#party').val('');
+                    $('#partyselect').show();
+                    $('#partyinqyn').val('Y');
+                    $('#party').prop('required', false);
+                    $('#partysel').prop('required', true);
+                } else {
+                    $('#partyinput').show();
+                    $('#partyselect').hide();
+                    $('#partysel').val('').change();
+                    $('#partysel').prop('required', false);
+                    $('#party').prop('required', true);
+                    $('#partyinqyn').val('N');
+                }
+            });
+
             $.ajaxSetup({
                 headers: {
                     "X-CSRF-TOKEN": "{{ csrf_token() }}"
                 }
+            });
+
+            $(document).on('change', '#partysel', function() {
+                let inqno = $(this).val();
+                $.ajax({
+                    url: '{{ url('banqenquieryfetch') }}',
+                    method: 'POST',
+                    data: {
+                        inqno: inqno
+                    },
+                    success: function(response) {
+                        $('#loadinqno').prop('disabled', true);
+                        let inquiry = response.inquiry;
+                        let bookdetail = response.bookdetail;
+
+                        $('#address').val(inquiry.add1);
+                        $('#city_name').val(inquiry.citycode).change();
+                        $('#mobile_no').val(inquiry.mobileno);
+                        $('#mobile_no2').val(inquiry.mobileno1);
+                        $('#function_type').val(inquiry.functype);
+                        $('#exp_pax').val(inquiry.pax);
+                        $('#gurr_pax').val(inquiry.gurrpax);
+                        $('#rate_pax').val(inquiry.ratepax);
+                        $('#remark').val(inquiry.remark);
+
+                        if (bookdetail.length > 0) {
+                            let tr = '';
+                            $('#venueTbody').html('');
+                            $('#totalrows').val(bookdetail.length);
+                            bookdetail.forEach((tdata, index) => {
+                                let sno = index + 1;
+                                tr += `<tr>
+                                        <td>
+                                            <select class="form-control select2-multiple" name="venue_name${sno}" id="venue_name${sno}" required>
+                                                <option value="">Select</option>
+                                                @foreach (venuemast() as $col)
+                                                    <option value="{{ $col->code }}" ${tdata.venuecode == '{{ $col->code }}' ? 'selected' : ''}>
+                                                        {{ $col->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td><input type="date" class="form-control" value="${tdata.fromdate}" name="from_date${sno}" id="from_date${sno}" required></td>
+                                        <td><input type="text" class="form-control timeinput" value="${tdata.fromtime}" name="from_time${sno}" id="from_time${sno}" required></td>
+                                        <td><input type="date" class="form-control" value="${tdata.todate}" name="to_date${sno}" id="to_date${sno}" required></td>
+                                        <td><input type="text" class="form-control timeinput" value="${tdata.totime}" name="to_time${sno}" id="to_time${sno}" required></td>
+                                        <td><button type="button" class="btn btn-danger remove-row">X</button></td>
+                                    </tr>`;
+                            });
+
+                            $('#venueTbody').append(tr);
+                        }
+
+                    },
+                    error: function(errores) {
+
+                    }
+                });
             });
 
             $('#banquetbookingform').on('submit', function(e) {
