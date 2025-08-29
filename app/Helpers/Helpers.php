@@ -9,6 +9,7 @@ use App\Models\FunctionType;
 use App\Models\HallBook;
 use App\Models\HallSale1;
 use App\Models\MenuHelp;
+use App\Models\PlanMast;
 use App\Models\RoomOcc;
 use App\Models\SubGroup;
 use App\Models\VenueMast;
@@ -482,4 +483,11 @@ function calculateRoundOff($amount, $mode = 'Standard')
         'billamt'  => $rounded,
         'roundoff' => $roundoff
     ];
+}
+
+
+function planbasedcategory($catcode)
+{
+    $plans = PlanMast::where('propertyid', Auth::user()->propertyid)->where('room_cat', $catcode)->where('activeYN', 'Y')->orderBy('name')->get();
+    return $plans;
 }

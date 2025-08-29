@@ -12,7 +12,7 @@
                                 @csrf
                                 <input type="hidden" name="sub_code" value="{{ $comp_mastdata->sub_code }}">
                                 <input type="hidden" name="sn" value="{{ $comp_mastdata->sn }}">
-                                <input type="hidden" value="1" name="pcount" id="pcount">
+                                <input type="hidden" value="{{ count($compdiscount) == 0 ? 1 : count($compdiscount) }}" name="pcount" id="pcount">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label class="col-form-label" for="name">Account Name</label>
@@ -209,53 +209,99 @@
                                                 <th>Plan</th>
                                                 <th>Plan Amount</th>
                                                 <th>Tax Inc</th>
-                                                <th>Action</th>
+                                                <th>Action {{ count($compdiscount) }}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($compdiscount as $item)
-                                                
-                                            @endforeach
-                                            <tr>
-                                                <td>
-                                                    <select name="roomcat1" id="roomcat1" class="form-control roomcat">
-                                                        <option value="">Select</option>
-                                                        @foreach ($roomcat as $cat)
-                                                            <option value="{{ $cat->cat_code }}">{{ $cat->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <select name="adult1" id="adult1" class="form-control">
-                                                        @for ($i = 1; $i <= 5; $i++)
-                                                            <option value="{{ $i }}">{{ $i }}</option>
-                                                        @endfor
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <input type="number" name="rate1" id="rate1"
-                                                        class="form-control rate" step="0.01">
-                                                </td>
-                                                <td>
-                                                    <select name="plan1" id="plan1" class="form-control plan">
-                                                        <option value="">Select Plan</option>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <input type="number" name="planamt1" id="planamt1"
-                                                        class="form-control planamt" step="0.01">
-                                                </td>
-                                                <td>
-                                                    <select name="taxinc1" id="taxinc1" class="form-control">
-                                                        <option value="Y">Yes</option>
-                                                        <option value="N">No</option>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <button type="button"
-                                                        class="btn btn-danger btn-sm removerow">X</button>
-                                                </td>
-                                            </tr>
+                                            @if (count($compdiscount) > 0)
+                                                @foreach ($compdiscount as $item)
+                                                    <tr>
+                                                        <td>
+                                                            <select name="roomcat{{ $item->sno }}" id="roomcat{{ $item->sno }}" class="form-control roomcat">
+                                                                <option value="">Select</option>
+                                                                @foreach ($roomcat as $cat)
+                                                                    <option value="{{ $cat->cat_code }}" {{ $item->roomcatcode == $cat->cat_code ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select name="adult{{ $item->sno }}" id="adult{{ $item->sno }}" class="form-control">
+                                                                @for ($i = 1; $i <= 5; $i++)
+                                                                    <option value="{{ $i }}" {{ $item->adult == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                                                @endfor
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" value="{{ $item->fixrate }}" name="rate{{ $item->sno }}" id="rate{{ $item->sno }}"
+                                                                class="form-control rate" step="0.01">
+                                                        </td>
+                                                        <td>
+                                                            <select name="plan{{ $item->sno }}" id="plan{{ $item->sno }}" class="form-control plan">
+                                                                <option value="">Select Plan</option>
+                                                                @foreach (planbasedcategory($item->roomcatcode) as $plan)
+                                                                    <option value="{{ $plan->pcode }}" {{ $item->plan == $plan->pcode ? 'selected' : '' }}>{{ $plan->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" value="{{ $item->planamount }}" name="planamt{{ $item->sno }}" id="planamt{{ $item->sno }}"
+                                                                class="form-control planamt" step="0.01">
+                                                        </td>
+                                                        <td>
+                                                            <select name="taxinc{{ $item->sno }}" id="taxinc{{ $item->sno }}" class="form-control">
+                                                                <option value="Y" {{ $item->taxinc == 'Y' ? 'selected' : '' }}>Yes</option>
+                                                                <option value="N" {{ $item->taxinc == 'N' ? 'selected' : '' }}>No</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <button type="button"
+                                                                class="btn btn-danger btn-sm removerow">X</button>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td>
+                                                        <select name="roomcat1" id="roomcat1" class="form-control roomcat">
+                                                            <option value="">Select</option>
+                                                            @foreach ($roomcat as $cat)
+                                                                <option value="{{ $cat->cat_code }}">{{ $cat->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select name="adult1" id="adult1" class="form-control">
+                                                            @for ($i = 1; $i <= 5; $i++)
+                                                                <option value="{{ $i }}" >{{ $i }}</option>
+                                                            @endfor
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="rate1" id="rate1"
+                                                            class="form-control rate" step="0.01">
+                                                    </td>
+                                                    <td>
+                                                        <select name="plan1" id="plan1" class="form-control plan">
+                                                            <option value="">Select Plan</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="planamt1" id="planamt1"
+                                                            class="form-control planamt" step="0.01">
+                                                    </td>
+                                                    <td>
+                                                        <select name="taxinc1" id="taxinc1" class="form-control">
+                                                            <option value="Y">Yes</option>
+                                                            <option value="N">No</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm removerow">X</button>
+                                                    </td>
+                                                </tr>
+                                            @endif
+
                                         </tbody>
                                     </table>
                                     <button type="button" id="addRow" class="btn btn-primary">Add Row</button>
@@ -383,7 +429,7 @@
                         success: function(data) {
                             planSelect.empty().append('<option value="">Select Plan</option>');
                             $.each(data, function(i, plan) {
-                                planSelect.append('<option value="' + plan.code + '">' + plan.name + '</option>');
+                                planSelect.append('<option value="' + plan.pcode + '">' + plan.name + '</option>');
                             });
                         }
                     });

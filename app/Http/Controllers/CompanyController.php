@@ -4356,9 +4356,9 @@ class CompanyController extends Controller
             if ($pcount > 0) {
                 CompanyDiscount::where('propertyid', $this->propertyid)->where('compcode', $request->sub_code)->delete();
                 for ($i = 1; $i <= $pcount; $i++) {
+                    // return $request->input("planamt2");
                     // return $request->input("roomcat$i");
                     if (!empty($request->input("roomcat$i"))) {
-                        // return $request->input("roomcat1");
                         $compdiscount = new CompanyDiscount;
                         $compdiscount->propertyid = $this->propertyid;
                         $compdiscount->compcode = $request->sub_code;
@@ -4367,7 +4367,7 @@ class CompanyController extends Controller
                         $compdiscount->adult = $request->input("adult$i");
                         $compdiscount->fixrate = $request->input("rate$i") ?? '';
                         $compdiscount->plan = $request->input("plan$i") ?? '';
-                        $compdiscount->planamount = $request->input("planamount$i") ?? '';
+                        $compdiscount->planamount = $request->input("planamt$i") ?? '';
                         $compdiscount->taxinc = $request->input("taxinc$i") ?? 'N';
                         $compdiscount->save();
                     }
