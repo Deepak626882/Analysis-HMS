@@ -1918,6 +1918,8 @@
                     if (xhrRooms.readyState === 4 && xhrRooms.status === 200) {
                         var result = xhrRooms.responseText;
                         var roomSelect = document.getElementById('roommast1');
+                        $('#roommast1').html();
+                        console.log('sagar');
                         if ($(`#roommast${index}`).val() != '') {
 
                         } else {

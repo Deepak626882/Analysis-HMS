@@ -12,6 +12,7 @@ use App\Models\BookinPlanDetail;
 use App\Models\ChannelEnviro;
 use App\Models\ChannelPushes;
 use App\Models\Cities;
+use App\Models\CompanyDiscount;
 use App\Models\PlanMast;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -1765,6 +1766,8 @@ class CompanyController extends Controller
 
         $roomcat = RoomCat::where('propertyid', $this->propertyid)->where('type', 'RO')->where('inclcount', 'Y')->orderBy('name')->get();
 
+        $compdiscount = CompanyDiscount::where('propertyid', $this->propertyid)->where('compcode', $subcode)->orderBy('sno')->get();
+
         return view('property.updatecompanymaster', [
             'comp_mastdata' => $comp_mastdata,
             'subgroupdata' => $subgroupdata,
@@ -1773,7 +1776,8 @@ class CompanyController extends Controller
             'cityname' => $cityname,
             'ledgerdatasub' => $ledgerdatasub,
             'update' => true,
-            'roomcat' => $roomcat
+            'roomcat' => $roomcat,
+            'compdiscount' => $compdiscount
         ]);
     }
 
@@ -4349,13 +4353,28 @@ class CompanyController extends Controller
 
         try {
             $pcount = $request->pcount;
-            if($pcount > 0) {
-                for($i = 1; $i < $pcount; $i++) {
-                    if(!empty($request->input("roomcat$i"))) {
-                        
+            if ($pcount > 0) {
+                CompanyDiscount::where('propertyid', $this->propertyid)->where('compcode', $request->sub_code)->delete();
+                for ($i = 1; $i <= $pcount; $i++) {
+                    // return $request->input("roomcat$i");
+                    if (!empty($request->input("roomcat$i"))) {
+                        // return $request->input("roomcat1");
+                        $compdiscount = new CompanyDiscount;
+                        $compdiscount->propertyid = $this->propertyid;
+                        $compdiscount->compcode = $request->sub_code;
+                        $compdiscount->sno = $i;
+                        $compdiscount->roomcatcode = $request->input("roomcat$i");
+                        $compdiscount->adult = $request->input("adult$i");
+                        $compdiscount->fixrate = $request->input("rate$i") ?? '';
+                        $compdiscount->plan = $request->input("plan$i") ?? '';
+                        $compdiscount->planamount = $request->input("planamount$i") ?? '';
+                        $compdiscount->taxinc = $request->input("taxinc$i") ?? 'N';
+                        $compdiscount->save();
                     }
                 }
             }
+
+            // return;
 
             $existingName = DB::table('subgroup')
                 ->where('propertyid', $this->propertyid)
@@ -4475,6 +4494,7 @@ class CompanyController extends Controller
 
             return redirect('companymaster')->with('success', 'Company Master Updated successfully!');
         } catch (Exception $e) {
+            // return $e->getMessage() . ' On Line: ' . $e->getLine();
             return back()->with('error', 'Unknown Error Occured: ' . $e->getMessage() . ' On Line: ' . $e->getLine());
         }
     }

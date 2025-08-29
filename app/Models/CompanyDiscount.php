@@ -10,9 +10,21 @@ class CompanyDiscount extends Model
     use HasFactory;
     const CREATED_AT = 'u_entdt';
     const UPDATED_AT = 'u_updatedt';
-    protected $table = 'cities';
+    protected $table = 'companydiscount';
 
     protected $fillable = [
-        ''
+        'sn',
+        'propertyid',
+        'compcode',
+        'sno',
+        'roomcatcode',
+        'adult',
+        'fixrate',
+        'plan',
+        'planamount',
+        'taxinc',
+        'u_name',
+        'u_entdt',
+        'u_ae'
     ];
 }
