@@ -1225,7 +1225,7 @@
                 let catid = $(this).find('option:selected').data('catid');
 
                 if ($(`#cat_code${index}`).val() != '') {
-                    $(`#cat_code${index}`).val(catid);
+                    // $(`#cat_code${index}`).val(catid);
                 } else {
                     $(`#cat_code${index}`).val(catid).change();
                     $(`#roommast${index}`).val(localStorage.getItem('ssroomno'));
