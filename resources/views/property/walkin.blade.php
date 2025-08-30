@@ -1219,62 +1219,109 @@
                 }, 500);
             });
 
-            // -----------------------------
-            // Helper: trigger rate calculation
-            // -----------------------------
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                }
+            });
+
+            localStorage.setItem('comprateyn', 'N');
+            let compdiscdata = [];
+            $(document).on('change', '#company', function() {
+                let compcode = $(this).val();
+
+                Swal.fire({
+                    title: 'Walkin',
+                    text: 'Apply Rates As Per Company',
+                    icon: 'info',
+                    showCancelButton: true,
+                    cancelButtonText: 'No',
+                    confirmButtonText: 'Yes'
+                }).then((success) => {
+                    if (success.isConfirmed) {
+                        $.ajax({
+                            url: "{{ url('walkincompdetail') }}",
+                            method: "POST",
+                            data: {
+                                compcode: compcode
+                            },
+                            success: function(response) {
+                                localStorage.setItem('comprateyn', 'Y');
+                                let compdata = response.compdata;
+                                compdiscdata = response.compdiscdata;
+                                $('#name').val(compdata.conperson ?? '');
+                                $('#mobile').val(compdata.mobile ?? '');
+                                $('#email').val(compdata.email ?? '');
+                                $('#cityname').val(compdata.citycode ?? '').change();
+                                $('#address1').val(compdata.address ?? '');
+                                $('#booking_source').val('Direct');
+                            },
+                            error: function(errorres) {
+
+                            }
+                        });
+                    }
+                });
+            });
+
             function triggerRateCalculation(index) {
                 const cid = $(`#roommast${index}`).val();
                 const adult = +($(`#adult${index}`).val() || 0);
                 const child = +($(`#child${index}`).val() || 0);
                 const room_category = $(`#cat_code${index}`).val();
                 const sumchildadult = adult + child;
+                if (localStorage.getItem('comprateyn') == 'N' || localStorage.getItem('comprateyn') == '') {
 
-                if (!$(`#planedit${index}`).val() || $(`#planedit${index}`).val() === 'N') {
-                    $.post('/getrate3', {
-                        data: JSON.stringify([room_category, cid, sumchildadult]),
-                        _token: '{{ csrf_token() }}'
-                    }, function(result) {
-                        $(`#rate${index}`).val(result);
-                    });
+                    if (!$(`#planedit${index}`).val() || $(`#planedit${index}`).val() === 'N') {
+                        $.post('/getrate3', {
+                            data: JSON.stringify([room_category, cid, sumchildadult]),
+                            _token: '{{ csrf_token() }}'
+                        }, function(result) {
+                            $(`#rate${index}`).val(result);
+                        });
+                    }
+
                 }
             }
 
-
-            // -----------------------------
-            // When a room is chosen
-            // -----------------------------
             $(document).on('change', '.roomselect', function() {
-                const index = this.id.match(/\d+$/)[0]; // e.g. roommast3 -> "3"
+                const index = this.id.match(/\d+$/)[0];
                 const roomNo = this.value;
                 const catid = $(this).find(':selected').data('catid');
 
                 if (!$(`#cat_code${index}`).val()) {
-                    // remember the desired room for later (after AJAX repopulate)
                     $(`#roommast${index}`).data('preselect', roomNo);
                     $(`#cat_code${index}`).val(catid).trigger('change');
                 } else {
-                    // category already set, just apply the room
                     $(`#roommast${index}`).val(roomNo);
-                    triggerRateCalculation(index); // ✅ trigger rate immediately
+                    triggerRateCalculation(index);
                 }
             });
 
-
-            // -----------------------------
-            // When category changes
-            // (ALL categories must have class .cat_code_class and ids like cat_code1, cat_code2, ...)
-            // -----------------------------
             $(document).on('change', '.cat_code_class', function() {
-                const index = this.id.match(/\d+$/)[0]; // e.g. cat_code3 -> "3"
+                const index = this.id.match(/\d+$/)[0];
                 const cid = this.value;
                 const checkindate = $('#checkindate').val();
                 const checkoutdate = $('#checkoutdate').val();
+                let adultcount = $(`#adult${index}`).val();
 
-                // Clear dropdowns while loading
                 $(`#roommast${index}`).empty().append('<option value="">Loading…</option>');
                 $(`#planmaster${index}`).empty().append('<option value="">Loading…</option>');
 
-                // ---- Fetch rooms ----
+                if (localStorage.getItem('comprateyn') == 'Y') {
+                    let matchedRow = compdiscdata.find(cdata => cdata.roomcatcode == cid && cdata.adult == adultcount);
+
+                    if (matchedRow) {
+                        if (matchedRow.plan != '') {
+                            $(`#rate${index}`).val(matchedRow.planamount);
+                        } else {
+                            $(`#rate${index}`).val(matchedRow.fixrate);
+                        }
+                    } else {
+                        $(`#rate${index}`).val('0.00');
+                    }
+                }
+
                 $.post('/getroomswalkin', {
                     cid,
                     checkindate,
@@ -1283,18 +1330,15 @@
                 }, function(result) {
                     $(`#roommast${index}`).html(result);
 
-                    // Reapply previously selected room if user had chosen one
                     const want = $(`#roommast${index}`).data('preselect');
                     if (want) {
                         $(`#roommast${index}`).val(want);
                         $(`#roommast${index}`).removeData('preselect');
 
-                        // ✅ Trigger rate calculation once after restore
                         triggerRateCalculation(index);
                     }
                 });
 
-                // ---- Fetch plans ----
                 $.post('/getplans', {
                     cid,
                     _token: '{{ csrf_token() }}'
@@ -1303,16 +1347,10 @@
                 });
             });
 
-
-            // -----------------------------
-            // Rate recalculation (child/adult/room changes)
-            // -----------------------------
             $(document).on('change', '[id^="child"], [id^="adult"], [id^="roommast"]', function() {
                 const index = this.id.match(/\d+$/)[0];
                 triggerRateCalculation(index);
             });
-
-
 
             $(document).on('input', '.rowdamount', function() {
                 clearTimeout(timer);
