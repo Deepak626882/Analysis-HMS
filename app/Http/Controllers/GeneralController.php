@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CompanyDiscount;
 use App\Models\EnviroBanquet;
 use App\Models\EnviroFom;
 use App\Models\EnviroInventory;
 use App\Models\EnviroPos;
 use App\Models\PlanMast;
+use App\Models\SubGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -102,5 +104,19 @@ class GeneralController extends Controller
         $roomcat = $request->roomcat;
         $plans = PlanMast::where('propertyid', Auth::user()->propertyid)->where('room_cat', $roomcat)->where('activeYN', 'Y')->orderBy('name')->get();
         return response()->json($plans);
+    }
+
+    public function walkincompdetail(Request $request)
+    {
+        $compcode = $request->compcode;
+
+        $compdata = SubGroup::where('propertyid', Auth::user()->propertyid)->where('sub_code', $compcode)->first();
+
+        $compdiscdata = CompanyDiscount::where('propertyid', Auth::user()->propertyid)->where('compcode', $compcode)->orderBy('sno')->get();
+
+        return response()->json([
+            'compdata' => $compdata,
+            'compdiscdata' => $compdiscdata
+        ]);
     }
 }

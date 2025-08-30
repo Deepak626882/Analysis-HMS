@@ -301,6 +301,8 @@ route::get('deletplanmast', [CompanyController::class, 'deletplanmast']);
 route::get('walkincheckin', [CompanyController::class, 'openwalkin']);
 // Fetch All Empty Rooms
 Route::post('fetchallemptyrooms', [GeneralController::class, 'fetchallemptyrooms'])->name('fetchallemptyrooms');
+// Fetch Company Details On Walkin Change
+Route::post('walkincompdetail', [GeneralController::class, 'walkincompdetail'])->name('walkincompdetail');
 // Find Guest History
 Route::post('guesthistory', [Fetch::class, 'guesthistory'])->name('guesthistory');
 // Open Prefilled Walkin Form
