@@ -1630,9 +1630,9 @@
                                 $('#idType').css('border-color', '');
                             }, 1000);
                         } else if (grcmandatory == 'Y' && idType != '' && idNumber != '') {
-                            formsubmit('#walkinform', '#walkinsubmit', 'Walkin', 'roomstatus', 'walkinsubmit');
+                            formsubmit('#walkinform', '#walkinsubmit', 'Walkin', "{{ fomparameter()->pageopenwalkin }}", 'walkinsubmit');
                         } else if (grcmandatory == 'N') {
-                            formsubmit('#walkinform', '#walkinsubmit', 'Walkin', 'roomstatus', 'walkinsubmit');
+                            formsubmit('#walkinform', '#walkinsubmit', 'Walkin', "{{ fomparameter()->pageopenwalkin }}", 'walkinsubmit');
                         }
                     }
                 };

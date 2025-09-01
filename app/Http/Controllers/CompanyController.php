@@ -8629,7 +8629,7 @@ class CompanyController extends Controller
             }
             DB::commit();
             return response()->json([
-                'redirecturl' => 'roomstatus',
+                'redirecturl' => fomparameter()->pageopenwalkin,
                 'status' => 'success',
                 'message' => 'Walk-in submission successful.',
             ]);

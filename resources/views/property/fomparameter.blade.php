@@ -176,6 +176,16 @@
                                                         <span class="text-danger"> {{ $message }} </span>
                                                     @enderror
 
+                                                    <label for="pageopenwalkin" class="col-form-label">Page Open After Walkin</label>
+                                                    <select id="pageopenwalkin" name="pageopenwalkin"
+                                                        class="form-control">
+                                                        <option value="roomstatus" {{ $fomparamdata->pageopenwalkin == 'roomstatus' ? 'selected' : '' }}>roomstatus</option>
+                                                        <option value="inhoseroomstatus" {{ $fomparamdata->pageopenwalkin == 'inhoseroomstatus' ? 'selected' : '' }}>inhoseroomstatus</option>
+                                                    </select>
+                                                    @error('pageopenwalkin')
+                                                        <span class="text-danger"> {{ $message }} </span>
+                                                    @enderror
+
                                                 </div>
 
                                                 <div class="col-md-6">
