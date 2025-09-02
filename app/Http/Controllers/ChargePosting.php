@@ -308,7 +308,7 @@ class ChargePosting extends Controller
             $revmastpaypost = DB::table('revmast')
                 ->where('propertyid', $this->propertyid)
                 ->where('field_type', 'P')
-                ->whereIn('pay_type', ['Cash', 'UPI', 'Credit Card', 'Hold', 'Company'])
+                ->whereIn('pay_type', ['Cash', 'UPI', 'Credit Card', 'Hold'])
                 ->get();
             $tl = [];
 
@@ -408,7 +408,6 @@ class ChargePosting extends Controller
                         }
                     }
                 }
-
             }
 
             if ($revmastpaypost->isNotEmpty()) {
@@ -508,9 +507,217 @@ class ChargePosting extends Controller
                     }
                 }
 
-                return $tp;
+                // return $tp;
             }
-            return 'paypost';
+            // return 'paypost';
+
+            $companypost = DB::table('revmast')
+                ->where('propertyid', $this->propertyid)
+                ->where('field_type', 'P')
+                ->whereIn('pay_type', ['Company'])
+                ->get();
+
+            if ($companypost->isNotEmpty()) {
+
+                foreach ($companypost as $rows) {
+                    $datarevpost = DB::table('paycharge')
+                        ->leftJoin('revmast', 'revmast.rev_code', '=', 'paycharge.paycode')
+                        ->select([
+                            DB::raw('(SUM(paycharge.amtcr - paycharge.amtdr)) as CreditAmt'),
+                            'paycharge.paycode',
+                            'revmast.ac_code',
+                            'revmast.name as RevenueName',
+                            'paycharge.comments',
+                            'paycharge.vdate',
+                            'paycharge.vprefix',
+                            'paycharge.paytype',
+                            'paycharge.comp_code'
+                        ])
+                        ->where('paycharge.propertyid', $this->propertyid)
+                        ->whereBetween('paycharge.vdate', [$fromdate, $todate])
+                        ->whereNotIn('paycharge.docid', function ($query) {
+                            $query->select(DB::raw('distinct contraid'))
+                                ->from('paycharge')
+                                ->whereNotNull('contraid')
+                                ->where('contraid', '<>', '');
+                        })
+                        ->where('paycharge.paytype', $rows->pay_type)
+                        ->where('paycharge.restcode', 'FOM' . $this->propertyid)
+                        ->groupBy('paycharge.paytype')
+                        ->get();
+
+                    if ($datarevpost->isNotEmpty()) {
+                        $tl[] = $datarevpost;
+                        foreach ($datarevpost as $row) {
+
+                            $billnos = DB::table('paycharge')
+                                ->select('vno')
+                                ->distinct()
+                                ->where('paycharge.propertyid', $this->propertyid)
+                                ->where('vdate', $row->vdate)
+                                ->where('paycharge.restcode', 'FOM' . $this->propertyid)
+                                ->where('paycharge.paycode', $row->paycode)
+                                ->pluck('vno')
+                                ->implode(', ');
+
+                            $vno = $row->vprefix . date('dm', strtotime($row->vdate));
+                            $vtype = 'HPOST';
+                            $docid = $this->propertyid . $vtype . '‎ ‎ ' . $row->vprefix . '‎ ‎ ‎ ‎ ' . $vno;
+
+                            $revmastpaypost1 = [
+                                'propertyid' => $this->propertyid,
+                                'docid' => $docid,
+                                'vsno' => $l++,
+                                'vno' => $vno,
+                                'vdate' => $row->vdate,
+                                'vtype' => $vtype,
+                                'vprefix' => $row->vprefix,
+                                'narration' => 'Adv. Agst. Res.No. : ' . $billnos,
+                                'contrasub' => $row->comp_code ?? '',
+                                'subcode' => $envirofom->roomchrgdueac,
+                                'amtcr' => $row->CreditAmt,
+                                'amtdr' => '0.00',
+                                'chqno' => '',
+                                'chqdate' => null,
+                                'clgdate' => $row->vdate,
+                                'groupcode' => '',
+                                'groupnature' => '',
+                                'u_name' => Auth::user()->name,
+                                'u_entdt' => $this->currenttime,
+                                'u_ae' => 'a',
+                            ];
+
+                            $revmastpaypost2 = [
+                                'propertyid' => $this->propertyid,
+                                'docid' => $docid,
+                                'vsno' => $l++,
+                                'vno' => $vno,
+                                'vdate' => $row->vdate,
+                                'vtype' => $vtype,
+                                'vprefix' => $row->vprefix,
+                                'narration' => 'Adv. Agst. Res.No. : ' . $billnos,
+                                'contrasub' => $envirofom->roomchrgdueac,
+                                'subcode' => $row->comp_code ?? '',
+                                'amtcr' => '0.00',
+                                'amtdr' => $row->CreditAmt,
+                                'chqno' => '',
+                                'chqdate' => null,
+                                'clgdate' => $row->vdate,
+                                'groupcode' => '',
+                                'groupnature' => '',
+                                'u_name' => Auth::user()->name,
+                                'u_entdt' => $this->currenttime,
+                                'u_ae' => 'a',
+                            ];
+
+                            Ledger::insert($revmastpaypost1);
+                            Ledger::insert($revmastpaypost2);
+                        }
+                    }
+                }
+            }
+
+            if ($companypost->isNotEmpty()) {
+                $tlp = [];
+                foreach ($revmastpaypost as $rows) {
+                    $datarevpostpos = DB::table('paycharge')
+                        ->leftJoin('revmast', 'revmast.rev_code', '=', 'paycharge.paycode')
+                        ->select([
+                            DB::raw('(SUM(paycharge.amtcr - paycharge.amtdr)) as CreditAmt'),
+                            'paycharge.paycode',
+                            'revmast.ac_code',
+                            'revmast.name as RevenueName',
+                            'paycharge.comments',
+                            'paycharge.vdate',
+                            'paycharge.vprefix',
+                            'paycharge.paytype',
+                            'paycharge.comp_code'
+                        ])
+                        ->where('paycharge.propertyid', $this->propertyid)
+                        ->whereBetween('paycharge.vdate', [$fromdate, $todate])
+                        ->whereNotIn('paycharge.docid', function ($query) {
+                            $query->select(DB::raw('distinct contraid'))
+                                ->from('paycharge')
+                                ->whereNotNull('contraid')
+                                ->where('contraid', '<>', '');
+                        })
+                        ->where('paycharge.paytype', $rows->pay_type)
+                        ->whereNot('paycharge.restcode', 'FOM' . $this->propertyid)
+                        ->groupBy('paycharge.paytype')
+                        ->get();
+
+                    if ($datarevpostpos->isNotEmpty()) {
+                        $tlp[] = $datarevpostpos;
+                        foreach ($datarevpostpos as $row) {
+
+                            $billnos = DB::table('paycharge')
+                                ->select('vno')
+                                ->distinct()
+                                ->where('paycharge.propertyid', $this->propertyid)
+                                ->where('vdate', $row->vdate)
+                                ->whereNot('paycharge.restcode', 'FOM' . $this->propertyid)
+                                ->where('paycharge.paycode', $row->paycode)
+                                ->pluck('vno')
+                                ->implode(', ');
+
+                            $vno = $row->vprefix . date('dm', strtotime($row->vdate));
+                            $vtype = 'HPOST';
+                            $docid = $this->propertyid . $vtype . '‎ ‎ ' . $row->vprefix . '‎ ‎ ‎ ‎ ' . $vno;
+
+                            $revmastpaypost1 = [
+                                'propertyid' => $this->propertyid,
+                                'docid' => $docid,
+                                'vsno' => $l++,
+                                'vno' => $vno,
+                                'vdate' => $row->vdate,
+                                'vtype' => $vtype,
+                                'vprefix' => $row->vprefix,
+                                'narration' => 'Adv. Agst. Res.No. : ' . $billnos,
+                                'contrasub' => $row->comp_code ?? '',
+                                'subcode' => $envirofom->roomchrgdueac,
+                                'amtcr' => $row->CreditAmt,
+                                'amtdr' => '0.00',
+                                'chqno' => '',
+                                'chqdate' => null,
+                                'clgdate' => $row->vdate,
+                                'groupcode' => '',
+                                'groupnature' => '',
+                                'u_name' => Auth::user()->name,
+                                'u_entdt' => $this->currenttime,
+                                'u_ae' => 'a',
+                            ];
+
+                            $revmastpaypost2 = [
+                                'propertyid' => $this->propertyid,
+                                'docid' => $docid,
+                                'vsno' => $l++,
+                                'vno' => $vno,
+                                'vdate' => $row->vdate,
+                                'vtype' => $vtype,
+                                'vprefix' => $row->vprefix,
+                                'narration' => 'Adv. Agst. Res.No. : ' . $billnos,
+                                'contrasub' => $envirofom->roomchrgdueac,
+                                'subcode' => $row->comp_code ?? '',
+                                'amtcr' => '0.00',
+                                'amtdr' => $row->CreditAmt,
+                                'chqno' => '',
+                                'chqdate' => null,
+                                'clgdate' => $row->vdate,
+                                'groupcode' => '',
+                                'groupnature' => '',
+                                'u_name' => Auth::user()->name,
+                                'u_entdt' => $this->currenttime,
+                                'u_ae' => 'a',
+                            ];
+
+                            Ledger::insert($revmastpaypost1);
+                            Ledger::insert($revmastpaypost2);
+                        }
+                    }
+                }
+
+                return $tlp;
+            }
 
             Paycharge::whereBetween('vdate', [$fromdate, $todate])->whereIn('vtype', ['PPOS', 'IPOS'])->where('propertyid', $this->propertyid)->delete();
 
