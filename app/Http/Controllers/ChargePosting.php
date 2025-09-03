@@ -48,8 +48,8 @@ class ChargePosting extends Controller
 
     public function accountposting(Request $request)
     {
-         $permission = revokeopen(191114);
-        if (is_null($permission) || $permission->view == 0) { 
+        $permission = revokeopen(191114);
+        if (is_null($permission) || $permission->view == 0) {
             return redirect()->back()->with('error', 'You have no permission to execute this functionality!');
         }
         return view('property.accountposting', [
@@ -59,14 +59,14 @@ class ChargePosting extends Controller
 
     public function accountpoststore(Request $request)
     {
-         $permission = revokeopen(191114);
-        if (is_null($permission) || $permission->ins == 0) { 
+        $permission = revokeopen(191114);
+        if (is_null($permission) || $permission->ins == 0) {
             return redirect()->back()->with('error', 'You have no permission to execute this functionality!');
         }
 
         try {
 
-            DB::beginTransaction();
+            // DB::beginTransaction();
             $fromdate = $request->fromdate;
             $todate = $request->todate;
 
@@ -112,8 +112,9 @@ class ChargePosting extends Controller
 
             $l = 1;
             Ledger::where('propertyid', $this->propertyid)->where('vtype', 'HPOST')->whereBetween('vdate', [$fromdate, $todate])->delete();
-            if ($ledgerdata->isNotEmpty()) {
 
+            if ($ledgerdata->isNotEmpty()) {
+                $t = [];
                 foreach ($ledgerdata as $row) {
                     $amountdata = DB::table('paycharge')
                         ->leftJoin('revmast', 'revmast.rev_code', '=', 'paycharge.paycode')
@@ -127,10 +128,12 @@ class ChargePosting extends Controller
                         ->where('paycharge.settledate', $row->settledate)
                         ->whereIn('revmast.field_type', ['C', 'T'])
                         ->whereRaw('(paycharge.amtdr - paycharge.amtcr) <> 0')
-                        ->where('paycharge.restcode', 'FOM' . $this->propertyid)
+                        // ->where('paycharge.restcode', 'FOM' . $this->propertyid)
                         ->where('paycharge.paycode', $row->paycode)
                         ->groupBy('paycharge.paycode')
                         ->first();
+
+                    // $t[] = $amountdata;
 
                     $billnos = DB::table('paycharge')
                         ->select('billno')
@@ -158,8 +161,8 @@ class ChargePosting extends Controller
                         'narration' => 'Against Guest Bill No(s) : ' . $billnos,
                         'contrasub' => $amountdata->ACCode ?? '',
                         'subcode' => $envirofom->roomchrgdueac,
-                        'amtcr' => $amountdata->DebitAmt,
-                        'amtdr' => '0.00',
+                        'amtcr' => '0.00',
+                        'amtdr' => $amountdata->DebitAmt,
                         'chqno' => '',
                         'chqdate' => null,
                         'clgdate' => $row->settledate,
@@ -181,8 +184,8 @@ class ChargePosting extends Controller
                         'narration' => 'Against Guest Bill No(s) : ' . $billnos,
                         'contrasub' => $envirofom->roomchrgdueac,
                         'subcode' => $amountdata->ACCode ?? '',
-                        'amtcr' => '0.00',
-                        'amtdr' => $amountdata->DebitAmt,
+                        'amtcr' => $amountdata->DebitAmt,
+                        'amtdr' => '0.00',
                         'chqno' => '',
                         'chqdate' => null,
                         'clgdate' => $row->settledate,
@@ -196,103 +199,118 @@ class ChargePosting extends Controller
                     Ledger::insert($hpostdata1);
                     Ledger::insert($hpostdata2);
                 }
+
+                // return $t;
             }
+
+            // return 'hy';
 
             // Pos Submit Ledger
             $posledger = DB::table('paycharge')
-                ->select([
-                    DB::raw('SUM(paycharge.amtdr) - SUM(paycharge.amtcr) AS DebitAmt'),
-                    DB::raw('MAX(paycharge.comments) as Comments'),
-                    DB::raw('paycharge.paycode'),
-                    DB::raw('MAX(revmast.ac_code) AS ACCode'),
-                    DB::raw('MAX(depart.name) as Department'),
-                    DB::raw('MAX(revmast.name) as RevenueName'),
-                    DB::raw('MAX(paycharge.vdate) as vdate'),
-                    DB::raw('MAX(paycharge.vprefix) as vprefix')
-                ])
                 ->leftJoin('revmast', 'paycharge.paycode', '=', 'revmast.rev_code')
                 ->leftJoin('depart', 'paycharge.restcode', '=', 'depart.dcode')
-                ->where('paycharge.roomtype', '<>', 'RO')
+                ->select([
+                    DB::raw('SUM(paycharge.amtdr) - SUM(paycharge.amtcr) AS DebitAmt'),
+                    DB::raw('MAX(paycharge.comments) AS Comments'),
+                    'paycharge.paycode',
+                    DB::raw('MAX(revmast.ac_code) AS ACCode'),
+                    DB::raw('MAX(depart.name) AS Department'),
+                    DB::raw('MAX(revmast.name) AS RevenueName'),
+                    DB::raw('MAX(paycharge.vdate) AS vdate'),
+                    DB::raw('MAX(paycharge.vprefix) AS vprefix')
+                ])
                 ->whereBetween('paycharge.vdate', [$fromdate, $todate])
                 ->where('paycharge.propertyid', $this->propertyid)
                 ->where('paycharge.restcode', '<>', 'FOM' . $this->propertyid)
+                ->where(function ($query) {
+                    $query->whereNull('paycharge.paytype')
+                        ->orWhere('paycharge.paytype', '');
+                })
                 ->groupBy('paycharge.paycode', 'paycharge.restcode')
+                ->havingRaw('SUM(paycharge.amtdr) - SUM(paycharge.amtcr) > 0')
                 ->get();
+
+            // return $posledger;
 
             if ($posledger->isNotEmpty()) {
                 foreach ($posledger as $row) {
 
-                    $billnos = DB::table('paycharge')
-                        ->select('vno')
-                        ->distinct()
-                        ->where('paycharge.propertyid', $this->propertyid)
-                        ->where('vdate', $row->vdate)
-                        ->whereRaw('paycharge.amtdr - paycharge.amtcr <> 0')
-                        ->where('paycharge.restcode', '<>', 'FOM' . $this->propertyid)
-                        ->where('paycharge.paycode', $row->paycode)
-                        ->pluck('vno')
-                        ->implode(', ');
+                    if (!is_null($row->DebitAmt)) {
+                        $billnos = DB::table('paycharge')
+                            ->select('vno')
+                            ->distinct()
+                            ->where('paycharge.propertyid', $this->propertyid)
+                            ->where('vdate', $row->vdate)
+                            ->whereRaw('paycharge.amtdr - paycharge.amtcr <> 0')
+                            ->where('paycharge.restcode', '<>', 'FOM' . $this->propertyid)
+                            ->where('paycharge.paycode', $row->paycode)
+                            ->pluck('vno')
+                            ->implode(', ');
 
-                    $vno = $row->vprefix . date('dm', strtotime($row->vdate));
-                    $vtype = 'HPOST';
-                    $docid = $this->propertyid . $vtype . '‎ ‎ ' . $row->vprefix . '‎ ‎ ‎ ‎ ' . $vno;
+                        $vno = $row->vprefix . date('dm', strtotime($row->vdate));
+                        $vtype = 'HPOST';
+                        $docid = $this->propertyid . $vtype . '‎ ‎ ' . $row->vprefix . '‎ ‎ ‎ ‎ ' . $vno;
 
-                    $posledgerdata1 = [
-                        'propertyid' => $this->propertyid,
-                        'docid' => $docid,
-                        'vsno' => $l++,
-                        'vno' => $vno,
-                        'vdate' => $row->vdate,
-                        'vtype' => $vtype,
-                        'vprefix' => $row->vprefix,
-                        'narration' => 'Bill No(s) : ' . $billnos,
-                        'contrasub' => $envirofom->roomchrgdueac,
-                        'subcode' => $amountdata->ACCode ?? '',
-                        'amtcr' => '0.00',
-                        'amtdr' => $amountdata->DebitAmt,
-                        'chqno' => '',
-                        'chqdate' => null,
-                        'clgdate' => $row->vdate,
-                        'groupcode' => '',
-                        'groupnature' => '',
-                        'u_name' => Auth::user()->name,
-                        'u_entdt' => $this->currenttime,
-                        'u_ae' => 'a',
-                    ];
+                        $posledgerdata1 = [
+                            'propertyid' => $this->propertyid,
+                            'docid' => $docid,
+                            'vsno' => $l++,
+                            'vno' => $vno,
+                            'vdate' => $row->vdate,
+                            'vtype' => $vtype,
+                            'vprefix' => $row->vprefix,
+                            'narration' => 'Bill No(s) : ' . $billnos,
+                            'contrasub' => $envirofom->roomchrgdueac,
+                            'subcode' => $row->ACCode ?? '',
+                            'amtcr' => '0.00',
+                            'amtdr' => $row->DebitAmt,
+                            'chqno' => '',
+                            'chqdate' => null,
+                            'clgdate' => $row->vdate,
+                            'groupcode' => '',
+                            'groupnature' => '',
+                            'u_name' => Auth::user()->name,
+                            'u_entdt' => $this->currenttime,
+                            'u_ae' => 'a',
+                        ];
 
-                    $posledgerdata2 = [
-                        'propertyid' => $this->propertyid,
-                        'docid' => $docid,
-                        'vsno' => $l++,
-                        'vno' => $vno,
-                        'vdate' => $row->vdate,
-                        'vtype' => $vtype,
-                        'vprefix' => $row->vprefix,
-                        'narration' => 'Bill No(s) : ' . $billnos,
-                        'contrasub' => $amountdata->ACCode ?? '',
-                        'subcode' => $envirofom->roomchrgdueac,
-                        'amtcr' => '0.00',
-                        'amtdr' => $amountdata->DebitAmt,
-                        'chqno' => '',
-                        'chqdate' => null,
-                        'clgdate' => $row->vdate,
-                        'groupcode' => '',
-                        'groupnature' => '',
-                        'u_name' => Auth::user()->name,
-                        'u_entdt' => $this->currenttime,
-                        'u_ae' => 'a',
-                    ];
+                        $posledgerdata2 = [
+                            'propertyid' => $this->propertyid,
+                            'docid' => $docid,
+                            'vsno' => $l++,
+                            'vno' => $vno,
+                            'vdate' => $row->vdate,
+                            'vtype' => $vtype,
+                            'vprefix' => $row->vprefix,
+                            'narration' => 'Bill No(s) : ' . $billnos,
+                            'contrasub' => $row->ACCode ?? '',
+                            'subcode' => $envirofom->roomchrgdueac,
+                            'amtcr' => $row->DebitAmt,
+                            'amtdr' => '0.00',
+                            'chqno' => '',
+                            'chqdate' => null,
+                            'clgdate' => $row->vdate,
+                            'groupcode' => '',
+                            'groupnature' => '',
+                            'u_name' => Auth::user()->name,
+                            'u_entdt' => $this->currenttime,
+                            'u_ae' => 'a',
+                        ];
 
-                    Ledger::insert($posledgerdata1);
-                    Ledger::insert($posledgerdata2);
+                        Ledger::insert($posledgerdata1);
+                        Ledger::insert($posledgerdata2);
+                    }
                 }
             }
+
+            // return 'ppp';
 
             $revmastpaypost = DB::table('revmast')
                 ->where('propertyid', $this->propertyid)
                 ->where('field_type', 'P')
-                ->whereIn('pay_type', ['Cash', 'UPI', 'Credit Card', 'Hold'])
+                ->whereIn('pay_type', ['Cash', 'UPI', 'Credit Card', 'Hold', 'Company'])
                 ->get();
+            $tl = [];
 
             if ($revmastpaypost->isNotEmpty()) {
 
@@ -300,7 +318,7 @@ class ChargePosting extends Controller
                     $datarevpost = DB::table('paycharge')
                         ->leftJoin('revmast', 'revmast.rev_code', '=', 'paycharge.paycode')
                         ->select([
-                            DB::raw('(paycharge.amtcr - paycharge.amtdr) as CreditAmt'),
+                            DB::raw('(SUM(paycharge.amtcr - paycharge.amtdr)) as CreditAmt'),
                             'paycharge.paycode',
                             'revmast.ac_code',
                             'revmast.name as RevenueName',
@@ -310,7 +328,6 @@ class ChargePosting extends Controller
                         ])
                         ->where('paycharge.propertyid', $this->propertyid)
                         ->whereBetween('paycharge.vdate', [$fromdate, $todate])
-                        ->whereIn('paycharge.vtype', ['ARRES', 'ADRES'])
                         ->whereNotIn('paycharge.docid', function ($query) {
                             $query->select(DB::raw('distinct contraid'))
                                 ->from('paycharge')
@@ -319,10 +336,11 @@ class ChargePosting extends Controller
                         })
                         ->where('paycharge.paytype', $rows->pay_type)
                         ->where('paycharge.restcode', 'FOM' . $this->propertyid)
+                        ->groupBy('paycharge.paytype')
                         ->get();
 
                     if ($datarevpost->isNotEmpty()) {
-
+                        $tl[] = $datarevpost;
                         foreach ($datarevpost as $row) {
 
                             $billnos = DB::table('paycharge')
@@ -390,7 +408,109 @@ class ChargePosting extends Controller
                         }
                     }
                 }
+
             }
+
+            if ($revmastpaypost->isNotEmpty()) {
+                $tp = [];
+                foreach ($revmastpaypost as $rows) {
+                    $datarevpostpos = DB::table('paycharge')
+                        ->leftJoin('revmast', 'revmast.rev_code', '=', 'paycharge.paycode')
+                        ->select([
+                            DB::raw('(SUM(paycharge.amtcr - paycharge.amtdr)) as CreditAmt'),
+                            'paycharge.paycode',
+                            'revmast.ac_code',
+                            'revmast.name as RevenueName',
+                            'paycharge.comments',
+                            'paycharge.vdate',
+                            'paycharge.vprefix'
+                        ])
+                        ->where('paycharge.propertyid', $this->propertyid)
+                        ->whereBetween('paycharge.vdate', [$fromdate, $todate])
+                        ->whereNotIn('paycharge.docid', function ($query) {
+                            $query->select(DB::raw('distinct contraid'))
+                                ->from('paycharge')
+                                ->whereNotNull('contraid')
+                                ->where('contraid', '<>', '');
+                        })
+                        ->where('paycharge.paytype', $rows->pay_type)
+                        ->whereNot('paycharge.restcode', 'FOM' . $this->propertyid)
+                        ->groupBy('paycharge.paytype')
+                        ->get();
+
+                    if ($datarevpostpos->isNotEmpty()) {
+                        $tp[] = $datarevpostpos;
+                        foreach ($datarevpostpos as $row) {
+
+                            $billnos = DB::table('paycharge')
+                                ->select('vno')
+                                ->distinct()
+                                ->where('paycharge.propertyid', $this->propertyid)
+                                ->where('vdate', $row->vdate)
+                                ->whereNot('paycharge.restcode', 'FOM' . $this->propertyid)
+                                ->where('paycharge.paycode', $row->paycode)
+                                ->pluck('vno')
+                                ->implode(', ');
+
+                            $vno = $row->vprefix . date('dm', strtotime($row->vdate));
+                            $vtype = 'HPOST';
+                            $docid = $this->propertyid . $vtype . '‎ ‎ ' . $row->vprefix . '‎ ‎ ‎ ‎ ' . $vno;
+
+                            $revmastpaypost1 = [
+                                'propertyid' => $this->propertyid,
+                                'docid' => $docid,
+                                'vsno' => $l++,
+                                'vno' => $vno,
+                                'vdate' => $row->vdate,
+                                'vtype' => $vtype,
+                                'vprefix' => $row->vprefix,
+                                'narration' => 'Adv. Agst. Res.No. : ' . $billnos,
+                                'contrasub' => $row->ac_code ?? '',
+                                'subcode' => $envirofom->roomchrgdueac,
+                                'amtcr' => $row->CreditAmt,
+                                'amtdr' => '0.00',
+                                'chqno' => '',
+                                'chqdate' => null,
+                                'clgdate' => $row->vdate,
+                                'groupcode' => '',
+                                'groupnature' => '',
+                                'u_name' => Auth::user()->name,
+                                'u_entdt' => $this->currenttime,
+                                'u_ae' => 'a',
+                            ];
+
+                            $revmastpaypost2 = [
+                                'propertyid' => $this->propertyid,
+                                'docid' => $docid,
+                                'vsno' => $l++,
+                                'vno' => $vno,
+                                'vdate' => $row->vdate,
+                                'vtype' => $vtype,
+                                'vprefix' => $row->vprefix,
+                                'narration' => 'Adv. Agst. Res.No. : ' . $billnos,
+                                'contrasub' => $envirofom->roomchrgdueac,
+                                'subcode' => $row->ac_code ?? '',
+                                'amtcr' => '0.00',
+                                'amtdr' => $row->CreditAmt,
+                                'chqno' => '',
+                                'chqdate' => null,
+                                'clgdate' => $row->vdate,
+                                'groupcode' => '',
+                                'groupnature' => '',
+                                'u_name' => Auth::user()->name,
+                                'u_entdt' => $this->currenttime,
+                                'u_ae' => 'a',
+                            ];
+
+                            Ledger::insert($revmastpaypost1);
+                            Ledger::insert($revmastpaypost2);
+                        }
+                    }
+                }
+
+                return $tp;
+            }
+            return 'paypost';
 
             Paycharge::whereBetween('vdate', [$fromdate, $todate])->whereIn('vtype', ['PPOS', 'IPOS'])->where('propertyid', $this->propertyid)->delete();
 
@@ -538,11 +658,12 @@ class ChargePosting extends Controller
                 Paycharge::insert($iposin);
             }
 
-            DB::commit();
+            // DB::commit();
 
-            return back()->with('success', 'Account Posting Successfully');
+            // return back()->with('success', 'Account Posting Successfully');
         } catch (Exception $e) {
-            DB::rollBack();
+            // DB::rollBack();
+            return $e->getMessage() . 'On Line: ' . $e->getLine();
             return back()->with('error', 'Unknown error occured: ' . $e->getMessage() . 'On Line: ' . $e->getLine());
         }
     }
