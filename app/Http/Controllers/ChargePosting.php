@@ -520,7 +520,7 @@ class ChargePosting extends Controller
             if ($companypost->isNotEmpty()) {
 
                 foreach ($companypost as $rows) {
-                    $datarevpost = DB::table('paycharge')
+                    $datarevpostcompfom = DB::table('paycharge')
                         ->leftJoin('revmast', 'revmast.rev_code', '=', 'paycharge.paycode')
                         ->select([
                             DB::raw('(SUM(paycharge.amtcr - paycharge.amtdr)) as CreditAmt'),
@@ -543,12 +543,12 @@ class ChargePosting extends Controller
                         })
                         ->where('paycharge.paytype', $rows->pay_type)
                         ->where('paycharge.restcode', 'FOM' . $this->propertyid)
-                        ->groupBy('paycharge.paytype')
+                        ->groupBy('paycharge.comp_code')
                         ->get();
 
-                    if ($datarevpost->isNotEmpty()) {
-                        $tl[] = $datarevpost;
-                        foreach ($datarevpost as $row) {
+                    if ($datarevpostcompfom->isNotEmpty()) {
+                        $tl[] = $datarevpostcompfom;
+                        foreach ($datarevpostcompfom as $row) {
 
                             $billnos = DB::table('paycharge')
                                 ->select('vno')
@@ -619,8 +619,8 @@ class ChargePosting extends Controller
 
             if ($companypost->isNotEmpty()) {
                 $tlp = [];
-                foreach ($revmastpaypost as $rows) {
-                    $datarevpostpos = DB::table('paycharge')
+                foreach ($companypost as $rows) {
+                    $datarevpostcomp = DB::table('paycharge')
                         ->leftJoin('revmast', 'revmast.rev_code', '=', 'paycharge.paycode')
                         ->select([
                             DB::raw('(SUM(paycharge.amtcr - paycharge.amtdr)) as CreditAmt'),
@@ -643,12 +643,12 @@ class ChargePosting extends Controller
                         })
                         ->where('paycharge.paytype', $rows->pay_type)
                         ->whereNot('paycharge.restcode', 'FOM' . $this->propertyid)
-                        ->groupBy('paycharge.paytype')
+                        ->groupBy('paycharge.comp_code')
                         ->get();
 
-                    if ($datarevpostpos->isNotEmpty()) {
-                        $tlp[] = $datarevpostpos;
-                        foreach ($datarevpostpos as $row) {
+                    if ($datarevpostcomp->isNotEmpty()) {
+                        $tlp[] = $datarevpostcomp;
+                        foreach ($datarevpostcomp as $row) {
 
                             $billnos = DB::table('paycharge')
                                 ->select('vno')
@@ -716,7 +716,7 @@ class ChargePosting extends Controller
                     }
                 }
 
-                return $tlp;
+                // return $tlp;
             }
 
             Paycharge::whereBetween('vdate', [$fromdate, $todate])->whereIn('vtype', ['PPOS', 'IPOS'])->where('propertyid', $this->propertyid)->delete();
@@ -867,10 +867,10 @@ class ChargePosting extends Controller
 
             // DB::commit();
 
-            // return back()->with('success', 'Account Posting Successfully');
+            return back()->with('success', 'Account Posting Successfully');
         } catch (Exception $e) {
             // DB::rollBack();
-            return $e->getMessage() . 'On Line: ' . $e->getLine();
+            // return $e->getMessage() . 'On Line: ' . $e->getLine();
             return back()->with('error', 'Unknown error occured: ' . $e->getMessage() . 'On Line: ' . $e->getLine());
         }
     }
