@@ -176,61 +176,65 @@ class UserParam extends Controller
         ];
 
         $compdata = Companyreg::where('propertyid', $request->input('propertyid'))->first();
-        foreach ($modules as $moduleName => $moduleid) {
-            if ($request->has($moduleName)) {
-                $moduleData = TblUserModule::where('module_name', ucfirst($moduleName))->get();
+foreach ($modules as $moduleName => $moduleid) {
+    if ($request->has($moduleName)) {
+        // Fetch all module data for this module
+        $moduleData = TblUserModule::where('module_name', ucfirst($moduleName))->get();
 
-                foreach ($moduleData as $data) {
-                    $fetchUserModule = UserModule::where('propertyid', $request->input('propertyid'))
-                        ->where('module', $data->module)->where('opt1', $data->opt1)->first();
-                    echo $data->sn . '-' . $data->module . '</br>';
+        // Delete existing UserModule + MenuHelp for this property/module
+        UserModule::where('propertyid', $request->input('propertyid'))
+            ->whereIn('module', $moduleData->pluck('module'))
+            ->delete();
 
-                    if (!$fetchUserModule) {
-                        $userModule = new UserModule;
-                        $userModule->propertyid = $request->input('propertyid');
-                        $userModule->opt1 = $data->opt1;
-                        $userModule->opt2 = $data->opt2;
-                        $userModule->opt3 = $data->opt3;
-                        $userModule->route = $data->route;
-                        $userModule->code = $data->code;
-                        $userModule->module = $data->module;
-                        $userModule->module_name = $data->module_name;
-                        $userModule->flag = $data->flag;
-                        $userModule->outletcode = $data->outletcode;
-                        $userModule->u_entdt = $this->currenttime;
-                        $userModule->u_updatedt = null;
-                        $userModule->save();
-                    }
-                    $menuhelpcheck = MenuHelp::where('module', $data->module)->where('propertyid', $request->input('propertyid'))
-                        ->where('username', $compdata->u_name)->where('opt1', $data->opt1)->first();
+        MenuHelp::where('propertyid', $request->input('propertyid'))
+            ->where('username', $compdata->u_name)
+            ->whereIn('module', $moduleData->pluck('module'))
+            ->delete();
 
-                    if (!$menuhelpcheck) {
-                        $menumodule = new MenuHelp;
-                        $menumodule->propertyid = $request->input('propertyid');
-                        $menumodule->username = $compdata->u_name;
-                        $menumodule->compcode = $compdata->comp_code;
-                        $menumodule->opt1 = $data->opt1;
-                        $menumodule->opt2 = $data->opt2;
-                        $menumodule->opt3 = $data->opt3;
-                        $menumodule->code = $data->code;
-                        $menumodule->route = $data->route;
-                        $menumodule->module = $data->module;
-                        $menumodule->module_name = $data->module_name;
-                        $menumodule->view = 1;
-                        $menumodule->ins = 1;
-                        $menumodule->edit = 1;
-                        $menumodule->del = 1;
-                        $menumodule->print = 1;
-                        $menumodule->flag = $data->flag;
-                        $menumodule->outletcode = $data->outletcode;
-                        $menumodule->u_entdt = $this->currenttime;
-                        $menumodule->u_updatedt = null;
-                        $menumodule->u_name = Auth::user()->name;
-                        $menumodule->save();
-                    }
-                }
-            }
+        // Re-insert fresh records
+        foreach ($moduleData as $data) {
+            // Insert into UserModule
+            UserModule::create([
+                'propertyid'   => $request->input('propertyid'),
+                'opt1'         => $data->opt1,
+                'opt2'         => $data->opt2,
+                'opt3'         => $data->opt3,
+                'route'        => $data->route,
+                'code'         => $data->code,
+                'module'       => $data->module,
+                'module_name'  => $data->module_name,
+                'flag'         => $data->flag,
+                'outletcode'   => $data->outletcode,
+                'u_entdt'      => $this->currenttime,
+                'u_updatedt'   => null,
+            ]);
+
+            // Insert into MenuHelp
+            MenuHelp::create([
+                'propertyid'   => $request->input('propertyid'),
+                'username'     => $compdata->u_name,
+                'compcode'     => $compdata->comp_code,
+                'opt1'         => $data->opt1,
+                'opt2'         => $data->opt2,
+                'opt3'         => $data->opt3,
+                'code'         => $data->code,
+                'route'        => $data->route,
+                'module'       => $data->module,
+                'module_name'  => $data->module_name,
+                'view'         => 1,
+                'ins'          => 1,
+                'edit'         => 1,
+                'del'          => 1,
+                'print'        => 1,
+                'flag'         => $data->flag,
+                'outletcode'   => $data->outletcode,
+                'u_entdt'      => $this->currenttime,
+                'u_updatedt'   => null,
+                'u_name'       => Auth::user()->name,
+            ]);
         }
+    }
+}
     }
 
 

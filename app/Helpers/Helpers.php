@@ -491,3 +491,4 @@ function planbasedcategory($catcode)
     $plans = PlanMast::where('propertyid', Auth::user()->propertyid)->where('room_cat', $catcode)->where('activeYN', 'Y')->orderBy('name')->get();
     return $plans;
 }
+

@@ -18,6 +18,7 @@ use App\Http\Controllers\FinancialPush;
 use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\HouseKeeping;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\MembersController;
 use App\Http\Controllers\PartyMaster;
 use App\Http\Controllers\Pos;
 use App\Http\Controllers\PrintController;
@@ -1206,3 +1207,7 @@ Route::post('calculateroundoffpos', [GeneralController::class, 'calculateroundof
 Route::post('calculateroundpurch', [GeneralController::class, 'calculateroundpurch'])->name('calculateroundpurch');
 // Calculate Round Off Banquet Billing
 Route::post('calculateroundbanquet', [GeneralController::class, 'calculateroundbanquet'])->name('calculateroundbanquet');
+// Open Member Category
+Route::get('member/category', [MembersController::class, 'openmembercategory']);
+// Category Submit
+Route::post('/member/category/store', [MembersController::class, 'categorystore'])->name('member.categorystore');
