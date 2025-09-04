@@ -13,6 +13,7 @@ use App\Models\ChannelEnviro;
 use App\Models\ChannelPushes;
 use App\Models\Cities;
 use App\Models\CompanyDiscount;
+use App\Models\FomBillDetail;
 use App\Models\PlanMast;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -13640,6 +13641,8 @@ class CompanyController extends Controller
                 ->where('leaderyn', 'Y')
                 ->first();
 
+                // return $rocc;
+
             $fomupdata = [
                 'cancelremark' => $reason,
                 'status' => 'Cancel',
@@ -13680,11 +13683,13 @@ class CompanyController extends Controller
 
                 return back()->with('success', 'Bill Cancel Successfully');
             } else {
-                $fetchbillno = DB::table('paycharge')
-                    ->where('propertyid', $this->propertyid)
-                    ->where('folionodocid', $request->input('docid'))
-                    ->where('sno1', $request->input('sno1'))
-                    ->value('billno');
+                // $fetchbillno = DB::table('paycharge')
+                //     ->where('propertyid', $this->propertyid)
+                //     ->where('folionodocid', $request->input('docid'))
+                //     ->where('sno1', $request->input('sno1'))
+                //     ->value('billno');
+
+                $fetchbillno = FomBillDetail::where('propertyid', $this->propertyid)->where('folionodocid', $request->input('docid'))->where('sno1', $request->input('sno1'))->value('billno');
 
                 $fomupdata = [
                     'cancelremark' => $request->input('cancelreason') ?? '',
@@ -13698,6 +13703,8 @@ class CompanyController extends Controller
                     'billno' => '0',
                     'split' => 1,
                 ];
+
+                // return $fetchbillno;
 
                 $roundid = 'ROFF' . $this->propertyid;
                 $delpaychargeround = DB::table('paycharge')->where('sno1', $request->input('sno1'))->where('folionodocid', $request->input('docid'))->where('paycode', $roundid)->delete();
