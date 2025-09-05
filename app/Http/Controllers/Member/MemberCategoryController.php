@@ -93,14 +93,25 @@ class MemberCategoryController extends Controller
         }
     }
 
-    public function editcategory(Request $request, $sn)
+    public function editcategory(Request $request, $code)
     {
         try {
-            $data = MemberCategory::where('sn', $sn)->first();
+            $data = MemberCategory::where('propertyid', $this->propertyid)->where('code', $code)->first();
 
             return view('property.members.categoryupdate', [
                 'data' => $data
             ]);
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function deletecategory(Request $request, $code)
+    {
+        try {
+            MemberCategory::where('propertyid', $this->propertyid)->where('code', $code)->delete();
+
+            return redirect()->back()->with('success', 'Member category deleted successfully!');
         } catch (Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

@@ -1216,4 +1216,4 @@ Route::get('member/category/update/{id}', [MemberCategoryController::class, 'edi
 // Update submit Member Category
 Route::put('category/update/{code}', [MemberCategoryController::class, 'updatecategory'])->name('member.category.update');
 // Delete member category
-Route::get('category/delete/{id}', [MemberCategoryController::class, 'deleteCategory'])->name('member.category.delete');
+Route::get('category/delete/{code}', [MemberCategoryController::class, 'deletecategory'])->name('member.category.delete');

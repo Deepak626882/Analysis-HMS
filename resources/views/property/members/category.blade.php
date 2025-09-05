@@ -89,13 +89,13 @@
                                                 <td>{{ $data->surcharge }}</td>
                                                 <td class="ins">
                                                     <a
-                                                        href="category/update/{{ $data->sn }}">
+                                                        href="category/update/{{ $data->code }}">
                                                         <button class="btn btn-success btn-sm"><i
                                                                 class="fa-regular fa-pen-to-square"></i>Edit
                                                         </button>
                                                     </a>
                                                     <a
-                                                        href="category/delete/{{ $data->sn }}">
+                                                        href="category/delete/{{ $data->code }}">
                                                         <button class="btn btn-danger btn-sm"><i
                                                                 class="fa-solid fa-trash"></i> Delete
                                                         </button>
