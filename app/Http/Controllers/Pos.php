@@ -808,7 +808,7 @@ class Pos extends Controller
             'kot.vno',
             'kot.vtime',
             'server_mast.name as waitername',
-            DB::raw('SUM(kot.qty) as totalqty'),
+            DB::raw('kot.qty as totalqty'),
             'kot.rate as totalrate',
             'unitmast.name AS unitname',
             'itemmast.Name AS itemname',
