@@ -276,40 +276,66 @@
             </script>
         @endif
         @if (session('infosale'))
-            <script>
-                Swal.fire({
-                    icon: 'info',
-                    title: "Sale Bill Entry",
-                    text: "{{ session('infosale')['text'] }}",
-                    showCancelButton: true,
-                    showConfirmButton: true,
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let printdata = JSON.parse('{!! session('infosale')['printdata'] !!}');
-                        let filetoopen;
-                        if (printdata.printsetup.description == 'Bill Windows Plain Paper') {
-                            filetoopen = 'salebillprint';
-                        } else if (printdata.printsetup.description == '3 Inch Running Paper Windows Print') {
-                            filetoopen = 'salebillprint2';
-                        }
-                        let openfile = window.open(filetoopen, '_blank');
-                        openfile.onload = function() {
-                            $('#roomno', openfile.document).text(printdata.roomno);
-                            $('#vdate', openfile.document).text(printdata.vdate);
-                            $('#billno', openfile.document).text(printdata.billno);
-                            $('#vtype', openfile.document).text(printdata.vtype);
-                            $('#departname', openfile.document).text(printdata.departname);
-                            $('#kotno', openfile.document).text(printdata.kotno);
-                            $('#waiter', openfile.document).text(printdata.waiter);
-                            $('#outletcode', openfile.document).text(printdata.outletcode);
-                            $('#departnature', openfile.document).text(printdata.departnature);
-                        }
+<script>
+    Swal.fire({
+        icon: 'info',
+        title: "Sale Bill Entry",
+        text: "{{ session('infosale')['text'] }}",
+        showCancelButton: true,
+        showConfirmButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let printdata = {!! session('infosale')['printdata'] !!};
+
+            let filetoopen;
+            if (printdata.printsetup.description === 'Bill Windows Plain Paper') {
+                filetoopen = 'salebillprint';
+                let openfile = window.open(filetoopen, '_blank');
+                openfile.onload = function() {
+                    $('#roomno', openfile.document).text(printdata.roomno);
+                    $('#vdate', openfile.document).text(printdata.vdate);
+                    $('#billno', openfile.document).text(printdata.billno);
+                    $('#vtype', openfile.document).text(printdata.vtype);
+                    $('#departname', openfile.document).text(printdata.departname);
+                    $('#kotno', openfile.document).text(printdata.kotno);
+                    $('#waiter', openfile.document).text(printdata.waiter);
+                    $('#outletcode', openfile.document).text(printdata.outletcode);
+                    $('#departnature', openfile.document).text(printdata.departnature);
+                }
+            } else if (printdata.printsetup.description === '3 Inch Running Paper Windows Print') {
+                filetoopen = 'salebillprint2';
+                let openfile = window.open(filetoopen, '_blank');
+                openfile.onload = function() {
+                    $('#roomno', openfile.document).text(printdata.roomno);
+                    $('#vdate', openfile.document).text(printdata.vdate);
+                    $('#billno', openfile.document).text(printdata.billno);
+                    $('#vtype', openfile.document).text(printdata.vtype);
+                    $('#departname', openfile.document).text(printdata.departname);
+                    $('#kotno', openfile.document).text(printdata.kotno);
+                    $('#waiter', openfile.document).text(printdata.waiter);
+                    $('#outletcode', openfile.document).text(printdata.outletcode);
+                    $('#departnature', openfile.document).text(printdata.departnature);
+                }
+            } else if (printdata.printsetup.description === '3 Inch Running Paper DOS Print') {
+                $.ajax({
+                    url: 'salebillprintthermal',
+                    data: { docid: printdata.docid },
+                    method: "POST",
+                    success: function() {
+                        // setTimeout(() => window.location.reload(), 500);
+                    },
+                    error: function(error) {
+                        console.log(error);
                     }
                 });
-            </script>
-        @endif
+            }
+        }
+    });
+</script>
+@endif
+
         @if (session('nightinfo'))
             <script>
                 Swal.fire({

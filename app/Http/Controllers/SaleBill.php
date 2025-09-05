@@ -566,7 +566,6 @@ class SaleBill extends Controller
                         'seqno' => 0,
                         'company' => '',
                         'itemrestcode' => $itemmast->RestCode,
-                        'delflag' => 'N',
                         'u_entdt' => $this->currenttime,
                         'u_name' => Auth::user()->u_name,
                         'u_ae' => 'a',
@@ -671,7 +670,8 @@ class SaleBill extends Controller
                 'sale1.kotno',
                 'depart.name as departname',
                 'depart.nature as departnature',
-                'server_mast.name as waitername'
+                'server_mast.name as waitername',
+                'sale1.docid'
             )
                 ->leftJoin('server_mast', 'server_mast.scode', '=', 'sale1.waiter')
                 ->leftJoin('depart', 'depart.dcode', '=', 'sale1.restcode')
@@ -689,7 +689,8 @@ class SaleBill extends Controller
                 'kotno' => $sale1print->kotno,
                 'outletcode' => $sale1print->restcode,
                 'departnature' => $sale1print->departnature,
-                'printsetup' => $printsetup
+                'printsetup' => $printsetup,
+                'docid' => $sale1print->docid
             ];
 
             if ($billprinty == 'Y' && empty($posroomno)) {

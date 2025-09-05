@@ -184,6 +184,7 @@
                                 $('#vnoup').val(results.sale1.vno ?? '');
                                 $('#kotno').val(results.sale1.kotno ?? '');
                                 $('#vdatesale1').val(results.sale1.vdate ?? '');
+                                // $('#sale1docid').val(results.sale1.docid ?? '');
                                 $('#vdatetime').text(`Date: ${dmy(results.sale1.vdate)} ${results.sale1.vtime}`);
                                 $('#roomno').val(results.sale1.roomno ?? '');
                                 $('#waitername').html(`${results.waitername == null ? '' : `Waiter: ${results.waitername}`}`);
@@ -551,31 +552,75 @@
                 let vdatesale1 = $('#vdatesale1').val();
                 let vtype = $('#vtype').val();
                 let departname = $('#departname').val();
+                let sale1docid = $('#sale1docid').val();
+
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    }
+                });
+
                 let filetoopen;
                 if ($('#printdescription').val() == 'Bill Windows Plain Paper') {
                     filetoopen = 'salebillprint';
+                    let kotno = $('#kotno').val();
+                    let waitersname = $('#waitersname').val();
+                    let outletcode = $('#dcode').val();
+                    let departnature = $('#departnature').val();
+                    let addeddocid = $('#addeddocid').val();
+
+                    let openfile = window.open(filetoopen, '_blank');
+                    openfile.onload = function() {
+                        $('#roomno', openfile.document).text(roomno);
+                        $('#vdate', openfile.document).text(vdatesale1);
+                        $('#billno', openfile.document).text(vnoup);
+                        $('#vtype', openfile.document).text(vtype);
+                        $('#departname', openfile.document).text(departname);
+                        $('#departnature', openfile.document).text(departnature);
+                        $('#kotno', openfile.document).text(kotno);
+                        $('#waiter', openfile.document).text(waitersname);
+                        $('#outletcode', openfile.document).text(outletcode);
+                        $('#addeddocid', openfile.document).text(addeddocid);
+                    }
                 } else if ($('#printdescription').val() == '3 Inch Running Paper Windows Print') {
                     filetoopen = 'salebillprint2';
-                }
-                let kotno = $('#kotno').val();
-                let waitersname = $('#waitersname').val();
-                let outletcode = $('#dcode').val();
-                let departnature = $('#departnature').val();
-                let addeddocid = $('#addeddocid').val();
+                    let kotno = $('#kotno').val();
+                    let waitersname = $('#waitersname').val();
+                    let outletcode = $('#dcode').val();
+                    let departnature = $('#departnature').val();
+                    let addeddocid = $('#addeddocid').val();
 
-                let openfile = window.open(filetoopen, '_blank');
-                openfile.onload = function() {
-                    $('#roomno', openfile.document).text(roomno);
-                    $('#vdate', openfile.document).text(vdatesale1);
-                    $('#billno', openfile.document).text(vnoup);
-                    $('#vtype', openfile.document).text(vtype);
-                    $('#departname', openfile.document).text(departname);
-                    $('#departnature', openfile.document).text(departnature);
-                    $('#kotno', openfile.document).text(kotno);
-                    $('#waiter', openfile.document).text(waitersname);
-                    $('#outletcode', openfile.document).text(outletcode);
-                    $('#addeddocid', openfile.document).text(addeddocid);
+                    let openfile = window.open(filetoopen, '_blank');
+                    openfile.onload = function() {
+                        $('#roomno', openfile.document).text(roomno);
+                        $('#vdate', openfile.document).text(vdatesale1);
+                        $('#billno', openfile.document).text(vnoup);
+                        $('#vtype', openfile.document).text(vtype);
+                        $('#departname', openfile.document).text(departname);
+                        $('#departnature', openfile.document).text(departnature);
+                        $('#kotno', openfile.document).text(kotno);
+                        $('#waiter', openfile.document).text(waitersname);
+                        $('#outletcode', openfile.document).text(outletcode);
+                        $('#addeddocid', openfile.document).text(addeddocid);
+                    }
+                } else if ($('#printdescription').val() == '3 Inch Running Paper DOS Print') {
+                    $.ajax({
+                        url: 'salebillprintthermal',
+                        data: {
+                            docid: sale1docid
+                        },
+                        method: "POST",
+                        success: function(response) {
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 500);
+                        },
+                        error: function(error) {
+                            console.log(error);
+                        }
+                    })
                 }
+
             });
         });
     </script>

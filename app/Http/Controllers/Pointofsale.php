@@ -3076,6 +3076,8 @@ class Pointofsale extends Controller
                 'taxes' => $taxes
             ];
 
+            Log::info(json_encode($data));
+
             $printsetup = PrintingSetup::where('propertyid', $this->propertyid)->where('module', 'POS')->where('restcode', $mersale1->restcode)->get();
 
             foreach ($printsetup as $print) {
