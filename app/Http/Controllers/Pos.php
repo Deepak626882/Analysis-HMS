@@ -812,7 +812,7 @@ class Pos extends Controller
             'kot.rate as totalrate',
             'unitmast.name AS unitname',
             'itemmast.Name AS itemname',
-            DB::raw('SUM(kot.qty) * kot.rate as kotamount')
+            DB::raw('kot.qty * kot.rate as kotamount')
         )
             ->leftJoin('itemmast', 'itemmast.Code', '=', 'kot.item')
             ->leftJoin('unitmast', 'unitmast.ucode', '=', 'itemmast.Unit')
