@@ -19,6 +19,7 @@ use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\HouseKeeping;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\Member\MemberCategoryController;
+use App\Http\Controllers\Member\MemberMasterController;
 use App\Http\Controllers\PartyMaster;
 use App\Http\Controllers\Pos;
 use App\Http\Controllers\PrintController;
@@ -1217,3 +1218,5 @@ Route::get('member/category/update/{id}', [MemberCategoryController::class, 'edi
 Route::put('category/update/{code}', [MemberCategoryController::class, 'updatecategory'])->name('member.category.update');
 // Delete member category
 Route::get('category/delete/{code}', [MemberCategoryController::class, 'deletecategory'])->name('member.category.delete');
+// Open Member Master
+// Route::get('member/master', [MemberMasterController::class, 'openmembermaster']);
