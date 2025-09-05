@@ -8,6 +8,7 @@ use App\Models\EnviroGeneral;
 use App\Models\FunctionType;
 use App\Models\HallBook;
 use App\Models\HallSale1;
+use App\Models\MemberCategory;
 use App\Models\MenuHelp;
 use App\Models\PlanMast;
 use App\Models\RoomOcc;
@@ -492,3 +493,8 @@ function planbasedcategory($catcode)
     return $plans;
 }
 
+function membercategories() {
+    $data = MemberCategory::where('propertyid', Auth::user()->propertyid)->orderByDesc('sn')->get();
+    
+    return $data;
+}

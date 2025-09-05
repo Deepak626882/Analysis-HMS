@@ -18,7 +18,7 @@ use App\Http\Controllers\FinancialPush;
 use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\HouseKeeping;
 use App\Http\Controllers\InventoryController;
-use App\Http\Controllers\MembersController;
+use App\Http\Controllers\Member\MemberCategoryController;
 use App\Http\Controllers\PartyMaster;
 use App\Http\Controllers\Pos;
 use App\Http\Controllers\PrintController;
@@ -1208,6 +1208,12 @@ Route::post('calculateroundpurch', [GeneralController::class, 'calculateroundpur
 // Calculate Round Off Banquet Billing
 Route::post('calculateroundbanquet', [GeneralController::class, 'calculateroundbanquet'])->name('calculateroundbanquet');
 // Open Member Category
-Route::get('member/category', [MembersController::class, 'openmembercategory']);
-// Category Submit
-Route::post('/member/category/store', [MembersController::class, 'categorystore'])->name('member.categorystore');
+Route::get('member/category', [MemberCategoryController::class, 'openmembercategory']);
+// Member Category Submit
+Route::post('/member/category/store', [MemberCategoryController::class, 'categorystore'])->name('member.categorystore');
+// Open Member Category Update
+Route::get('member/category/update/{id}', [MemberCategoryController::class, 'editcategory'])->name('member.category.edit');
+// Update submit Member Category
+Route::put('category/update/{code}', [MemberCategoryController::class, 'updatecategory'])->name('member.category.update');
+// Delete member category
+Route::get('category/delete/{id}', [MemberCategoryController::class, 'deleteCategory'])->name('member.category.delete');
