@@ -827,14 +827,7 @@ class Pos extends Controller
             ->where('kot.propertyid', $this->propertyid)
             ->where('kot.nckot', 'N')
             ->groupBy(
-                'kot.item',
-                'kot.rate',
-                'kot.restcode',
-                'kot.vno',
-                'kot.vtime',
-                'server_mast.name',
-                'unitmast.name',
-                'itemmast.Name'
+                'kot.item'
             )
             ->get();
 
