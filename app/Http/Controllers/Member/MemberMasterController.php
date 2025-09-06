@@ -26,6 +26,6 @@ class MemberMasterController extends Controller
 
     public function openmembermaster(Request $request)
     {
-        return view('property.members.mastersd');
+        return view('property.members.master');
     }
 }
