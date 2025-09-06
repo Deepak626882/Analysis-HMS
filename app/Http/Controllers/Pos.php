@@ -808,21 +808,36 @@ class Pos extends Controller
             'kot.vno',
             'kot.vtime',
             'server_mast.name as waitername',
-            DB::raw('kot.qty as totalqty'),
-            'kot.rate as totalrate',
+            DB::raw('SUM(kot.qty) as totalqty'),
+           'kot.rate as totalrate',
             'unitmast.name AS unitname',
             'itemmast.Name AS itemname',
-            DB::raw('kot.qty * kot.rate as kotamount')
+            DB::raw('SUM(kot.qty * kot.rate) as kotamount')
         )
-            ->leftJoin('itemmast', 'itemmast.Code', '=', 'kot.item')
+            ->leftJoin('itemmast', function ($join) {
+                $join->on('itemmast.Code', '=', 'kot.item')
+                    ->on('itemmast.RestCode', '=', 'kot.restcode');
+            })
             ->leftJoin('unitmast', 'unitmast.ucode', '=', 'itemmast.Unit')
             ->leftJoin('server_mast', 'server_mast.scode', '=', 'kot.waiter')
             ->where('kot.roomno', $vno)
             ->where('kot.pending', 'Y')
             ->where('kot.voidyn', 'N')
             ->where('kot.restcode', $dcode)
+            ->where('kot.propertyid', $this->propertyid)
             ->where('kot.nckot', 'N')
-            ->groupBy('kot.item')->get();
+            ->groupBy(
+                'kot.item',
+                'kot.rate',
+                'kot.restcode',
+                'kot.vno',
+                'kot.vtime',
+                'server_mast.name',
+                'unitmast.name',
+                'itemmast.Name'
+            )
+            ->get();
+
         $sessionmast = SessionMast::where('propertyid', $this->propertyid)->get();
         $waitername = '';
         $kottime = '';
