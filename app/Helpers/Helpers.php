@@ -2,6 +2,7 @@
 
 use App\Models\Cities;
 use App\Models\Companyreg;
+use App\Models\Countries;
 use App\Models\EnviroBanquet;
 use App\Models\EnviroFom;
 use App\Models\EnviroGeneral;
@@ -496,5 +497,11 @@ function planbasedcategory($catcode)
 function membercategories() {
     $data = MemberCategory::where('propertyid', Auth::user()->propertyid)->orderByDesc('sn')->get();
     
+    return $data;
+}
+
+function allcountries() {
+    $data = Countries::where('propertyid', Auth::user()->propertyid)->orderBy('name')->get();
+
     return $data;
 }

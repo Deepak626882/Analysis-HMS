@@ -808,11 +808,11 @@ class Pos extends Controller
             'kot.vno',
             'kot.vtime',
             'server_mast.name as waitername',
-            DB::raw('kot.qty as totalqty'),
+            DB::raw('SUM(kot.qty) as totalqty'),
             'kot.rate as totalrate',
             'unitmast.name AS unitname',
             'itemmast.Name AS itemname',
-            DB::raw('kot.qty * kot.rate as kotamount')
+            DB::raw('SUM(kot.qty) * kot.rate as kotamount')
         )
             ->leftJoin('itemmast', 'itemmast.Code', '=', 'kot.item')
             ->leftJoin('unitmast', 'unitmast.ucode', '=', 'itemmast.Unit')

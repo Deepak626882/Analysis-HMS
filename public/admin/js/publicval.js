@@ -37,6 +37,31 @@ $(document).ready(function () {
         $(this).val(title($(this).val()));
     });
 
+    $('#pancard').on('input', function () {
+        let pan = $(this).val().toUpperCase();
+        if (pan != '') {
+            const pattern = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+
+            $(this).val(pan);
+
+            let message = '';
+            if (pattern.test(pan)) {
+                message = '<p class="valid">✔ Valid PAN Card</p>';
+            } else {
+                message = '<p class="invalid">✖ Invalid PAN Card</p>';
+            }
+
+            if ($(this).next('.pan-result').length === 0) {
+                $(this).after('<div class="pan-result"></div>');
+            }
+
+            $(this).next('.pan-result').html(message);
+        } else {
+            $(this).next('.pan-result').html('');
+        }
+    });
+
+
     $(document).on('input', '#printerpath', function () {
         var value = $(this).val();
         // Updated pattern for Windows-style paths with backslashes
