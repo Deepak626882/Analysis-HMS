@@ -1,6 +1,15 @@
 @extends('property.layouts.main')
 @section('main-container')
     @include('cdns.select')
+    <style>
+        #memberexttable tbody tr th {
+            padding: 1px;
+        }
+
+        #memberexttable tbody tr td {
+            padding: 1px;
+        }
+    </style>
     <div class="content-body">
 
         <div class="container-fluid">
@@ -273,9 +282,9 @@
                                         <div class="row">
                                             <input type="hidden" name="signimage" id="signimage">
                                             <div class="col-md-6">
-                                                <h1 class="signature-heading">
-                                                    <i class="fas fa-pen-signature"></i> Guest Signature
-                                                </h1>
+                                                <h5 class="signature-heading">
+                                                    <i class="fas fa-pen-signature"></i> Member Signature
+                                                </h5>
                                                 <div class="text-center mt-5 mb-3">
                                                     <button type="button" id="openModalBtn"
                                                         class="btn btn-primary">Sign Your Name</button>
@@ -287,8 +296,8 @@
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title">Guest Signature
-                                                                </h5>
+                                                                <h6 class="modal-title">Member Signature
+                                                                </h6>
                                                                 <button type="button" class="btn-close"
                                                                     data-bs-dismiss="modal"
                                                                     aria-label="Close"><i
@@ -326,10 +335,108 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <img id="imagePreview" alt="Signature Preview" />
+                                                <img src="https://placehold.co/150x150?text=Analysis" id="imagePreview" alt="Signature Preview" />
                                             </div>
                                         </div>
 
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <div class="mb-3">
+                                            <button type="button" id="btnFamily" class="btn btn-primary">Family Member</button>
+                                            <button type="button" id="btnAddress" class="btn btn-secondary">Address</button>
+                                        </div>
+
+                                        <div id="familySection" class="border p-3 mb-3" style="display:none;">
+                                            <table id="memberexttable" class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>SN</th>
+                                                        <th>Relation</th>
+                                                        <th>Prefix</th>
+                                                        <th>Name</th>
+                                                        <th>Gender</th>
+                                                        <th>DOB</th>
+                                                        <th>Anniversary</th>
+                                                        <th>Mobile No.</th>
+                                                        <th>Email</th>
+                                                        <th>Lvl</th>
+                                                        <th>Card Issue</th>
+                                                        <th>Card Valid</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>
+                                                            <select class="form-control select2-multiple" name="relation1" id="relation1">
+                                                                <option value="">Select</option>
+                                                                <option value="Spouse">Spouse</option>
+                                                                <option value="Husband">Husband</option>
+                                                                <option value="Son">Son</option>
+                                                                <option value="Daughter">Daughter</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-control select2-multiple" name="greeting1" id="greeting1">
+                                                                <option value="Mr.">Mr.</option>
+                                                                <option value="Ms.">Ms.</option>
+                                                                <option value="Mam">Mam</option>
+                                                                <option value="Dr.">Dr.</option>
+                                                                <option value="Prof.">Prof.</option>
+                                                                <option value="Mrs.">Mrs.</option>
+                                                                <option value="Miss">Miss</option>
+                                                                <option value="Sir">Sir</option>
+                                                                <option value="Madam">Madam</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control" name="extname1" id="extname1">
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-control select2-multiple" name="extgender1" id="extgender1">
+                                                                <option value="">Select</option>
+                                                                <option value="male">Male</option>
+                                                                <option value="female">female</option>
+                                                                <option value="other">Other</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="date" class="form-control" name="extdob1" id="extdob1">
+                                                        </td>
+                                                        <td>
+                                                            <input type="date" class="form-control" name="extdanniversary1" id="extdanniversary1">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control" name="extmob1" id="extmob1">
+                                                        </td>
+                                                        <td>
+                                                            <input type="email" class="form-control" name="extmail1" id="extmail1">
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-control select2-multiple" name="extlevel1" id="extlevel1">
+                                                                <option value="">Select</option>
+                                                                <option value="1">1</option>
+                                                                <option value="2">2</option>
+                                                                <option value="3">3</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="date" class="form-control" name="extcardissue1" id="extcardissue1">
+                                                        </td>
+                                                        <td>
+                                                            <input type="date" class="form-control" name="extcardvalid1" id="extcardvalid1">
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div id="addressSection" class="border p-3" style="display:none;">
+                                            <h5>Address Details</h5>
+                                            <p>Here you can add address information.</p>
+                                        </div>
                                     </div>
 
                                     <div class="text-center">
@@ -368,6 +475,88 @@
                     reader.readAsDataURL(file);
                 }
             });
+
+            setTimeout(() => {
+                $('#btnFamily').trigger('click');
+            }, 500);
+
+            $('#btnFamily').click(function() {
+                $('#familySection').show();
+                $('#addressSection').hide();
+            });
+
+            $('#btnAddress').click(function() {
+                $('#addressSection').show();
+                $('#familySection').hide();
+            });
+
+            $(document).on('keypress', 'input[type="email"]', function(e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    addRawRow();
+                }
+            });
+
+            function addRawRow() {
+                var $tbody = $('#memberexttable tbody');
+                var lastIndex = parseInt($tbody.find('tr:last td:first').text());
+                var newIndex = lastIndex + 1;
+
+                var rowHtml = `
+                        <tr>
+                            <td>${newIndex}</td>
+                            <td>
+                                <select class="form-control select2-multiple" name="relation${newIndex}" id="relation${newIndex}">
+                                    <option value="">Select</option>
+                                    <option value="Spouse">Spouse</option>
+                                    <option value="Husband">Husband</option>
+                                    <option value="Son">Son</option>
+                                    <option value="Daughter">Daughter</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-control select2-multiple" name="greeting${newIndex}" id="greeting${newIndex}">
+                                    <option value="Mr.">Mr.</option>
+                                    <option value="Ms.">Ms.</option>
+                                    <option value="Mam">Mam</option>
+                                    <option value="Dr.">Dr.</option>
+                                    <option value="Prof.">Prof.</option>
+                                    <option value="Mrs.">Mrs.</option>
+                                    <option value="Miss">Miss</option>
+                                    <option value="Sir">Sir</option>
+                                    <option value="Madam">Madam</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="form-control" name="extname${newIndex}" id="extname${newIndex}"></td>
+                            <td>
+                                <select class="form-control select2-multiple" name="extgender${newIndex}" id="extgender${newIndex}">
+                                    <option value="">Select</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </td>
+                            <td><input type="date" class="form-control" name="extdob${newIndex}" id="extdob${newIndex}"></td>
+                            <td><input type="date" class="form-control" name="extdanniversary${newIndex}" id="extdanniversary${newIndex}"></td>
+                            <td><input type="text" class="form-control" name="extmob${newIndex}" id="extmob${newIndex}"></td>
+                            <td><input type="email" class="form-control" name="extmail${newIndex}" id="extmail${newIndex}"></td>
+                            <td>
+                                <select class="form-control select2-multiple" name="extlevel${newIndex}" id="extlevel${newIndex}">
+                                    <option value="">Select</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </td>
+                            <td><input type="date" class="form-control" name="extcardissue${newIndex}" id="extcardissue${newIndex}"></td>
+                            <td><input type="date" class="form-control" name="extcardvalid${newIndex}" id="extcardvalid${newIndex}"></td>
+                        </tr>
+                        `;
+
+                $tbody.append(rowHtml);
+
+                $tbody.find(`input#extmail${newIndex}`).focus();
+            }
         });
 
         $(document).ready(function() {
