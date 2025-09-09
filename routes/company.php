@@ -1220,3 +1220,5 @@ Route::put('category/update/{code}', [MemberCategoryController::class, 'updateca
 Route::get('member/category/delete/{code}', [MemberCategoryController::class, 'deletecategory'])->name('member.category.delete');
 // Open Member Master
 Route::get('member/master', [MemberMasterController::class, 'openmembermaster']);
+// Submit Member Master
+Route::post('/member/store', [MemberMasterController::class, 'store'])->name('member.store');

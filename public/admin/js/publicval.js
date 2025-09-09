@@ -26,10 +26,35 @@ $(document).ready(function () {
         $(this).val(inputval);
     });
 
-    $(document).on('input', '#gstin', function () {
-        let inputval = $(this).val().toUpperCase().replace(/[^A-Z0-9]|^(.{15}).*$/g, '$1');
-        $(this).val(inputval);
+    $('#gstin').on('input', function () {
+        let gstin = $(this).val().toUpperCase();
+        const pattern = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+
+        $(this).val(gstin);
+
+        if ($(this).next('.gstin-result').length === 0) {
+            $(this).after('<div class="gstin-result"></div>');
+        }
+
+        let message = '';
+
+        if (gstin === '') {
+            message = '';
+        }
+        else if (pattern.test(gstin)) {
+            message = '<p class="valid">✔ Valid GSTIN</p>';
+        }
+        else {
+            message = '<p class="invalid">✖ Invalid GSTIN</p>';
+        }
+
+        $('#gstin').next('.gstin-result').html(message);
     });
+
+    // $(document).on('input', '#gstin', function () {
+    //     let inputval = $(this).val().toUpperCase().replace(/[^A-Z0-9]|^(.{15}).*$/g, '$1');
+    //     $(this).val(inputval);
+    // });
 
     $(document).on('input', '#kotremark', function () {
         let inputval = $(this).val().replace(/[^A-Za-z-0-9\s]|^(.{50}).*$/g, '$1');
