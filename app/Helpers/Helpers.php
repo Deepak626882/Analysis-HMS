@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ACGroup;
 use App\Models\Cities;
 use App\Models\Companyreg;
 use App\Models\Countries;
@@ -13,6 +14,7 @@ use App\Models\MemberCategory;
 use App\Models\MenuHelp;
 use App\Models\PlanMast;
 use App\Models\RoomOcc;
+use App\Models\States;
 use App\Models\SubGroup;
 use App\Models\VenueMast;
 use App\Models\VenueOcc;
@@ -93,6 +95,16 @@ if (!function_exists('allcities')) {
     {
         $citydata = Cities::where('propertyid', Auth::user()->propertyid)->where('activeyn', '1')
             ->orderBy('cityname', 'ASC')->get();
+
+        return $citydata;
+    }
+}
+
+if (!function_exists('allstates')) {
+    function allstates()
+    {
+        $citydata = States::where('propertyid', Auth::user()->propertyid)
+            ->orderBy('name', 'ASC')->get();
 
         return $citydata;
     }
@@ -502,6 +514,11 @@ function membercategories() {
 
 function allcountries() {
     $data = Countries::where('propertyid', Auth::user()->propertyid)->orderBy('name')->get();
+    return $data;
+}
+
+function acgroup($group_code) {
+    $data = ACGroup::where('propertyid', Auth::user()->propertyid)->first();
 
     return $data;
 }

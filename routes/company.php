@@ -19,6 +19,7 @@ use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\HouseKeeping;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\Member\MemberCategoryController;
+use App\Http\Controllers\Member\MemberFacilityMasterController;
 use App\Http\Controllers\Member\MemberMasterController;
 use App\Http\Controllers\PartyMaster;
 use App\Http\Controllers\Pos;
@@ -1219,6 +1220,22 @@ Route::put('category/update/{code}', [MemberCategoryController::class, 'updateca
 // Delete member category
 Route::get('member/category/delete/{code}', [MemberCategoryController::class, 'deletecategory'])->name('member.category.delete');
 // Open Member Master
-Route::get('member/master', [MemberMasterController::class, 'openmembermaster']);
+Route::get('member/master', [MemberMasterController::class, 'openmembermaster'])->name('member.master');
 // Submit Member Master
 Route::post('/member/store', [MemberMasterController::class, 'store'])->name('member.store');
+// Open Member Master Update
+Route::get('member/master/update/{id}', [MemberMasterController::class, 'editmaster'])->name('member.master.edit');
+// Update submit Member Master
+Route::put('master/update/{code}', [MemberMasterController::class, 'updatemaster'])->name('member.master.update');
+// Delete member master
+Route::get('member/master/delete/{code}', [MemberMasterController::class, 'deletemaster'])->name('member.master.delete');
+// Open Member Facility Master
+Route::get('member/memfacilitymast', [MemberFacilityMasterController::class, 'index'])->name('member.memfacilitymast');
+// Submit Member Facility Master
+Route::post('/member/facilitymast/store', [MemberFacilityMasterController::class, 'store'])->name('member.facilitymast.store');
+// Open Update MemberFacility Master
+Route::get('/member/memberfacility/update/{code}', [MemberFacilityMasterController::class, 'update'])->name('member.memberfacility.update');
+// Submit Update MemberFacility Master
+Route::put('/member/facilitymast/updatestore/{code}', [MemberFacilityMasterController::class, 'updatestore'])->name('member.facilitymast.updatestore');
+// Delete MemberFacility Master
+Route::get('/member/memberfacility/delete/{code}', [MemberFacilityMasterController::class, 'delete'])->name('member.memberfacility.delete');

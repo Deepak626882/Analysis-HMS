@@ -503,7 +503,6 @@ class Reporting extends Controller
       $dynamicAliases = [];
 
       foreach ($seqrevcode as $code) {
-
          $alias = "sum_" . strtolower(substr($code, 0, 4));
          $selectFields[] = DB::raw("SUM(CASE WHEN paycode = '{$code}' THEN amtdr ELSE 0 END) AS {$alias}");
          $dynamicAliases[] = $alias;
@@ -567,14 +566,13 @@ class Reporting extends Controller
          $mainQuery->whereIn('guestfolio.busssource', explode(',', $allbusssource));
       }
 
-      // if (strtolower($settleyn) == 'y') {
-      //    $mainQuery->whereIn('paycharge.paytype', explode(',', strtolower($allsettlement)));
-      // }
+      if (strtolower($settleyn) == 'y') {
+         $mainQuery->whereIn('paycharge.paytype', explode(',', strtolower($allsettlement)));
+      }
 
       $mainQuery->groupBy('paycharge.billno')
          ->orderBy('paycharge.billno')
          ->orderBy('paycharge.settledate');
-
 
       $cgstQuery = DB::table('paycharge')
          ->select($selectFields)
@@ -630,42 +628,69 @@ class Reporting extends Controller
 
       $resulttmp = $resultQuery->get();
 
+      if ($resulttmp->isEmpty()) {
+         return json_encode([
+            'skipcode' => $skipcode,
+            'report' => [],
+            'revmast' => $revmast,
+            'resultQuery' => []
+         ]);
+      }
+
+      $roomDocIds = $resulttmp->pluck('roomdocid')->filter()->unique()->values()->toArray();
+
+      $bulkPaymentQuery = DB::table('paycharge')
+         ->leftJoin('revmast', function ($join) {
+            $join->on('revmast.rev_code', '=', 'paycharge.paycode')
+               ->where('revmast.field_type', '=', 'P');
+         })
+         ->whereIn('paycharge.folionodocid', $roomDocIds)
+         ->where('modeset', 'S')
+         ->where('paycharge.paycode', '!=', 'ROFF' . $this->propertyid)
+         ->select([
+            'paycharge.folionodocid',
+            'paycharge.paytype',
+            DB::raw('SUM(paycharge.amtcr) AS totalamt')
+         ])
+         ->groupBy('paycharge.folionodocid', 'paycharge.paytype')
+         ->havingRaw('SUM(paycharge.amtcr) > 0');
+
+
+      if (strtolower($settleyn) == 'y') {
+         $bulkPaymentQuery->whereIn('paycharge.paytype', explode(',', strtolower($allsettlement)));
+      }
+
+      $bulkPaymentData = $bulkPaymentQuery->get()->groupBy('folionodocid');
+
+      $bulkAdvanceData = Paycharge::whereIn('paycharge.folionodocid', $roomDocIds)
+         ->where('paycharge.propertyid', $this->propertyid)
+         ->whereIn('vtype', ['REC', 'CHK'])
+         ->whereNull('modeset')
+         ->select([
+            'folionodocid',
+            'sno1',
+            DB::raw('SUM(paycharge.amtcr) AS advance_sum')
+         ])
+         ->groupBy('folionodocid', 'sno1')
+         ->get()
+         ->keyBy(function ($item) {
+            return $item->folionodocid . '_' . $item->sno1;
+         });
+
       $result = [];
 
       foreach ($resulttmp as $row) {
-         $payamttotaltmp = DB::table('paycharge')
-            ->leftJoin('revmast', function ($join) {
-               $join->on('revmast.rev_code', '=', 'paycharge.paycode')
-                  ->where('revmast.field_type', '=', 'P');
-            })
-            ->where('paycharge.folionodocid', $row->roomdocid)
-            ->where('modeset', 'S')
-            ->where('paycharge.paycode', '!=', 'ROFF' . $this->propertyid)
-            ->groupBy('paycharge.paytype')
-            ->havingRaw('SUM(paycharge.amtcr) > 0')
-            ->selectRaw('paycharge.paytype, SUM(paycharge.amtcr) AS totalamt');
+         $paymentDataForRoom = $bulkPaymentData->get($row->roomdocid, collect());
 
-         if (strtolower($settleyn) == 'y') {
-            $payamttotal = $payamttotaltmp
-               ->whereIn('paycharge.paytype', explode(',', strtolower($allsettlement)))
-               ->get();
-         } else {
-            $payamttotal = $payamttotaltmp->get();
-         }
-
-         $paytypeStr = $payamttotal->pluck('paytype')->implode(', ');
-         $paymentStr = $payamttotal->pluck('totalamt')->implode(', ');
+         $paytypeStr = $paymentDataForRoom->pluck('paytype')->implode(', ');
+         $paymentStr = $paymentDataForRoom->pluck('totalamt')->implode(', ');
 
          if (strtolower($settleyn) == 'y' && empty(trim($paytypeStr))) {
             continue;
          }
 
-         $advancesum = Paycharge::where('paycharge.propertyid', $this->propertyid)
-            ->whereIn('vtype', ['REC', 'CHK'])
-            ->where('paycharge.folionodocid', $row->roomdocid ?? 0)
-            ->where('paycharge.sno1', $row->rocc1)
-            ->whereNull('modeset')
-            ->sum('paycharge.amtcr') ?? 0;
+         $advanceKey = $row->roomdocid . '_' . $row->rocc1;
+         $advancesum = $bulkAdvanceData->get($advanceKey)->advance_sum ?? 0;
 
          $row->paytype = $paytypeStr;
          $row->payment = $paymentStr;
@@ -2795,7 +2820,7 @@ class Reporting extends Controller
          ->where('restcode', 'BANQ' . $this->propertyid)
          ->whereBetween('vdate', [$ranges['ftd']['start'], $ranges['ftd']['end']])
          ->first();
-         
+
       $reportData[] = [
          'category' => 'Banquet',
          'rev_code' => '',

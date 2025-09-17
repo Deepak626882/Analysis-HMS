@@ -263,7 +263,7 @@ class Reservation extends Controller
                 ->leftJoin('room_cat', 'room_cat.cat_code', '=', 'grpbookingdetails.RoomCat')
                 ->where('grpbookingdetails.BookingDocid', $docid)
                 ->where('grpbookingdetails.Property_ID', $this->propertyid)
-                ->groupBy('grpbookingdetails.RoomCat', 'room_cat.name')
+                ->groupBy('grpbookingdetails.RoomCat', 'room_cat.name', 'grpbookingdetails.RoomNo')
                 ->get();
         }
 

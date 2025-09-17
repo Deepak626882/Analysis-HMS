@@ -21,6 +21,7 @@
                             <div class="mb-3">
                                 <form method="post" action="{{ route('member.store') }}" enctype="multipart/form-data">
                                     @csrf
+                                    <input type="hidden" value="1" name="totalrow" id="totalrow">
                                     <div class="row">
                                         <div class="col-md-3">
                                             <div class="form-group">
@@ -91,12 +92,7 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="accountname">A/C Name</label>
-                                                <select class="form-control  select2-multiple" name="accountname" id="accountname">
-                                                    <option value="">Select</option>
-                                                    @foreach (subgroupall() as $item)
-                                                        <option value="{{ $item->sub_code }}">{{ $item->name }}</option>
-                                                    @endforeach
-                                                </select>
+                                                <input type="text" class="form-control" name="accountname" id="accountname">
                                             </div>
                                         </div>
 
@@ -105,8 +101,8 @@
                                                 <label for="undergroup">Under Group</label>
                                                 <select class="form-control  select2-multiple" name="undergroup" id="undergroup">
                                                     <option value="">Select</option>
-                                                    @foreach (subgroupall() as $item)
-                                                        <option value="{{ $item->sub_code }}">{{ $item->name }}</option>
+                                                    @foreach ($groupdata as $item)
+                                                        <option value="{{ $item->group_code }}">{{ $item->group_name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -417,9 +413,15 @@
                                                         <td>
                                                             <select class="form-control select2-multiple" name="extlevel1" id="extlevel1">
                                                                 <option value="">Select</option>
-                                                                <option value="1">1</option>
                                                                 <option value="2">2</option>
                                                                 <option value="3">3</option>
+                                                                <option value="4">4</option>
+                                                                <option value="5">5</option>
+                                                                <option value="6">6</option>
+                                                                <option value="7">7</option>
+                                                                <option value="8">8</option>
+                                                                <option value="9">9</option>
+                                                                <option value="10">10</option>
                                                             </select>
                                                         </td>
                                                         <td>
@@ -434,15 +436,184 @@
                                         </div>
 
                                         <div id="addressSection" class="border p-3" style="display:none;">
-                                            <h5>Address Details</h5>
-                                            <p>Here you can add address information.</p>
+                                            <button type="button" class="btn btn-sm btn-info btn-residental">Residental Address</button>
+                                            <button type="button" class="btn btn-sm btn-info btn-workplace">WorkPlace Address</button>
+
+                                            <div class="residentalsection" style="display:none;">
+                                                <div class="row">
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="residentaladdress">Residental Address</label>
+                                                            <textarea class="form-control" name="residentaladdress" id="residentaladdress" rows="2" placeholder="Enter Full Address"></textarea>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="residentalcity">City</label>
+                                                            <select class="form-control select2-multiple" name="residentalcity" id="residentalcity">
+                                                                <option value="">Select</option>
+                                                                @foreach (allcities() as $item)
+                                                                    <option data-pin_code="{{ $item->zipcode }}" data-country_code="{{ $item->country }}" data-state_code="{{ $item->state }}" value="{{ $item->city_code }}">{{ $item->cityname }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="residentalstate">State</label>
+                                                            <select class="form-control select2-multiple" name="residentalstate" id="residentalstate">
+                                                                <option value="">Select</option>
+                                                                @foreach (allstates() as $item)
+                                                                    <option value="{{ $item->state_code }}">{{ $item->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="residentalcountry">Country</label>
+                                                            <select class="form-control select2-multiple" name="residentalcountry" id="residentalcountry">
+                                                                <option value="">Select</option>
+                                                                @foreach (allcountries() as $item)
+                                                                    <option value="{{ $item->country_code }}">{{ $item->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="residentalpincode">Pin Code</label>
+                                                            <input type="text" class="form-control" name="residentalpincode" id="residentalpincode" readonly>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <input checked type="radio" value="residental" class="form-check-input" name="correspondanceaddress" id="correspondanceaddress1">
+                                                            <label for="correspondanceaddress1">Correspondance Address</label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="workplacesection" style="display:none;">
+                                                <div class="row">
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="workplaceaddress">WorkPlace Address</label>
+                                                            <textarea class="form-control" name="workplaceaddress" id="workplaceaddress" rows="2" placeholder="Enter Full Address"></textarea>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="workplacecity">City</label>
+                                                            <select class="form-control select2-multiple" name="workplacecity" id="workplacecity">
+                                                                <option value="">Select</option>
+                                                                @foreach (allcities() as $item)
+                                                                    <option data-pin_code="{{ $item->zipcode }}" data-country_code="{{ $item->country }}" data-state_code="{{ $item->state }}" value="{{ $item->city_code }}">{{ $item->cityname }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="workplacestate">State</label>
+                                                            <select class="form-control select2-multiple" name="workplacestate" id="workplacestate">
+                                                                <option value="">Select</option>
+                                                                @foreach (allstates() as $item)
+                                                                    <option value="{{ $item->state_code }}">{{ $item->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="workplacecountry">Country</label>
+                                                            <select class="form-control select2-multiple" name="workplacecountry" id="workplacecountry">
+                                                                <option value="">Select</option>
+                                                                @foreach (allcountries() as $item)
+                                                                    <option value="{{ $item->country_code }}">{{ $item->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="workplacepincode">Pin Code</label>
+                                                            <input type="text" class="form-control" name="workplacepincode" id="workplacepincode" readonly>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <input type="radio" value="workplace" class="form-check-input" name="correspondanceaddress" id="correspondanceaddress2">
+                                                            <label for="correspondanceaddress2">Correspondance Address</label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="text-center">
+                                    <div class="text-center mt-4">
                                         <button type="submit" class="btn btn-success">Submit</button>
                                     </div>
                                 </form>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Member ID</th>
+                                            <th>App. No.</th>
+                                            <th>App. Date</th>
+                                            <th>Mem. Date</th>
+                                            <th>Total Mem.</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @foreach ($membermast as $item)
+                                            <tr>
+                                                <td>{{ $item->name }}</td>
+                                                <td>{{ $item->member_id }}</td>
+                                                <td>{{ $item->appno }}</td>
+                                                <td>{{ date('d-m-Y', strtotime($item->appdate)) }}</td>
+                                                <td>{{ date('d-m-Y', strtotime($item->membership_date)) }}</td>
+                                                <td>{{ $item->totalmember }}</td>
+                                                <td class="ins">
+                                                    <a
+                                                        href="master/update/{{ $item->sub_code }}">
+                                                        <button class="btn btn-success btn-sm"><i
+                                                                class="fa-regular fa-pen-to-square"></i>Edit
+                                                        </button>
+                                                    </a>
+                                                    <a
+                                                        href="master/delete/{{ $item->sub_code }}">
+                                                        <button class="btn btn-danger btn-sm"><i
+                                                                class="fa-solid fa-trash"></i> Delete
+                                                        </button>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
 
                         </div>
@@ -488,6 +659,37 @@
             $('#btnAddress').click(function() {
                 $('#addressSection').show();
                 $('#familySection').hide();
+                $('.btn-residental').trigger('click');
+            });
+
+            $(document).on('click', '.btn-residental', function() {
+                $('.residentalsection').show();
+                $('.workplacesection').hide();
+            });
+
+            $(document).on('click', '.btn-workplace', function() {
+                $('.workplacesection').show();
+                $('.residentalsection').hide();
+            });
+
+            $(document).on('change', '#residentalcity', function() {
+                const state_code = $(this).find('option:selected').data('state_code');
+                const country_code = $(this).find('option:selected').data('country_code');
+                const pin_code = $(this).find('option:selected').data('pin_code');
+                $('#residentalstate').val(state_code).change();
+                $('#residentalcountry').val(country_code).change();
+                $('#residentalpincode').val(pin_code);
+                $('#residentalpincode').prop('readonly', pin_code == '' ? false : true);
+            });
+
+            $(document).on('change', '#workplacecity', function() {
+                const state_code = $(this).find('option:selected').data('state_code');
+                const country_code = $(this).find('option:selected').data('country_code');
+                const pin_code = $(this).find('option:selected').data('pin_code');
+                $('#workplacestate').val(state_code).change();
+                $('#workplacecountry').val(country_code).change();
+                $('#workplacepincode').val(pin_code);
+                $('#workplacepincode').prop('readonly', pin_code == '' ? false : true);
             });
 
             $(document).on('keypress', 'input[type="email"]', function(e) {
@@ -501,6 +703,7 @@
                 var $tbody = $('#memberexttable tbody');
                 var lastIndex = parseInt($tbody.find('tr:last td:first').text());
                 var newIndex = lastIndex + 1;
+                $('#totalrow').val(newIndex);
 
                 var rowHtml = `
                         <tr>
@@ -543,9 +746,16 @@
                             <td>
                                 <select class="form-control select2-multiple" name="extlevel${newIndex}" id="extlevel${newIndex}">
                                     <option value="">Select</option>
-                                    <option value="1">1</option>
+                                    <option value="">Select</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
                                 </select>
                             </td>
                             <td><input type="date" class="form-control" name="extcardissue${newIndex}" id="extcardissue${newIndex}"></td>
