@@ -506,19 +506,47 @@ function planbasedcategory($catcode)
     return $plans;
 }
 
-function membercategories() {
+function membercategories()
+{
     $data = MemberCategory::where('propertyid', Auth::user()->propertyid)->orderByDesc('sn')->get();
-    
+
     return $data;
 }
 
-function allcountries() {
+function allcountries()
+{
     $data = Countries::where('propertyid', Auth::user()->propertyid)->orderBy('name')->get();
     return $data;
 }
 
-function acgroup($group_code) {
+function acgroup($group_code)
+{
     $data = ACGroup::where('propertyid', Auth::user()->propertyid)->first();
 
     return $data;
+}
+
+function membermast()
+{
+    $membermast = DB::table('subgroup')
+        ->select(
+            'subgroup.sub_code',
+            'subgroup.name',
+            'member_categories.title as membercategory',
+            'subgroup.appno',
+            'subgroup.appdate',
+            'subgroup.membership_date',
+            'subgroup.member_id',
+            'subgroup.subyn',
+            DB::raw('COUNT(memberfamily.subcode) AS totalmember')
+        )
+        ->rightJoin('memberfamily', 'memberfamily.subcode', '=', 'subgroup.sub_code')
+        ->leftJoin('member_categories', 'member_categories.code', '=', 'subgroup.membercategory')
+        ->where('subgroup.subyn', 0)
+        ->where('subgroup.propertyid', Auth::user()->propertyid)
+        ->where('subgroup.comp_type', 'member')
+        ->groupBy('subgroup.sub_code', 'subgroup.name', 'subgroup.subyn')
+        ->get();
+
+    return $membermast;
 }

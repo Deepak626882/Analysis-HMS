@@ -588,7 +588,7 @@
                                     </thead>
 
                                     <tbody>
-                                        @foreach ($membermast as $item)
+                                        @foreach (membermast() as $item)
                                             <tr>
                                                 <td>{{ $item->name }}</td>
                                                 <td>{{ $item->member_id }}</td>

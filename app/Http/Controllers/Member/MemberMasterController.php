@@ -33,29 +33,8 @@ class MemberMasterController extends Controller
             ->where('group_name', 'SUNDRY DEBTORS')
             ->where('propertyid', $this->propertyid)->get();
 
-        $membermast = DB::table('subgroup')
-            ->select(
-                'subgroup.sub_code',
-                'subgroup.name',
-                'member_categories.title as membername',
-                'subgroup.appno',
-                'subgroup.appdate',
-                'subgroup.membership_date',
-                'subgroup.member_id',
-                'subgroup.subyn',
-                DB::raw('COUNT(memberfamily.subcode) AS totalmember')
-            )
-            ->rightJoin('memberfamily', 'memberfamily.subcode', '=', 'subgroup.sub_code')
-            ->leftJoin('member_categories', 'member_categories.code', '=', 'subgroup.membercategory')
-            ->where('subgroup.subyn', 0)
-            ->where('subgroup.propertyid', $this->propertyid)
-            ->where('subgroup.comp_type', 'member')
-            ->groupBy('subgroup.sub_code', 'subgroup.name', 'subgroup.subyn')
-            ->get();
-
         return view('property.members.master', [
-            'groupdata' => $groupdata,
-            'membermast' => $membermast
+            'groupdata' => $groupdata
         ]);
     }
 
