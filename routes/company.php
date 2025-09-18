@@ -31,6 +31,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomStatus;
 use App\Http\Controllers\SmartCard\CardInitializationController;
 use App\Http\Controllers\SmartCard\CardRechargeController;
+use App\Http\Controllers\SmartCard\CardReFundController;
 use App\Http\Controllers\SmartCard\CardRegistrationController;
 use App\Http\Controllers\UserController; //created by ananya
 use App\Http\Controllers\WPParameter;
@@ -1254,3 +1255,7 @@ Route::post('smartcard/cardregistration/store', [CardRegistrationController::cla
 Route::get('smartcard/cardrecharge', [CardRechargeController::class, 'index'])->name('smartcard.cardrecharge');
 // Submit Smart Card Recharge
 Route::post('smartcard/cardrecharge/store', [CardRechargeController::class, 'store'])->name('smartcard.cardrecharge.store');
+// Open Card Refund
+Route::get('smartcard/cardrefund', [CardReFundController::class, 'index'])->name('smartcard.cardrefund');
+// // Submit Smart Card Refund
+Route::post('smartcard/cardrefund/store', [CardReFundController::class, 'store'])->name('smartcard.cardrefund.store');

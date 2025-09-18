@@ -11,7 +11,7 @@
                                 <form action="{{ route('smartcard.cardrecharge.store') }}" method="post">
                                     @csrf
                                     <div class="text-center">
-                                        <button class="btn btn-success" type="button"><i class="fa-solid fa-credit-card"></i> Scan For Recharge</button>
+                                        <button class="btn btn-success" type="button"><i class="fa-solid fa-credit-card"></i> Scan For Refund</button>
                                     </div>
 
                                     <div class="row">
