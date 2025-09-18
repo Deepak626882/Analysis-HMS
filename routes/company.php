@@ -29,6 +29,7 @@ use App\Http\Controllers\PythonAuth;
 use App\Http\Controllers\Reservation;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomStatus;
+use App\Http\Controllers\SmartCard\CardInitializationController;
 use App\Http\Controllers\UserController; //created by ananya
 use App\Http\Controllers\WPParameter;
 use Carbon\Cli\Invoker;
@@ -1239,3 +1240,11 @@ Route::get('/member/memberfacility/update/{code}', [MemberFacilityMasterControll
 Route::put('/member/facilitymast/updatestore/{code}', [MemberFacilityMasterController::class, 'updatestore'])->name('member.facilitymast.updatestore');
 // Delete MemberFacility Master
 Route::get('/member/memberfacility/delete/{code}', [MemberFacilityMasterController::class, 'delete'])->name('member.memberfacility.delete');
+// Open Card Initilization
+Route::get('smartcard/cardinitialization', [CardInitializationController::class, 'index'])->name('smartcard.cardinitialization');
+// Submit Smart Card Initilization
+Route::post('smartcard/cardinitialization/store', [CardInitializationController::class, 'store'])->name('smartcard.cardinitialization.store');
+// Open Card Registration
+Route::get('smartcard/cardregistration', [CardInitializationController::class, 'index'])->name('smartcard.cardregistration');
+// Submit Smart Card Registration
+Route::post('smartcard/cardregistration/store', [CardInitializationController::class, 'store'])->name('smartcard.cardregistration.store');
