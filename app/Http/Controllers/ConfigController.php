@@ -17,6 +17,10 @@ class ConfigController extends Controller
         $max_execution_time = ini_get('max_execution_time');
         $max_input_time = ini_get('max_input_time');
 
+        // Check if Imagick is loaded
+        $imagickLoaded = extension_loaded('imagick');
+        $imagickVersion = $imagickLoaded ? (new \Imagick())->getVersion() : null;
+
         return response()->json([
             'upload_max_filesize' => $uploadMaxFilesize,
             'max_input_vars' => $maxInputVars,
@@ -25,9 +29,12 @@ class ConfigController extends Controller
             'memory_limit' => $memory_limit,
             'post_max_size' => $postMaxSize,
             'max_execution_time' => $max_execution_time,
-            'max_input_time' => $max_input_time
+            'max_input_time' => $max_input_time,
+            'imagick_loaded' => $imagickLoaded,
+            'imagick_version' => $imagickVersion,
         ]);
     }
+
 
     public function phpinipath()
     {
