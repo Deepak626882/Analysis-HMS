@@ -897,6 +897,9 @@ Route::post('enviroentrysubmit', [InventoryController::class, 'enviroentrysubmit
 Route::get('deleteinv', [InventoryController::class, 'deleteinv'])->name('deleteinv');
 // invfi
 Route::get('config', [ConfigController::class, 'config'])->name('config');
+Route::get('/phpinfo', function() {
+    return phpinfo();
+});
 // phpini
 Route::get('/php-ini-path', [ConfigController::class, 'phpinipath']);
 // Year and Updation
