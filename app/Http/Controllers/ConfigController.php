@@ -21,6 +21,13 @@ class ConfigController extends Controller
         $imagickLoaded = extension_loaded('imagick');
         $imagickVersion = $imagickLoaded ? (new \Imagick())->getVersion() : null;
 
+        // Check if ZIP is loaded
+        $zipLoaded = extension_loaded('zip');
+
+        // Check if GD is loaded
+        $gdLoaded = extension_loaded('gd');
+        $gdVersion = $gdLoaded ? gd_info()['GD Version'] : null;
+
         return response()->json([
             'upload_max_filesize' => $uploadMaxFilesize,
             'max_input_vars' => $maxInputVars,
@@ -32,8 +39,12 @@ class ConfigController extends Controller
             'max_input_time' => $max_input_time,
             'imagick_loaded' => $imagickLoaded,
             'imagick_version' => $imagickVersion,
+            'zip_loaded' => $zipLoaded,
+            'gd_loaded' => $gdLoaded,
+            'gd_version' => $gdVersion,
         ]);
     }
+
 
 
     public function phpinipath()
