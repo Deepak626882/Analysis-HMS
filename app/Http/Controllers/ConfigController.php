@@ -8,7 +8,6 @@ use Illuminate\Foundation\Application;
 class ConfigController extends Controller
 {
 
-
     public function config()
     {
         $maxInputVars = ini_get('max_input_vars');
@@ -27,11 +26,7 @@ class ConfigController extends Controller
 
         $gdLoaded = extension_loaded('gd');
         $gdVersion = $gdLoaded ? gd_info()['GD Version'] : null;
-
-        // PHP version
         $phpVersion = phpversion();
-
-        // Laravel version
         $laravelVersion = Application::VERSION;
 
         return response()->json([
