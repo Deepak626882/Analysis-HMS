@@ -15,6 +15,7 @@ use App\Http\Controllers\Reporting;
 use App\Http\Controllers\Fetch;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FinancialPush;
+use App\Http\Controllers\General\QRCodeController;
 use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\HouseKeeping;
 use App\Http\Controllers\InventoryController;
@@ -508,6 +509,10 @@ route::get('loadoutlets', [CompanyController::class, 'loadoutlets']);
 route::post('checkparam', [CompanyController::class, 'sidemenuperm']);
 // Open Setup Outlet
 route::get('setupoutlet', [CompanyController::class, 'opensetupoutlet']);
+// Outlet COde Generator
+Route::post('outletqrgenerater', [QRCodeController::class, 'outletqrgenerater'])->name('outletqrgenerater');
+// Open Public Item List
+Route::get('outlet/{propertyid}/{outlet_code}/{comp_name}', [GeneralController::class, 'outletwiseitemshow'])->name('outlet.outletcode.compname');
 // Submit Setup Outlet
 route::post('outletmasterstore', [CompanyController::class, 'submitoutlet'])->name('outletmasterstore');
 // Get Setup Outlet

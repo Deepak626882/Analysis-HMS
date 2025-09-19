@@ -119,4 +119,35 @@ class GeneralController extends Controller
             'compdiscdata' => $compdiscdata
         ]);
     }
+
+    public function outletwiseitemshow(Request $request, $propertyid, $outletcode, $comp_name)
+    {
+        $items = DB::table('itemmast')
+            ->select(
+                'itemmast.Name as item_name',
+                'itemrate.Rate as item_rate',
+                'items.itempic',
+                'itemmast.ItemGroup as item_group_code',
+                'itemgrp.name as group_name',
+                'itemmast.dishtype'
+            )
+            ->leftJoin('items', 'items.icode', '=', 'itemmast.Code')
+            ->leftJoin('itemrate', function ($join) {
+                $join->on('itemrate.ItemCode', '=', 'itemmast.Code')
+                    ->on('itemrate.RestCode', '=', 'itemmast.RestCode');
+            })
+            ->leftJoin('itemgrp', function ($join) {
+                $join->on('itemgrp.code', '=', 'itemmast.ItemGroup')
+                    ->on('itemgrp.restcode', '=', 'itemmast.RestCode');
+            })
+            ->where('itemmast.Property_ID', $propertyid)
+            ->where('itemmast.RestCode', $outletcode)
+            ->where('itemmast.ActiveYN', 'Y')
+            ->orderBy('itemrate.AppDate')
+            ->get();
+
+        return view('frontend.outletitemlist', [
+            'items' => $items
+        ]);
+    }
 }

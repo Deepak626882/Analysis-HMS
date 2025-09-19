@@ -513,11 +513,12 @@
                                                     class="btn btn-success editBtn update-btn btn-sm">
                                                     <i class="fa-regular fa-pen-to-square"></i>Edit
                                                 </button>
-                                                 <a href="{{ url('deleteoutlet/' . $row->sn . '/' . $row->dcode . '/' . $row->short_name) }}">
+                                                <a href="{{ url('deleteoutlet/' . $row->sn . '/' . $row->dcode . '/' . $row->short_name) }}">
                                                     <button class="btn btn-danger btn-sm delete-btn">
                                                         <i class="fa-solid fa-trash"></i> Delete
                                                     </button>
                                                 </a>
+                                                <a data-dcode="{{ $row->dcode }}" class="btn btn-sm btn-info qrcodebtn" href="javascript:void()"><i class="fa-solid fa-qrcode"></i> QR Code</a>
                                             </td>
                                             <td class="none">{{ $row->sn }}</td>
                                             <td class="none">{{ $row->dcode }}</td>
@@ -1003,47 +1004,46 @@
         </div>
     </div>
 
-
     <script>
         // NC Type Name
-        document.addEventListener('DOMContentLoaded', function() {
-            var name = document.getElementById('name');
-            var namelist = document.getElementById('namelist');
-            var currentLiIndex = -1;
-            name.addEventListener('keydown', function(event) {
-                if (event.key === 'ArrowDown') {
-                    event.preventDefault();
-                    var liElements = namelist.querySelectorAll('li');
-                    currentLiIndex = (currentLiIndex + 1) % liElements.length;
-                    if (liElements.length > 0) {
-                        name.value = liElements[currentLiIndex].textContent;
-                    }
-                }
-            });
-            name.addEventListener('keyup', function() {
-                var cid = this.value;
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', '/gettablenames', true);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        namelist.innerHTML = xhr.responseText;
-                        namelist.style.display = 'block';
-                    }
-                };
-                xhr.send('cid=' + cid + '&_token=' + '{{ csrf_token() }}');
+        // document.addEventListener('DOMContentLoaded', function() {
+        // var name = document.getElementById('name');
+        // var namelist = document.getElementById('namelist');
+        // var currentLiIndex = -1;
+        // name.addEventListener('keydown', function(event) {
+        //     if (event.key === 'ArrowDown') {
+        //         event.preventDefault();
+        //         var liElements = namelist.querySelectorAll('li');
+        //         currentLiIndex = (currentLiIndex + 1) % liElements.length;
+        //         if (liElements.length > 0) {
+        //             name.value = liElements[currentLiIndex].textContent;
+        //         }
+        //     }
+        // });
+        // name.addEventListener('keyup', function() {
+        //     var cid = this.value;
+        //     var xhr = new XMLHttpRequest();
+        //     xhr.open('POST', '/gettablenames', true);
+        //     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        //     xhr.onreadystatechange = function() {
+        //         if (xhr.readyState === 4 && xhr.status === 200) {
+        //             namelist.innerHTML = xhr.responseText;
+        //             namelist.style.display = 'block';
+        //         }
+        //     };
+        //     xhr.send('cid=' + cid + '&_token=' + '{{ csrf_token() }}');
 
-            });
-            $(document).on('click', function(event) {
-                if (!$(event.target).closest('li').length) {
-                    namelist.style.display = 'None';
-                }
-            });
-            $(document).on('click', '#namelist li', function() {
-                $('#name').val($(this).text());
-                namelist.style.display = 'None';
-            });
-        });
+        // });
+        // $(document).on('click', function(event) {
+        //     if (!$(event.target).closest('li').length) {
+        //         namelist.style.display = 'None';
+        //     }
+        // });
+        // $(document).on('click', '#namelist li', function() {
+        //     $('#name').val($(this).text());
+        //     namelist.style.display = 'None';
+        // });
+        // });
 
         $(document).ready(function() {
             // handleFormSubmission('#outletsetupform', '#submitBtn', 'outletmasterstore');
@@ -1165,9 +1165,41 @@
             });
         });
     </script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
     <script>
-        new Datatable('#depart');
+        $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                }
+            });
+
+            $(document).on('click', '.qrcodebtn', function() {
+                let dcode = $(this).data('dcode');
+                let outletname = $(this).closest('tr').children('td').eq('1').text();
+
+                $.ajax({
+                    method: "POST",
+                    url: "{{ url('outletqrgenerater') }}",
+                    data: {
+                        dcode: dcode
+                    },
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function(data) {
+                        let blob = new Blob([data], {
+                            type: "image/png"
+                        });
+                        let link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = `${outletname}_QR_CODE.png`;
+                        link.click();
+                    },
+                    error: function(xhr) {
+                        console.error("Error generating QR", xhr);
+                    }
+                });
+            });
+        });
     </script>
 @endsection
