@@ -293,10 +293,10 @@
                                 <div class="text-2xl font-bold text-primary">
                                     ₹{{ number_format($item->item_rate, 0) }}
                                 </div>
-                                <button class="add-to-cart bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300 flex items-center space-x-2">
+                                {{-- <button class="add-to-cart bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300 flex items-center space-x-2">
                                     <i class="fas fa-plus"></i>
                                     <span>Add</span>
-                                </button>
+                                </button> --}}
                             </div>
                         </div>
                     </div>
