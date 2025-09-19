@@ -37,7 +37,7 @@ class QRCodeController extends Controller
         }
         $compdata = companydata();
 
-        $url = url("/outlet/{$compdata->propertyid}/{$chk->dcode}/{$compdata->comp_name}");
+        $url = url("/outlet/{$compdata->propertyid}/{$chk->dcode}/" . str_replace(' ', '_', $compdata->comp_name));
 
         $icon = "/public/admin/images/favicon.png";
 
