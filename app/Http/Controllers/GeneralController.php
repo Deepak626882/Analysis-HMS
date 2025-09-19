@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\CompanyDiscount;
+use App\Models\Companyreg;
+use App\Models\Depart;
 use App\Models\EnviroBanquet;
 use App\Models\EnviroFom;
 use App\Models\EnviroInventory;
@@ -146,8 +148,14 @@ class GeneralController extends Controller
             ->orderBy('itemrate.AppDate')
             ->get();
 
+        $comp_data = Companyreg::where('propertyid', $propertyid)->first();
+
+        $depart = Depart::where('propertyid', $propertyid)->where('dcode', $outletcode)->first();
+
         return view('frontend.outletitemlist', [
-            'items' => $items
+            'items' => $items,
+            'comp_data' => $comp_data,
+            'depart' => $depart
         ]);
     }
 }
