@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Application;
 
 class ConfigController extends Controller
 {
+
+
     public function config()
     {
         $maxInputVars = ini_get('max_input_vars');
@@ -17,16 +20,19 @@ class ConfigController extends Controller
         $max_execution_time = ini_get('max_execution_time');
         $max_input_time = ini_get('max_input_time');
 
-        // Check if Imagick is loaded
         $imagickLoaded = extension_loaded('imagick');
         $imagickVersion = $imagickLoaded ? (new \Imagick())->getVersion() : null;
 
-        // Check if ZIP is loaded
         $zipLoaded = extension_loaded('zip');
 
-        // Check if GD is loaded
         $gdLoaded = extension_loaded('gd');
         $gdVersion = $gdLoaded ? gd_info()['GD Version'] : null;
+
+        // PHP version
+        $phpVersion = phpversion();
+
+        // Laravel version
+        $laravelVersion = Application::VERSION;
 
         return response()->json([
             'upload_max_filesize' => $uploadMaxFilesize,
@@ -42,10 +48,10 @@ class ConfigController extends Controller
             'zip_loaded' => $zipLoaded,
             'gd_loaded' => $gdLoaded,
             'gd_version' => $gdVersion,
+            'php_version' => $phpVersion,
+            'laravel_version' => $laravelVersion,
         ]);
     }
-
-
 
     public function phpinipath()
     {
