@@ -247,7 +247,7 @@
                         <!-- Item Image -->
                         <div class="relative h-48 overflow-hidden">
                             @if ($item->itempic)
-                                <img src="http://localhost:8000/storage/property/itempicture/{{ $item->itempic }}"
+                                <img src="{{ url('/storage/property/itempicture/') }}/{{ $item->itempic }}"
                                     alt="{{ $item->item_name }}"
                                     class="w-full h-full object-cover">
                             @else
