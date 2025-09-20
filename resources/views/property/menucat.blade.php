@@ -7,7 +7,7 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <form class="form" name="menucatform" id="menucatform" action="{{url('menucatstore')}}">
+                            <form method="POST" class="form" name="menucatform" id="menucatform" action="{{url('menucatstore')}}">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-4">
