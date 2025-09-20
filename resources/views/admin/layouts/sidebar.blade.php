@@ -37,9 +37,15 @@
                 </a>
             </li>
 
-             <li>
+            <li>
                 <a href="{{ url('/expirymodule') }}" aria-expanded="false">
                     <i class="fa-solid fa-lock"></i><span class="nav-text">License</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url('/superadmin/backups') }}" aria-expanded="false">
+                    <i class="fa-solid fa-lock"></i><span class="nav-text">Backup</span>
                 </a>
             </li>
 

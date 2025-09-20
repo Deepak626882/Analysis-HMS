@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SuperAdmin\BackupController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\MainController;
@@ -135,3 +136,10 @@ Route::get('/autochargepost', [CronController::class, 'autoCharge']);
 // Open Expiry Module
 Route::get('expirymodule', [MainController::class, 'showUpdateForm']);
 Route::post('/property/update-expiry', [PropertyController::class, 'updateExpiry'])->name('property.updateExpiry');
+// Open Backup Page
+Route::get('superadmin/backups', [BackupController::class, 'index'])->name('superadmin.backups');
+// Download Backup Prepare
+Route::get('superadmin/storagefdownload', [BackupController::class, 'downloadStorage'])->name('superadmin.storagefdownload');
+// Download Created Backup 
+Route::get('superadmin/download-temp-zip/{filename}', [BackupController::class, 'downloadTempZip']);
+Route::POST('superadmin/database-backup', [BackupController::class, 'downloadDatabaseBackup'])->name('superadmin.database-backup');

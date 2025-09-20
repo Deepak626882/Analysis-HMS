@@ -8,23 +8,23 @@
 
     <title>Analysis</title>
     <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="admin/images/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('admin/images/favicon.png') }}">
     <!-- Pignose Calender -->
-    <link href="admin/plugins/pg-calendar/css/pignose.calendar.min.css" rel="stylesheet">
+    <link href="{{ asset('admin/plugins/pg-calendar/css/pignose.calendar.min.css') }}" rel="stylesheet">
     <!-- Chartist -->
-    <link rel="stylesheet" href="admin/plugins/chartist/css/chartist.min.css">
-    <link rel="stylesheet" href="admin/plugins/chartist-plugin-tooltips/css/chartist-plugin-tooltip.css">
+    <link rel="stylesheet" href="{{ asset('admin/plugins/chartist/css/chartist.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/plugins/chartist-plugin-tooltips/css/chartist-plugin-tooltip.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
         integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Custom Stylesheet -->
-    <link href="admin/css/style.css" rel="stylesheet">
-    <link href="admin/plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css"
+    <link href="{{ asset('admin/css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('admin/plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css') }}"
         rel="stylesheet">
     <!-- Color picker plugins css -->
-    <link href="admin/plugins/jquery-asColorPicker-master/css/asColorPicker.css" rel="stylesheet">
+    <link href="{{ asset('admin/plugins/jquery-asColorPicker-master/css/asColorPicker.css') }}" rel="stylesheet">
     <!-- Daterange picker plugins css -->
-    <link href="admin/plugins/timepicker/bootstrap-timepicker.min.css" rel="stylesheet">
+    <link href="{{ asset('admin/plugins/timepicker/bootstrap-timepicker.min.css') }}" rel="stylesheet">
     <!-- Notify CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-notify@1.0.4/dist/simple-notify.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
