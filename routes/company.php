@@ -1085,7 +1085,7 @@ Route::post('venuemasterstore', [PrintController::class, 'submitvenuemaster'])->
 Route::post('venuemasterupdateform', [PrintController::class, 'updatevenuemasterstore'])->name('venuemasterupdateform');
 // Delete Venue master
 Route::get('deletevenuemaster/{sn}/{ucode}', [PrintController::class, 'deletevenuemaster']);
-
+Route::get('banquetload', [CompanyController::class, 'banquetload']);
 
 // Open Item Group
 Route::get('itemgroups', [PrintController::class, 'openitemgroups']);
