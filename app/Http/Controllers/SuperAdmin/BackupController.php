@@ -29,43 +29,48 @@ class BackupController extends Controller
     }
 
     public function downloadStorage(Request $request)
-    {
-        $this->cleanOldBackups();
-        $zipFileName = 'storage_backup_' . date('Y-m-d_H-i-s') . '.zip';
-        $zipPath = storage_path($zipFileName);
+{
+    $this->cleanOldBackups();
 
-        $zip = new ZipArchive;
+    $zipFileName = 'storage_backup_' . date('Y-m-d_H-i-s') . '.zip';
+    $zipPath = storage_path($zipFileName);
 
-        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
-            $files = File::allFiles(storage_path());
+    $zip = new ZipArchive;
 
-            foreach ($files as $file) {
-                $relativePath = str_replace(storage_path() . '/', '', $file->getPathname());
-                $zip->addFile($file->getPathname(), $relativePath);
+    if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+        $files = File::allFiles(storage_path());
+
+        foreach ($files as $file) {
+            $fullPath = $file->getPathname();
+
+            if (file_exists($fullPath)) {
+                // get relative path for inside zip
+                $relativePath = str_replace(storage_path() . '/', '', $fullPath);
+                $zip->addFile($fullPath, $relativePath);
             }
-
-            $zip->close();
-        } else {
-            return response()->json(['status' => 'error', 'message' => 'Could not create zip file']);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'url' => url('superadmin/download-temp-zip/' . $zipFileName)
-        ]);
+        $zip->close();
+    } else {
+        return response()->json(['status' => 'error', 'message' => 'Could not create zip file']);
     }
 
-    public function downloadTempZip($filename)
-    {
-        $filePath = storage_path($filename);
+    return response()->json([
+        'status' => 'success',
+        'url' => url('superadmin/download-temp-zip/' . $zipFileName)
+    ]);
+}
 
-        if (file_exists($filePath)) {
-            return response()->download($filePath)->deleteFileAfterSend(true);
-        }
+public function downloadTempZip($filename)
+{
+    $filePath = storage_path($filename);
 
-        abort(404);
+    if (file_exists($filePath)) {
+        return response()->download($filePath)->deleteFileAfterSend(true);
     }
 
+    abort(404);
+}
     public function downloadDatabaseBackup(Request $request)
     {
         $this->cleanOldBackups();
