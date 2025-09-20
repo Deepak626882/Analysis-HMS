@@ -181,18 +181,18 @@
                     <button
                         class="px-3 py-1.5 text-xs rounded-md bg-primary text-white hover:bg-secondary transition"
                         onclick="
-                            const tabs = document.getElementById('category-tabs');
-                            if (tabs.classList.contains('flex-wrap')) {
-                                tabs.classList.remove('flex-wrap','gap-2');
-                                tabs.classList.add('space-x-2','overflow-x-auto','scrollbar-hide','pb-2');
-                                this.innerText = 'Multi-Line View';
-                            } else {
-                                tabs.classList.add('flex-wrap','gap-2');
-                                tabs.classList.remove('space-x-2','overflow-x-auto','scrollbar-hide','pb-2');
-                                this.innerText = 'Single Line View';
-                            }
-                        ">
-                        Single Line View
+                                const tabs = document.getElementById('category-tabs');
+                                if (tabs.classList.contains('flex-wrap')) {
+                                    tabs.classList.remove('flex-wrap','gap-2');
+                                    tabs.classList.add('space-x-2','overflow-x-auto','scrollbar-hide','pb-2');
+                                    this.innerText = 'Multi-Line View';
+                                } else {
+                                    tabs.classList.add('flex-wrap','gap-2');
+                                    tabs.classList.remove('space-x-2','overflow-x-auto','scrollbar-hide','pb-2');
+                                    this.innerText = 'Single Line View';
+                                }
+                            ">
+                        Multi-Line View
                     </button>
                     <button id="download-pdf"
                         class="px-3 ml-1 py-1.5 text-xs rounded-md bg-primary text-white hover:bg-secondary transition">
@@ -203,7 +203,7 @@
                 </div>
 
                 {{-- Tabs --}}
-                <div id="category-tabs" class="flex flex-wrap gap-2 transition-all">
+                <div id="category-tabs" class="flex space-x-2 overflow-x-auto scrollbar-hide pb-2 transition-all">
                     {{-- All Items --}}
                     <button class="category-tab px-3 py-1.5 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-medium whitespace-nowrap transition-all" data-group="all">
                         All Items
@@ -213,7 +213,9 @@
                     </button>
 
                     @php
-                        $groupedItems = $items->groupBy('item_group_code');
+                        $groupedItems = $items->groupBy('item_group_code')->sortBy(function ($group) {
+                            return $group->first()->group_name ?? '';
+                        });
                     @endphp
                     @foreach ($groupedItems as $groupCode => $groupItems)
                         @php
@@ -234,7 +236,7 @@
 
         <!-- Menu Items -->
         <section class="mx-6 mb-6">
-            <div id="items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="items-container" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($items as $item)
                     <div class="menu-item bg-white/95 backdrop-blur rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
                         data-group="{{ $item->item_group_code }}"
@@ -264,7 +266,7 @@
                         </div>
 
                         <!-- Item Details -->
-                        <div class="p-6">
+                        <div class="p-3">
                             <div class="flex items-start justify-between mb-3">
                                 <div class="flex-1">
                                     <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $item->item_name }}</h3>
@@ -293,10 +295,6 @@
                                 <div class="text-2xl font-bold text-primary">
                                     ₹{{ number_format($item->item_rate, 0) }}
                                 </div>
-                                {{-- <button class="add-to-cart bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300 flex items-center space-x-2">
-                                    <i class="fas fa-plus"></i>
-                                    <span>Add</span>
-                                </button> --}}
                             </div>
                         </div>
                     </div>
