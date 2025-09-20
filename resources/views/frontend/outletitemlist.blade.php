@@ -168,8 +168,11 @@
         <section class="m-6 h-64 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center text-white relative overflow-hidden">
             <div class="absolute inset-0 bg-black/30"></div>
             <div class="text-center z-10">
-                <h2 class="text-4xl font-bold mb-2">Delicious Menu</h2>
-                <p class="text-lg opacity-90">Taxes As Applicable Extra</p>
+            <h2 class="text-4xl font-bold mb-4">Delicious Menu</h2>
+            <div class="propertylogo flex justify-center mb-4">
+                <img src="{{ url('/storage/admin/property_logo') }}/{{ $comp_data->logo }}" alt="" class="max-h-16 w-auto">
+            </div>
+            <p class="text-lg opacity-90">Taxes As Applicable Extra</p>
             </div>
         </section>
 
@@ -236,7 +239,7 @@
 
         <!-- Menu Items -->
         <section class="mx-6 mb-6">
-            <div id="items-container" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="items-container" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 @foreach ($items as $item)
                     <div class="menu-item bg-white/95 backdrop-blur rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
                         data-group="{{ $item->item_group_code }}"
@@ -245,13 +248,13 @@
                         data-name="{{ strtolower($item->item_name) }}">
 
                         <!-- Item Image -->
-                        <div class="relative h-48 overflow-hidden">
+                        <div class="relative overflow-hidden">
                             @if ($item->itempic)
-                                <img src="{{ url('/storage/property/itempicture/') }}/{{ $item->itempic }}"
+                                <img style="max-height: 11rem;min-height: 11rem;" src="{{ url('/storage/property/itempicture/') }}/{{ $item->itempic }}"
                                     alt="{{ $item->item_name }}"
-                                    class="w-full h-full object-cover">
+                                    class="w-full object-cover">
                             @else
-                                <div class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                                <div style="max-height: 11rem;min-height: 11rem;" class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                                     <i class="fas fa-utensils text-4xl text-gray-400"></i>
                                 </div>
                             @endif
@@ -266,10 +269,10 @@
                         </div>
 
                         <!-- Item Details -->
-                        <div class="p-3">
+                        <div class="p-1">
                             <div class="flex items-start justify-between mb-3">
                                 <div class="flex-1">
-                                    <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $item->item_name }}</h3>
+                                    <h5 class="font-bold text-gray-800 mb-2">{{ strtoupper($item->item_name) }}</h5>
                                     <div class="flex items-center space-x-2 mb-3">
                                         @if ($item->dishtype == 1)
                                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
