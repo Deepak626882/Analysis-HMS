@@ -142,4 +142,7 @@ Route::get('superadmin/backups', [BackupController::class, 'index'])->name('supe
 Route::get('superadmin/storagefdownload', [BackupController::class, 'downloadStorage'])->name('superadmin.storagefdownload');
 // Download Created Backup 
 Route::get('superadmin/download-temp-zip/{filename}', [BackupController::class, 'downloadTempZip']);
+// Download Database
 Route::POST('superadmin/database-backup', [BackupController::class, 'downloadDatabaseBackup'])->name('superadmin.database-backup');
+// Verify Database
+Route::post('superadmin/verify-database', [BackupController::class, 'verifyDatabase'])->name('superadmin.verify-database');
