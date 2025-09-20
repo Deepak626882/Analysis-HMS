@@ -29,48 +29,49 @@ class BackupController extends Controller
     }
 
     public function downloadStorage(Request $request)
-{
-    $this->cleanOldBackups();
+    {
+        $this->cleanOldBackups();
 
-    $zipFileName = 'storage_backup_' . date('Y-m-d_H-i-s') . '.zip';
-    $zipPath = storage_path($zipFileName);
+        $zipFileName = 'storage_backup_' . date('Y-m-d_H-i-s') . '.zip';
+        $zipPath = storage_path($zipFileName);
 
-    $zip = new ZipArchive;
+        $zip = new ZipArchive;
 
-    if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
-        $files = File::allFiles(storage_path());
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+            $files = File::allFiles(storage_path());
 
-        foreach ($files as $file) {
-            $fullPath = $file->getPathname();
+            foreach ($files as $file) {
+                $fullPath = $file->getPathname();
 
-            if (file_exists($fullPath)) {
-                // get relative path for inside zip
-                $relativePath = str_replace(storage_path() . '/', '', $fullPath);
-                $zip->addFile($fullPath, $relativePath);
+                if (file_exists($fullPath)) {
+                    // get relative path for inside zip
+                    $relativePath = str_replace(storage_path() . '/', '', $fullPath);
+                    $zip->addFile($fullPath, $relativePath);
+                }
             }
+
+            $zip->close();
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Could not create zip file']);
         }
 
-        $zip->close();
-    } else {
-        return response()->json(['status' => 'error', 'message' => 'Could not create zip file']);
+        return response()->json([
+            'status' => 'success',
+            'url' => url('superadmin/download-temp-zip/' . $zipFileName)
+        ]);
     }
 
-    return response()->json([
-        'status' => 'success',
-        'url' => url('superadmin/download-temp-zip/' . $zipFileName)
-    ]);
-}
+    public function downloadTempZip($filename)
+    {
+        $filePath = storage_path($filename);
 
-public function downloadTempZip($filename)
-{
-    $filePath = storage_path($filename);
+        if (file_exists($filePath)) {
+            return response()->download($filePath)->deleteFileAfterSend(true);
+        }
 
-    if (file_exists($filePath)) {
-        return response()->download($filePath)->deleteFileAfterSend(true);
+        abort(404);
     }
 
-    abort(404);
-}
     public function downloadDatabaseBackup(Request $request)
     {
         $this->cleanOldBackups();
@@ -97,8 +98,8 @@ public function downloadTempZip($filename)
         }
 
         // Zip the SQL file
-        $zip = new \ZipArchive;
-        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
+        $zip = new ZipArchive;
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
             $zip->addFile($filePath, $fileName);
             $zip->close();
         }
