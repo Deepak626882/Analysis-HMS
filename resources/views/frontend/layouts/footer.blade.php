@@ -60,7 +60,7 @@
 
           <div class="me-md-auto text-center text-md-start">
               <div class="copyright">
-                  &copy; Copyright <strong><span>{{ config('app.name', 'Analysis') }} {{ date('Y') }}</span></strong>                  . All Rights Reserved
+                  &copy; Copyright <strong><span>{{ config('app.name', 'Analysis') }} {{ date('Y') }}</span></strong> . All Rights Reserved
               </div>
               <div class="credits">
                   Analysis HMS
@@ -80,58 +80,50 @@
           class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
+
 
   <!-- Template Main JS File -->
-  <script src="assets/js/main.js"></script>
+  <script src="{{ asset('assets/js/main.js') }}"></script>
 
   </body>
 
   </html>
   <script>
-    $(document).ready(function() {
-        AOS.init();
-        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+      $(document).ready(function() {
+          AOS.init();
+          var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
-        $('#demo-request-form').on('submit', function(e) {
-            e.preventDefault();
-            var formData = {
-                name: $('#name').val(),
-                email: $('#email').val(),
-                phone_number: $('#phone_number').val(),
-                hotel_name: $('#hotel_name').val(),
-                message: $('#message').val(),
-                _token: csrfToken
-            };
+          $('#demo-request-form').on('submit', function(e) {
+              e.preventDefault();
+              var formData = {
+                  name: $('#name').val(),
+                  email: $('#email').val(),
+                  phone_number: $('#phone_number').val(),
+                  hotel_name: $('#hotel_name').val(),
+                  message: $('#message').val(),
+                  _token: csrfToken
+              };
 
-            $.ajax({
-                url: '{{ route('demo-request.store') }}',
-                method: 'POST',
-                data: formData,
-                success: function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success!',
-                        text: 'Request Submitted Successfully',
-                    });
-                    $('#demo-request-form')[0].reset();
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Error: ' + error,
-                    });
-                }
-            });
-        });
-    });
-</script>
+              $.ajax({
+                  url: '{{ route('demo-request.store') }}',
+                  method: 'POST',
+                  data: formData,
+                  success: function(response) {
+                      Swal.fire({
+                          icon: 'success',
+                          title: 'Success!',
+                          text: 'Request Submitted Successfully',
+                      });
+                      $('#demo-request-form')[0].reset();
+                  },
+                  error: function(xhr, status, error) {
+                      Swal.fire({
+                          icon: 'error',
+                          title: 'Oops...',
+                          text: 'Error: ' + error,
+                      });
+                  }
+              });
+          });
+      });
+  </script>

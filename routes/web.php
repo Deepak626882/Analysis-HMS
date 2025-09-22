@@ -146,3 +146,15 @@ Route::get('superadmin/download-temp-zip/{filename}', [BackupController::class, 
 Route::POST('superadmin/database-backup', [BackupController::class, 'downloadDatabaseBackup'])->name('superadmin.database-backup');
 // Verify Database
 Route::post('superadmin/verify-database', [BackupController::class, 'verifyDatabase'])->name('superadmin.verify-database');
+// About Us Open
+Route::get('about', [HomeController::class, 'about'])->name('about');
+// Front Office Services
+Route::get('services/front-office', [HomeController::class, 'frontofficeservices'])->name('services.front-office');
+// POS Services
+Route::get('services/pointofsale', [HomeController::class, 'pointofsaleservices'])->name('services.pointofsale');
+// Banquet Services
+Route::get('services/banquet', [HomeController::class, 'banquetservices'])->name('services.banquet');
+// Inventory Services
+Route::get('services/inventory', [HomeController::class, 'inventoryservices'])->name('services.inventory');
+// Reservation Services
+Route::get('services/reservation', [HomeController::class, 'reservationservices'])->name('services.reservation');

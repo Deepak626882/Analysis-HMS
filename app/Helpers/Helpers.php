@@ -22,6 +22,12 @@ use App\Models\VoucherPrefix;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+
+function allcompanies()
+{
+    return Companyreg::groupBy('propertyid')->latest()->get();
+}
+
 if (!function_exists('companydata')) {
     function companydata()
     {

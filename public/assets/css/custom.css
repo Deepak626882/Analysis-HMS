@@ -132,3 +132,10 @@
 [data-aos] {
     transition-duration: 1s;
 }
+
+.about-hero {
+    background: url('https://images.pexels.com/photos/1643280/pexels-photo-1643280.jpeg?_gl=1*1owp6wy*_ga*MTYwOTI3MDMyMi4xNzU4NTI1Mzk0*_ga_8JE65Q40S6*czE3NTg1MjUzOTMkbzEkZzEkdDE3NTg1MjU0NzkkajM1JGwwJGgw') center/cover no-repeat;
+    padding: 160px 0;
+    color: #fff;
+    text-align: center;
+}
