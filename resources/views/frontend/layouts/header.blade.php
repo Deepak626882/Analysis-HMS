@@ -79,15 +79,15 @@
                 {{-- <h1 class="text-light"><a href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}</a></h1> --}}
                 <!-- Uncomment below if you prefer to use an image logo -->
-                <a href="{{ url('./') }}"><img src="{{ env('APP_HEADERIMG', 'assets/img/logo.gif') }}"
+                <a href="{{ url('./') }}"><img src="{{ asset('assets/img/logo.gif') }}"
                         alt="" class="img-fluid"></a>
             </div>
 
             <nav id="navbar" class="navbar">
                 <ul>
                     <li><a class="active" href="{{ url('/') }}">Home</a></li>
-                    <li><a href="login">Login</a></li>
-                    <li><a href="application">Application</a></li>
+                    <li><a href="{{ url('login') }}">Login</a></li>
+                    <li><a href="{{ url('application') }}">Application</a></li>
                     <li><a href="{{ url('/') }}#demo-request">Demo & Support</a></li>
                     <li><a href="{{ url('/about') }}">About</a></li>
                     <li class="dropdown"><a href="#"><span>Services</span> <i class="bi bi-chevron-down"></i></a>
