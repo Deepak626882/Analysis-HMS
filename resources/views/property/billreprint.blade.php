@@ -522,7 +522,8 @@
                                                 `input[name^="room_charge_${index + 2}"]`).val();
                                             debitcellnew = parseFloat(inputValue);
                                         }
-                                        let taxper = parseInt($(row).find('.taxper').text());
+                                        let taxper = parseFloat($(row).find('.taxper').text());
+                                        console.log(taxper)
                                         let calculatedtax = 0;
                                         let assigned = 0.00;
                                         if (taxper != 0) {
