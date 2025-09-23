@@ -229,13 +229,6 @@ class Pointofsale extends Controller
         $vprefix = $request->vprefix;
         $dep = Depart::where('propertyid', $this->propertyid)->where('dcode', $dcode)->first();
 
-        $associatedrestcode = Depart1::where('propertyid', $this->propertyid)
-            ->where('departcode', $dep->dcode)
-            ->pluck('associatedrestcode')
-            ->toArray();
-
-        // $restcodes = array_merge([$dep->dcode], $associatedrestcode);
-
         $sale1 = Sale1::where('vno', $billno)->where('restcode', $dep->dcode)->where('vprefix', $vprefix)->where('propertyid', $this->propertyid)
             ->first();
 
@@ -350,6 +343,8 @@ class Pointofsale extends Controller
                     ->groupBy('suntran.docid')
                     ->get();
             }
+
+            // return $sale1;
 
             $outlet1 = null;
             $outlet2 = null;

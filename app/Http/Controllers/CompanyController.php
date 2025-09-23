@@ -6756,11 +6756,13 @@ class CompanyController extends Controller
             )->orderBy('sn')->get();
         $sundrynames = DB::table('sundrymast')->where('propertyid', $this->propertyid)->orderBy('name')->get();
         $sundrytype = DB::table('sundrytypefix')->where('propertyid', $this->propertyid)->orderBy('sn')->get();
+        $depart = Depart::where('propertyid', $this->propertyid)->where('dcode', $vtype)->first();
         return view('property.sundrysettingupdate', [
             'data' => $data,
             'revmast' => $revmast,
             'sundrynames' => $sundrynames,
-            'sundrytype' => $sundrytype
+            'sundrytype' => $sundrytype,
+            'depart' => $depart
         ]);
     }
 
@@ -6872,11 +6874,13 @@ class CompanyController extends Controller
             )->orderBy('sn')->get();
         $sundrynames = DB::table('sundrymast')->where('propertyid', $this->propertyid)->orderBy('name')->get();
         $sundrytype = DB::table('sundrytypefix')->where('propertyid', $this->propertyid)->orderBy('sn')->get();
+        $depart = Depart::where('propertyid', $this->propertyid)->where('dcode', $vtype)->first();
         return view('property.purchasesundrysettingupdate', [
             'data' => $data,
             'revmast' => $revmast,
             'sundrynames' => $sundrynames,
-            'sundrytype' => $sundrytype
+            'sundrytype' => $sundrytype,
+            'depart' => $depart
         ]);
     }
 

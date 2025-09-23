@@ -151,6 +151,11 @@ class SaleBill extends Controller
                 $totalamt = floatval($request->input($rest . 'totalamountoutlet', 0));
                 $sundryCount = intval($request->input($rest . 'sundrycount', 0));
 
+                if ($sundryCount == '0') {
+                    DB::rollBack();
+                    return back()->with('error', 'Sundry Count not Found');
+                }
+
                 if ($roundoff > 0) {
                     $roundyn = 'Y';
                 } else {
@@ -346,7 +351,7 @@ class SaleBill extends Controller
                     Paycharge::insert($paycharge1);
                     Paycharge::insert($paycharge2);
                 }
-
+                // return $sundryCount;
                 // c. Insert suntran entries
                 for ($s = 1; $s <= $sundryCount; $s++) {
                     $st = DB::table('sundrytype')

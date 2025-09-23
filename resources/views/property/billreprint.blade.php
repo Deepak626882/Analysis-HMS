@@ -523,7 +523,7 @@
                                             debitcellnew = parseFloat(inputValue);
                                         }
                                         let taxper = parseFloat($(row).find('.taxper').text());
-                                        console.log(taxper)
+                                        // console.log(taxper);
                                         let calculatedtax = 0;
                                         let assigned = 0.00;
                                         if (taxper != 0) {

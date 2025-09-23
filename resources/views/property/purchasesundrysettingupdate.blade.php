@@ -18,6 +18,12 @@
                                                 name="appdate" id="appdate" class="form-control" required>
                                         </div>
                                     </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="appdate" class="col-form-label">Name</label>
+                                            <input type="text" value="{{ $depart->name }}" class="form-control" name="" id="" readonly>
+                                        </div>
+                                    </div>
                                 </div>
                                 <select class="none" name="vtype" id="vtype">
                                     <option value="select"></option>
