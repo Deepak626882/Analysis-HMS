@@ -31,7 +31,6 @@ class GenerateSitemap extends Command
             $url->addChild('lastmod', now()->toDateString());
             $url->addChild('changefreq', 'monthly');
             $url->addChild('priority', '0.8');
-            
         }
 
         $file = public_path('sitemap.xml');
