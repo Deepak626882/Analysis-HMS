@@ -29,7 +29,7 @@ class GenerateSitemap extends Command
             $url = $xml->addChild('url');
             $url->addChild('loc', $page);
             $url->addChild('lastmod', now()->toDateString());
-            $url->addChild('changefreq', 'monthly');
+            $url->addChild('changefreq', 'weekly');
             $url->addChild('priority', '0.8');
         }
 
