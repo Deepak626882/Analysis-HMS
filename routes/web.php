@@ -7,6 +7,8 @@ use App\Http\Controllers\MainController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AutoLoginController;
 use App\Http\Controllers\CronController;
+use App\Http\Controllers\DemoRequestController;
+use App\Http\Controllers\Frontend\ContactController;
 use App\Http\Controllers\PropertyController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PythonAuth;
@@ -158,3 +160,9 @@ Route::get('services/banquet', [HomeController::class, 'banquetservices'])->name
 Route::get('services/inventory', [HomeController::class, 'inventoryservices'])->name('services.inventory');
 // Reservation Services
 Route::get('services/reservation', [HomeController::class, 'reservationservices'])->name('services.reservation');
+// Open Contact Page
+Route::get('contact', [HomeController::class, 'contact'])->name('contact');
+// Submit Contact Form
+Route::post('contactsubmit', [ContactController::class, 'store'])->name('contact.submit');
+// Submit Demo Request
+Route::post('/demo-request', [DemoRequestController::class, 'store'])->name('demo-request.store');

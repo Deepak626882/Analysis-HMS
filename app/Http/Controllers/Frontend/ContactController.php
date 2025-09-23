@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Frontend;
 
+use App\Http\Controllers\Controller;
+use App\Models\Contact;
 use Illuminate\Http\Request;
-use App\Models\DemoRequest;
 
-class DemoRequestController extends Controller
+class ContactController extends Controller
 {
     public function store(Request $request)
     {
@@ -13,18 +14,16 @@ class DemoRequestController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone_number' => 'nullable|string|max:20',
-            'hotel_name' => 'nullable|string|max:255',
             'message' => 'nullable|string',
         ]);
 
-        DemoRequest::create([
+        Contact::create([
             'name' => $request->name,
             'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'hotel_name' => $request->hotel_name,
+            'phone' => $request->phone_number,
             'message' => $request->message,
         ]);
 
-        return response()->json(['message' => 'Request Submitted Successfully!'], 200);
+        return response()->json(['message' => 'Contact Submitted Successfully!'], 200);
     }
 }

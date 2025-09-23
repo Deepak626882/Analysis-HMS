@@ -816,7 +816,6 @@ Route::post('expenseupdate', [Pos::class, 'expenseupdate'])->name('expenseupdate
 Route::get('deleteexpenseentry/{sn}/{ucode}', [Pos::class, 'deleteexpenseentry'])->name('deleteexpenseentry');
 // PrintExpense
 Route::get('/print-expense/{docid}', [Pos::class, 'printExpense'])->name('print.expense');
-Route::post('/demo-request', [DemoRequestController::class, 'store'])->name('demo-request.store');
 // Open Party Master
 Route::get('partymaster', [CompanyController::class, 'partymaster'])->name('partymaster');
 // Open Update Party Master

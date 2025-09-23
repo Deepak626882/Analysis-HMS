@@ -22,6 +22,12 @@ return [
     'footer_logo' => env('APP_FOOTERIMG', 'assets/img/logofooter.gif'),
     'header_logo' => env('APP_HEADERIMG', 'assets/img/logo.gif'),
     'admin_headerimg' => 'admin/images/logo-text.png',
+    'main_mail' => env('APP_MAIN_MAIL', 'default@example.com'),
+    'facebook' => env('APP_FACEBOOK', 'default_fb'),
+    'twitter' => env('APP_TWITTER', 'default_tw'),
+    'instagram' => env('APP_INSTAGRAM', 'default_ig'),
+    'linkedin' => env('APP_LINKEDIN', 'default_li'),
+
 
     /*
     |--------------------------------------------------------------------------
@@ -161,16 +167,16 @@ return [
     */
 
     'providers' => ServiceProvider::defaultProviders()->merge([
-            /*
+        /*
              * Package Service Providers...
              */
 
-            /*
+        /*
              * Application Service Providers...
              */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-            // App\Providers\BroadcastServiceProvider::class,
+        // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
     ])->toArray(),

@@ -47,6 +47,10 @@ class HomeController extends Controller
         return view('frontend.services.reservation');
     }
 
+    public function contact() {
+        return view('frontend.contactus');
+    }
+
     // public function login()
     // {
     //     return view('frontend.login');
