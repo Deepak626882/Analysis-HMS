@@ -129,8 +129,7 @@ route::post('update_usermaster2', [MainController::class, 'update_usermasterstor
 route::post('usermasterstore2', [MainController::class, 'submitusermaster'])->name('usermasterstore2');
 // Search Username
 route::match(['get', 'post'], 'searchusername', [MainController::class, 'loadcompanylist'])->name('searchusername');
-
-
+// Get Update Logs
 Route::get('getUpdateLogs', [MainController::class, 'fetchUpdates']);
 // Auto Charge Posting
 Route::get('/autochargepost', [CronController::class, 'autoCharge']);
