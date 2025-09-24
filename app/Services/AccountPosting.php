@@ -24,7 +24,7 @@ class AccountPosting
     public function accountpoststore($fromdate, $todate)
     {
         try {
-            DB::beginTransaction();
+            // DB::beginTransaction();
             $propertyid = Auth::user()->propertyid;
             $permission = revokeopen(191114);
             if (is_null($permission) || $permission->ins == 0) {
@@ -473,6 +473,8 @@ class AccountPosting
                 ->get();
             $tl = [];
 
+            // return $revmastpaypost;
+
             if ($revmastpaypost->isNotEmpty()) {
 
                 foreach ($revmastpaypost as $rows) {
@@ -597,6 +599,8 @@ class AccountPosting
                         ->whereNot('paycharge.restcode', 'FOM' . $propertyid)
                         ->groupBy('paycharge.paytype')
                         ->get();
+
+                        // Log::info('datapos: ' . json_encode($datarevpostpos));
 
                     if ($datarevpostpos->isNotEmpty()) {
                         $tp[] = $datarevpostpos;
@@ -880,7 +884,7 @@ class AccountPosting
                 // return $tlp;
             }
 
-            DB::commit();
+            // DB::commit();
             return ['success' => true, 'message' => 'Account Posting Successfully'];
         } catch (Exception $e) {
             DB::rollBack();
