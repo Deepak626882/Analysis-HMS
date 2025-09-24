@@ -73,6 +73,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Models\Kot as KotModal;
 use App\Models\Sundrytype;
+use App\Services\AccountPosting;
 use Illuminate\Support\Facades\Log;
 
 use function App\Helpers\endsWith;
@@ -12993,182 +12994,185 @@ class CompanyController extends Controller
 
     public function submitnightaudit(Request $request)
     {
-        $permission = revokeopen(191112);
-        if (is_null($permission) || $permission->ins == 0) {
-            return redirect()->back()->with('error', 'You have no permission to execute this functionality!');
-        }
-        $ncurdate = Carbon::parse($request->input('ncurdate'))->addDays(1)->format('Y-m-d');
-        $ncurdateorg = DB::table('enviro_general')->where('propertyid', $this->propertyid)->value('ncur');
+        try {
+            DB::begintransaction();
+            $permission = revokeopen(191112);
+            if (is_null($permission) || $permission->ins == 0) {
+                return redirect()->back()->with('error', 'You have no permission to execute this functionality!');
+            }
+            $ncurdate = Carbon::parse($request->input('ncurdate'))->addDays(1)->format('Y-m-d');
+            $ncurdateorg = DB::table('enviro_general')->where('propertyid', $this->propertyid)->value('ncur');
 
-        if ($this->ncurdate >  date('Y-m-d')) {
-            return back()->with('error', 'Invalid date process');
-        }
+            if ($this->ncurdate >  date('Y-m-d')) {
+                return back()->with('error', 'Invalid date process');
+            }
 
-        $enviro_pos = EnviroPos::where('propertyid', $this->propertyid)->first();
+            $enviro_pos = EnviroPos::where('propertyid', $this->propertyid)->first();
 
-        if ($enviro_pos->kotatnightaudit == 'Y') {
-            $chkkotpending = Kot::where('propertyid', $this->propertyid)
-                ->where('pending', 'Y')
-                ->where('vdate', $ncurdateorg)
-                ->where('voidyn', 'N')
-                ->groupBy('vno')
-                ->get();
+            if ($enviro_pos->kotatnightaudit == 'Y') {
+                $chkkotpending = Kot::where('propertyid', $this->propertyid)
+                    ->where('pending', 'Y')
+                    ->where('vdate', $ncurdateorg)
+                    ->where('voidyn', 'N')
+                    ->groupBy('vno')
+                    ->get();
 
-            $departmentBills = [];
+                $departmentBills = [];
 
-            foreach ($chkkotpending as $item) {
-                $departname = Depart::where('propertyid', $this->propertyid)
-                    ->where('dcode', $item->restcode)
-                    ->first();
+                foreach ($chkkotpending as $item) {
+                    $departname = Depart::where('propertyid', $this->propertyid)
+                        ->where('dcode', $item->restcode)
+                        ->first();
 
-                if (!isset($departmentBills[$departname->name])) {
-                    $departmentBills[$departname->name] = [];
+                    if (!isset($departmentBills[$departname->name])) {
+                        $departmentBills[$departname->name] = [];
+                    }
+
+                    $departmentBills[$departname->name][] = $item->vno;
                 }
 
-                $departmentBills[$departname->name][] = $item->vno;
+                $msgParts = [];
+                foreach ($departmentBills as $departName => $bills) {
+                    // $msgParts[] = "Bill no. " . implode(', ', $bills) . " pending in " . $departName;
+                    $msgParts[] =  $departName;
+                }
+
+                if (count($chkkotpending) > 0) {
+                    $msg = "You have some pending KOTs in: " . implode(" and ", $msgParts);
+                    return back()->with('nightinfo', ['message' => $msg, 'bills' => json_encode($bills), 'row' => 1]);
+                }
             }
 
-            $msgParts = [];
-            foreach ($departmentBills as $departName => $bills) {
-                // $msgParts[] = "Bill no. " . implode(', ', $bills) . " pending in " . $departName;
-                $msgParts[] =  $departName;
-            }
+            if ($enviro_pos->posbillatnightaudit == 'Y') {
+                $pendingBills = [];
+                $checksalepending = Sale1::select(
+                    'sale1.docid',
+                    'depart.name as departname',
+                    'sale1.vno',
+                    DB::raw("CASE WHEN paycharge.docid IS NULL THEN 'Bill Left' ELSE 'Billed' END AS status")
+                )
+                    ->leftJoin('paycharge', 'paycharge.docid', '=', 'sale1.docid')
+                    ->leftJoin('depart', 'depart.dcode', '=', 'sale1.restcode')
+                    ->where('sale1.propertyid', $this->propertyid)
+                    ->where('sale1.vdate', $ncurdateorg)
+                    ->whereNull('paycharge.docid')
+                    ->where('sale1.delflag', 'N')
+                    ->groupBy('sale1.vno')
+                    ->get();
 
-            if (count($chkkotpending) > 0) {
-                $msg = "You have some pending KOTs in: " . implode(" and ", $msgParts);
-                return back()->with('nightinfo', ['message' => $msg, 'bills' => json_encode($bills), 'row' => 1]);
-            }
-        }
-
-        if ($enviro_pos->posbillatnightaudit == 'Y') {
-            $pendingBills = [];
-            $checksalepending = Sale1::select(
-                'sale1.docid',
-                'depart.name as departname',
-                'sale1.vno',
-                DB::raw("CASE WHEN paycharge.docid IS NULL THEN 'Bill Left' ELSE 'Billed' END AS status")
-            )
-                ->leftJoin('paycharge', 'paycharge.docid', '=', 'sale1.docid')
-                ->leftJoin('depart', 'depart.dcode', '=', 'sale1.restcode')
-                ->where('sale1.propertyid', $this->propertyid)
-                ->where('sale1.vdate', $ncurdateorg)
-                ->whereNull('paycharge.docid')
-                ->where('sale1.delflag', 'N')
-                ->groupBy('sale1.vno')
-                ->get();
-
-            if ($checksalepending) {
-                foreach ($checksalepending as $item) {
-                    if ($item->status != 'Billed') {
-                        if (!isset($pendingBills[$item->departname])) {
-                            $pendingBills[$item->departname] = [];
+                if ($checksalepending) {
+                    foreach ($checksalepending as $item) {
+                        if ($item->status != 'Billed') {
+                            if (!isset($pendingBills[$item->departname])) {
+                                $pendingBills[$item->departname] = [];
+                            }
+                            $pendingBills[$item->departname][] = $item->vno;
                         }
-                        $pendingBills[$item->departname][] = $item->vno;
+                    }
+
+                    $summaryString = "";
+                    foreach ($pendingBills as $departname => $bills) {
+                        // $summaryString .= $departname . ": Bill No. " . implode(", ", $bills) . "; ";
+                        $summaryString .= $departname . ", ";
+                    }
+
+                    $summaryString = rtrim($summaryString, "; ");
+
+                    if (!empty($summaryString)) {
+                        // $msg = "You have some unsettled Sale Bills: " . $summaryString;
+                        $msg = "You have some unsettled Bills in: " . $summaryString;
+                        return back()->with('nightinfo',  ['message' => $msg, 'bills' => json_encode($bills), 'row' => 2]);
                     }
                 }
-
-                $summaryString = "";
-                foreach ($pendingBills as $departname => $bills) {
-                    // $summaryString .= $departname . ": Bill No. " . implode(", ", $bills) . "; ";
-                    $summaryString .= $departname . ", ";
-                }
-
-                $summaryString = rtrim($summaryString, "; ");
-
-                if (!empty($summaryString)) {
-                    // $msg = "You have some unsettled Sale Bills: " . $summaryString;
-                    $msg = "You have some unsettled Bills in: " . $summaryString;
-                    return back()->with('nightinfo',  ['message' => $msg, 'bills' => json_encode($bills), 'row' => 2]);
-                }
             }
-        }
 
 
-        $chknotcharged = DB::table('roomocc')
-            ->select('roomocc.*', 'guestfolio.mfoliono', 'guestfolio.comp')
-            ->leftJoin('guestfolio', 'guestfolio.Docid', '=', 'roomocc.DocId')
-            ->where('roomocc.propertyid', $this->propertyid)
-            ->whereNull('roomocc.chkoutdate')
-            ->where('roomocc.chkindate', '<=', $ncurdateorg)
-            ->get();
-
-        $roomsNotFound = [];
-
-        foreach ($chknotcharged as $row) {
-            $founduncharged = DB::table('paycharge')
-                ->where('propertyid', $this->propertyid)
-                ->where('vdate', $ncurdateorg)
-                ->where('vtype', 'RC')
-                ->where('folionodocid', $row->docid)
+            $chknotcharged = DB::table('roomocc')
+                ->select('roomocc.*', 'guestfolio.mfoliono', 'guestfolio.comp')
+                ->leftJoin('guestfolio', 'guestfolio.Docid', '=', 'roomocc.DocId')
+                ->where('roomocc.propertyid', $this->propertyid)
+                ->whereNull('roomocc.chkoutdate')
+                ->where('roomocc.chkindate', '<=', $ncurdateorg)
                 ->get();
-            if ($founduncharged->isEmpty()) {
-                $roomsNotFound[] = $row->roomno;
+
+            $roomsNotFound = [];
+
+            foreach ($chknotcharged as $row) {
+                $founduncharged = DB::table('paycharge')
+                    ->where('propertyid', $this->propertyid)
+                    ->where('vdate', $ncurdateorg)
+                    ->where('vtype', 'RC')
+                    ->where('folionodocid', $row->docid)
+                    ->get();
+                if ($founduncharged->isEmpty()) {
+                    $roomsNotFound[] = $row->roomno;
+                }
             }
-        }
 
 
-        if (!empty($roomsNotFound)) {
-            $errorMessage = 'Please Charge Posting For Rooms: ' . implode(', ', $roomsNotFound);
-            return back()->with('error', 'Please Charge Posting For Rooms: ' . implode(', ', $roomsNotFound));
-            // echo 'hy';
-            // exit;
-        }
+            if (!empty($roomsNotFound)) {
+                $errorMessage = 'Please Charge Posting For Rooms: ' . implode(', ', $roomsNotFound);
+                return back()->with('error', 'Please Charge Posting For Rooms: ' . implode(', ', $roomsNotFound));
+                // echo 'hy';
+                // exit;
+            }
 
-        $nullroomocc = DB::table('roomocc')
-            ->where('propertyid', $this->propertyid)
-            ->whereNull('type')
-            ->pluck('docid');
+            $nullroomocc = DB::table('roomocc')
+                ->where('propertyid', $this->propertyid)
+                ->whereNull('type')
+                ->pluck('docid');
 
-        $searchpay = DB::table('paycharge')
-            ->where('propertyid', $this->propertyid)
-            ->whereIn('folionodocid', $nullroomocc)
-            ->whereNot('billno', '0')
-            ->whereNull('settledate')
-            ->groupBy('folionodocid')
-            ->get(['roomno']);
+            $searchpay = DB::table('paycharge')
+                ->where('propertyid', $this->propertyid)
+                ->whereIn('folionodocid', $nullroomocc)
+                ->whereNot('billno', '0')
+                ->whereNull('settledate')
+                ->groupBy('folionodocid')
+                ->get(['roomno']);
 
-        if ($searchpay->isNotEmpty()) {
-            $totalroom = $searchpay->pluck('roomno')->implode(', ');
-            return back()->with('error', 'Please Settle Bill For Rooms: ' . $totalroom);
-        }
+            if ($searchpay->isNotEmpty()) {
+                $totalroom = $searchpay->pluck('roomno')->implode(', ');
+                return back()->with('error', 'Please Settle Bill For Rooms: ' . $totalroom);
+            }
 
 
-        $todayscheckout = DB::table('roomocc')
-            ->select('roomocc.*', 'enviro_general.ncur')
-            ->leftJoin('enviro_general', 'enviro_general.propertyid', '=', 'roomocc.propertyid')
-            ->where('roomocc.depdate', DB::raw('enviro_general.ncur'))
-            ->whereNull('roomocc.type')
-            ->where('roomocc.propertyid', $this->propertyid)
-            ->get();
+            $todayscheckout = DB::table('roomocc')
+                ->select('roomocc.*', 'enviro_general.ncur')
+                ->leftJoin('enviro_general', 'enviro_general.propertyid', '=', 'roomocc.propertyid')
+                ->where('roomocc.depdate', DB::raw('enviro_general.ncur'))
+                ->whereNull('roomocc.type')
+                ->where('roomocc.propertyid', $this->propertyid)
+                ->get();
 
-        foreach ($todayscheckout as $row) {
-            $updatedep = Carbon::parse($request->input('ncurdate'))->addDays(1)->format('Y-m-d');
-            $uproomocc = [
-                'depdate' => $updatedep,
+            foreach ($todayscheckout as $row) {
+                $updatedep = Carbon::parse($request->input('ncurdate'))->addDays(1)->format('Y-m-d');
+                $uproomocc = [
+                    'depdate' => $updatedep,
+                ];
+                DB::table('roomocc')->where('propertyid', $this->propertyid)->update($uproomocc);
+            }
+
+            $updateData = [
+                'Cancel' => 'Y',
+                'Canceldate' => $ncurdateorg,
+                'U_Name' => 'NOSHOW',
+                'u_updatedt' => $this->currenttime,
             ];
-            DB::table('roomocc')->where('propertyid', $this->propertyid)->update($uproomocc);
-        }
 
-        $updateData = [
-            'Cancel' => 'Y',
-            'Canceldate' => $ncurdateorg,
-            'U_Name' => 'NOSHOW',
-            'u_updatedt' => $this->currenttime,
-        ];
+            $updateQuery = DB::table('grpbookingdetails')
+                ->where('Cancel', 'N')
+                ->where('ArrDate', $ncurdateorg)
+                ->where('ContraDocId', '')
+                ->whereNotExists(function ($query) use ($ncurdateorg) {
+                    $query->select(DB::raw(1))
+                        ->from('guestfolio')
+                        ->whereColumn('grpbookingdetails.BookingDocId', 'guestfolio.docid')
+                        ->where('Vdate', $ncurdateorg);
+                })
+                ->update($updateData);
 
-        $updateQuery = DB::table('grpbookingdetails')
-            ->where('Cancel', 'N')
-            ->where('ArrDate', $ncurdateorg)
-            ->where('ContraDocId', '')
-            ->whereNotExists(function ($query) use ($ncurdateorg) {
-                $query->select(DB::raw(1))
-                    ->from('guestfolio')
-                    ->whereColumn('grpbookingdetails.BookingDocId', 'guestfolio.docid')
-                    ->where('Vdate', $ncurdateorg);
-            })
-            ->update($updateData);
-
-        try {
+            $service = app(AccountPosting::class);
+            $service->accountpoststore($ncurdateorg, $ncurdateorg);
 
             $checkedrooms = RoomOcc::where('propertyid', $this->propertyid)->whereNull('type')->get();
             if ($checkedrooms) {
@@ -13179,6 +13183,7 @@ class CompanyController extends Controller
             }
 
             if (date('m-d', strtotime($this->ncurdate)) == '03-31') {
+                DB::commit();
                 return back()->with('success', 'Night Audit Completed');
             }
 
@@ -13198,8 +13203,10 @@ class CompanyController extends Controller
                     'u_name' => Auth::user()->u_name,
                     'u_ae' => 'e',
                 ]);
+            DB::commit();
             return redirect()->route('logout');
         } catch (Exception $e) {
+            DB::rollBack();
             return back()->with('error', 'Unable to Update Night Audit!');
         }
     }
