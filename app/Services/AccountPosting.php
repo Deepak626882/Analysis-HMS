@@ -16,6 +16,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AccountPosting
 {
@@ -51,6 +52,7 @@ class AccountPosting
             }
 
             Paycharge::whereBetween('vdate', [$fromdate, $todate])->whereIn('vtype', ['PPOS', 'IPOS'])->where('propertyid', $propertyid)->delete();
+            // return [$fromdate, $todate];
 
             $roomchrgdueac = EnviroFom::where('propertyid', $propertyid)->first();
             if ($roomchrgdueac->roomchrgdueac == '') {
@@ -318,8 +320,8 @@ class AccountPosting
                         'u_ae' => 'a',
                     ];
 
-                    // Ledger::insert($hpostdata1);
-                    // Ledger::insert($hpostdata2);
+                    Ledger::insert($hpostdata1);
+                    Ledger::insert($hpostdata2);
                 }
 
                 // return $t;
@@ -336,7 +338,7 @@ class AccountPosting
                     DB::raw('SUM(amtdr) AS TotalDr'),
                     DB::raw('SUM(amtcr) AS TotalCr'),
                     DB::raw('MAX(comments) AS Comments'),
-                    DB::raw('MAX(vdate) AS vdate'),
+                    DB::raw('vdate AS vdate'),
                     DB::raw('MAX(vprefix) AS vprefix')
                 ])
                 ->whereBetween('vdate', [$fromdate, $todate])
@@ -382,7 +384,7 @@ class AccountPosting
 
             if ($posledger->isNotEmpty()) {
                 foreach ($posledger as $row) {
-
+                    
                     if (!is_null($row->DebitAmt)) {
                         $billnos = DB::table('paycharge')
                             ->select('vno')
@@ -453,6 +455,8 @@ class AccountPosting
                             'u_entdt' => now(),
                             'u_ae' => 'a',
                         ];
+
+                        // Log::info(json_encode($posledgerdata2));
 
                         Ledger::insert($posledgerdata1);
                         Ledger::insert($posledgerdata2);

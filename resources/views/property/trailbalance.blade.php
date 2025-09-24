@@ -274,22 +274,22 @@
                             }
 
                             rows += `<tr class="clickable-row"
-                            data-docid="${row.docid}" 
-                            data-vtype="${row.vtype}" 
-                            data-vdate="${row.vdate}"
-                            data-sub_code="${row.subcode}"
-                            data-compname="${row.name}">
-                            <td>${row.name}</td>
-                            <td class="text-end debitcell">${debit}</td>
-                            <td class="text-end creditcell">${credit}</td>
-                        </tr>`;
+                                        data-docid="${row.docid}" 
+                                        data-vtype="${row.vtype}" 
+                                        data-vdate="${row.vdate}"
+                                        data-sub_code="${row.subcode}"
+                                        data-compname="${row.name}">
+                                        <td>${row.name}</td>
+                                        <td class="text-end debitcell">${debit}</td>
+                                        <td class="text-end creditcell">${credit}</td>
+                                    </tr>`;
                         });
 
                         $('#main-table tbody').html(rows);
                         $('#total-debit').text(totalDebit.toFixed(2));
                         $('#total-credit').text(totalCredit.toFixed(2));
                         let ttlamt = totalDebit - totalCredit;
-                        $('#totaldebitmincredit').text(`Total: ${Math.abs(ttlamt)} ${ttlamt < 0 ? 'Cr' : 'Dr'}`);
+                        $('#totaldebitmincredit').text(`Total: ${Math.abs(ttlamt.toFixed(2))} ${ttlamt < 0 ? 'Cr' : 'Dr'}`);
 
                         if (!dataTableInitialized) {
                             let totalbalance = totalDebit - totalCredit;
