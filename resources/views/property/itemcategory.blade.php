@@ -117,6 +117,7 @@
                                             </td>
                                             <td class="none">{{ $row->sn }}</td>
                                             <td class="none">{{ $row->Code }}</td>
+                                            <td class="none">{{ $row->RestCode }}</td>
                                         </tr>
                                         @php $sn++; @endphp
                                     @endforeach
@@ -227,6 +228,7 @@
 
             $(".editBtn").click(function() {
                 var code = $(this).closest("tr").find("td:eq(7)").text();
+                var restcode = $(this).closest("tr").find("td:eq(8)").text();
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", "{{ route('menucatupdata') }}");
                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -255,7 +257,7 @@
                         $("#upsn").val(data.sn);
                     }
                 };
-                xhr.send("code=" + code);
+                xhr.send(`code=${code}&restcode=${restcode}`);
             });
         });
     </script>
