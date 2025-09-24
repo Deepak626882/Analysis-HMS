@@ -99,7 +99,7 @@
                                             </tbody>
                                             <tfoot class="bg-light fw-bold">
                                                 <tr>
-                                                    <td>Total</td>
+                                                    <td id="totaldebitmincredit"></td>
                                                     <td class="debitcell" id="total-debit" class="text-end">0.00</td>
                                                     <td class="creditcell" id="total-credit" class="text-end">0.00</td>
                                                 </tr>
@@ -288,6 +288,8 @@
                         $('#main-table tbody').html(rows);
                         $('#total-debit').text(totalDebit.toFixed(2));
                         $('#total-credit').text(totalCredit.toFixed(2));
+                        let ttlamt = totalDebit - totalCredit;
+                        $('#totaldebitmincredit').text(`Total: ${Math.abs(ttlamt)} ${ttlamt < 0 ? 'Cr' : 'Dr'}`);
 
                         if (!dataTableInitialized) {
                             let totalbalance = totalDebit - totalCredit;

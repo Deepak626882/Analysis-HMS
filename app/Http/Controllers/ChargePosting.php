@@ -63,6 +63,8 @@ class ChargePosting extends Controller
     public function accountpoststore(Request $request)
     {
         $result = $this->accountposting->accountpoststore($request->fromdate, $request->todate);
+
+        // return $result;
         return back()->with($result['success'] == true ? 'success' : 'error', $result['message']);
     }
 }

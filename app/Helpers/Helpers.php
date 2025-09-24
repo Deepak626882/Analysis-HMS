@@ -7,6 +7,7 @@ use App\Models\Countries;
 use App\Models\EnviroBanquet;
 use App\Models\EnviroFom;
 use App\Models\EnviroGeneral;
+use App\Models\EnviroPos;
 use App\Models\FunctionType;
 use App\Models\HallBook;
 use App\Models\HallSale1;
@@ -194,6 +195,15 @@ if (!function_exists('fomparameter')) {
     function fomparameter()
     {
         $data = EnviroFom::where('propertyid', Auth::user()->propertyid)->first();
+
+        return $data;
+    }
+}
+
+if (!function_exists('posparameter')) {
+    function posparameter()
+    {
+        $data = EnviroPos::where('propertyid', Auth::user()->propertyid)->first();
 
         return $data;
     }
