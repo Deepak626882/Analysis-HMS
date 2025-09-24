@@ -53,6 +53,9 @@
                                             id="todate">
                                     </div>
                                 </div>
+                                <div style="margin-top: 30px;" class="ml-5">
+                                    <button id="fetchbutton" name="fetchbutton" type="button" class="btn btn-success">Refresh <i class="fa-solid fa-arrows-rotate"></i></button>
+                                </div>
                                 <div class="">
                                     <div class="form-group">
                                         <input type="checkbox" name="openingbalance" id="openingbalance" class="form-check-input" value="openingbalance" checked>
@@ -213,6 +216,15 @@
             let dataTableInitialized = false;
             $(document).on('change', '#fromdate, #todate, #openingbalance', function() {
                 showLoader();
+                fetchtrialfirst();
+            });
+
+            $(document).on('click', '#fetchbutton', function() {
+                showLoader();
+                fetchtrialfirst();
+            });
+
+            function fetchtrialfirst() {
                 $('#main-table').DataTable().destroy();
                 $('#startdate').text(dmy($('#fromdate').val()));
                 $('#enddate').text(dmy($('#todate').val()));
@@ -452,8 +464,7 @@
                         });
                     }
                 });
-            });
-
+            }
             setTimeout(() => {
                 $('#fromdate').trigger('change');
             }, 1500);
