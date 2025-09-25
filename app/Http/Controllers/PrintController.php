@@ -413,40 +413,21 @@ class PrintController extends Controller
         $company = Companyreg::where('propertyid', $this->propertyid)->first();
         $statename = States::where('propertyid', $this->propertyid)->where('state_code', $company->state_code)->value('name');
 
+        $godown = Depart::where('propertyid', $this->propertyid)->where('dcode', "PURC$this->propertyid")->get();
+
+        $itemgrp = ItemGrp::where('property_id', $this->propertyid)->where('restcode', "PURC$this->propertyid")->where('activeyn', 'Y')->orderBy('name')->get();
+
+        // return $itemgrp;
+
         return view('property.stockregister', [
             'ncurdate' => $this->ncurdate,
             'company' => $company,
-            'statename' => $statename
+            'statename' => $statename,
+            'godown' => $godown,
+            'itemgrp' => $itemgrp
         ]);
     }
 
-    public function getGodowns(Request $request)
-    {
-        $storeType = $request->query('storeType');
-
-
-        if ($storeType == 'Main Store') {
-            $godowns = DB::table('depart')
-                ->where('dcode', 'PURC' . $this->propertyid)
-                ->where('propertyid', $this->propertyid)
-                ->get();
-        } elseif ($storeType == 'Sub-Store') {
-            $godowns = DB::table('depart')
-                ->where('rest_type', 'store')
-                ->where('dcode', '!=', 'PURC' . $this->propertyid)
-                ->where('propertyid', $this->propertyid)
-                ->get();
-        } elseif ($storeType == 'House Keeping') {
-            $godowns = DB::table('depart')
-                ->where('rest_type', 'HOUSE KEEPING')
-                ->where('propertyid', $this->propertyid)
-                ->get();
-        } else {
-            $godowns = collect(); // return empty
-        }
-
-        return response()->json($godowns);
-    }
     public function getItemsAndGroups(Request $request)
     {
         $itemType = $request->input('item_type');
@@ -485,7 +466,7 @@ class PrintController extends Controller
     {
         $fromdate = $request->input('fromdate');
         $todate = $request->input('todate');
-
+        $allitems = $request->input('items');
         // 1. Fetch all distinct items with unit names
         $ditems = DB::table('stock as S')
             ->distinct()
@@ -513,6 +494,7 @@ class PrintController extends Controller
             })
             ->where('S.propertyid', $this->propertyid)
             ->whereIn('S.godowncode', ['PURC' . $this->propertyid])
+            ->whereIn('I.Code', $allitems)
             ->whereIn('VT.ncat', [
                 'PBC',
                 'PBR',
@@ -567,6 +549,7 @@ class PrintController extends Controller
             ->whereIn('S.godowncode', ['PURC' . $this->propertyid])
             ->whereIn('VT.ncat', ['PBC', 'PBR', 'STOP', 'MRE', 'BKREC', 'KSREC', 'KMREC', 'RQI'])
             ->where('S.recdqty', '>', 0)
+            ->whereIn('S.item', $allitems)
             ->groupBy('S.item')
             ->havingRaw('SUM(S.recdqty) > 0')
             ->get();
@@ -609,6 +592,7 @@ class PrintController extends Controller
             ->whereIn('S.godowncode', ['PURC' . $this->propertyid])
             ->whereIn('VT.ncat', ['PRR', 'PRC', 'RQR', 'BKISS', 'KSISS', 'KMISS'])
             ->where('S.issqty', '>', 0)
+            ->whereIn('S.item', $allitems)
             ->groupBy('S.item', 'I.Name')
             ->havingRaw('SUM(S.issqty) > 0')
             ->get();
@@ -686,6 +670,7 @@ class PrintController extends Controller
             ->whereBetween('S.vdate', [$fromdate, $todate])
             ->whereIn('S.godowncode', ['PURC' . $this->propertyid])
             ->where('I.ItemType', 'Store')
+            ->whereIn('I.Code', $allitems)
             ->orderBy('S.item')
             ->orderBy('S.vdate')
             ->orderBy('SeqNo')

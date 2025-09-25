@@ -14,90 +14,102 @@
                         <div class="card-body">
                             <form>
                                 <div class="text-center titlep mb-4">
-                                    <h3>{{ $company->comp_name }}</h3>
-                                    <p class="mb-1">{{ $company->address1 }}</p>
-                                    <p class="mb-1">{{ $statename . ' - ' . $company->city . ' - ' . $company->pin }}</p>
+                                    <h3>{{ companydata()->comp_name }}</h3>
+                                    <p class="mb-1">{{ companydata()->address1 }}</p>
+                                    <p class="mb-1">{{ $statename . ' - ' . companydata()->city . ' - ' . companydata()->pin }}</p>
                                     <p class="mb-0 font-weight-bold">Stock Register Report</p>
                                 </div>
 
-                                <div class="row g-3 mb-3">
-                                    <div class="col-md-2">
-                                        <label>From Date</label>
-                                        <input type="date" id="fromdate" class="form-control"
-                                            value="{{ $ncurdate }}">
+                                <div class="row justify-content-around">
+
+                                    <input type="hidden" value="{{ companydata()->start_dt }}" name="start_dt" id="start_dt">
+                                    <input type="hidden" value="{{ companydata()->end_dt }}" name="end_dt" id="end_dt">
+                                    <input type="hidden" value="{{ ncurdate() }}" name="ncurdatef" id="ncurdatef">
+                                    <div class="">
+                                        <div class="form-group">
+                                            <label for="fromdate" class="col-form-label">From Date <i
+                                                    class="fa-regular fa-calendar mb-1"></i></label>
+                                            <input type="date" value="{{ ncurdate() }}" class="form-control"
+                                                name="fromdate" id="fromdate">
+                                        </div>
                                     </div>
-                                    <div class="col-md-2">
-                                        <label>To Date</label>
-                                        <input type="date" id="todate" class="form-control"
-                                            value="{{ $ncurdate }}">
+                                    <div class="">
+                                        <div class="form-group">
+                                            <label for="todate" class="col-form-label">To Date <i
+                                                    class="fa-regular fa-calendar mb-1"></i></label>
+                                            <input type="date" value="{{ ncurdate() }}" class="form-control"
+                                                name="todate" id="todate">
+                                        </div>
                                     </div>
-                                    <div class="col-md-2">
-                                        <label>Type</label>
-                                        <select id="type" class="form-control">
-                                            <option value="All">All</option>
+                                    <div class="">
+                                        <label for="type" class="col-form-label">Type</label>
+                                        <select class="form-control" name="type" id="type">
+                                            <option value="All" selected>All</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-2">
-                                        <label>Valuation</label>
-                                        <select id="valuation" class="form-control">
-                                            <option value="Actual">Actual</option>
+                                    <div class="">
+                                        <label for="valuation" class="col-form-label">Valuation</label>
+                                        <select class="form-control" name="valuation" id="valuation">
+                                            <option value="Actual" selected>Actual</option>
                                             <option value="LastPurchaseRate">Last Purchase Rate</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label>Store Type</label>
-                                        <div class="radio-group">
-                                            <label><input type="radio" name="storeType" value="Main Store" checked> Main
-                                                Store</label>
-                                            <label><input type="radio" name="storeType" value="Sub Store"> Sub
-                                                Store</label>
-                                            <label><input type="radio" name="storeType" value="House Keeping"> House
-                                                Keeping</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label>Godown</label>
-                                        <select id="godownDropdown" class="form-control">
-                                            <option value="">Select Godown</option>
+                                    <div class="">
+                                        <label for="storetype" class="col-form-label">Store Type</label>
+                                        <select class="form-control" name="storetype" id="storetype">
+                                            <option value="main_store" selected>Main Store</option>
+                                            <option value="sub_store">Sub Store</option>
+                                            <option value="house_keeping">House Keeping</option>
                                         </select>
                                     </div>
+                                    <div class="">
+                                        <label for="godownDropdown">Godown</label>
+                                        <select class="form-control" name="godownDropdown" id="godownDropdown">
+                                            <option value="">Select</option>
+                                            @foreach ($godown as $item)
+                                                <option value="{{ $item->dcode }}">{{ $item->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
                                 </div>
 
-                                <div class="text-center">
+                                <div class="row">
+
+                                    <div class="col-md-3">
+                                        <button style="width: -webkit-fill-available;" type="button"
+                                            class="btn rhead btn-outline-primary" name="itemgrplistbtn"
+                                            id="itemgrplistbtn">Item Group <i class="fa-solid fa-angle-down"></i></button>
+                                        <ul class="checkul" id="listeditemgrp" style="display:none;">
+                                            <li> <input type="checkbox" id="checkallitemgrps">
+                                                <span>Select All <span class="tcount">{{ count($itemgrp) }}</span></span>
+                                                @foreach ($itemgrp as $item)
+                                            <li data-groupname="{{ $item->name }}" class="groupnameli">
+                                                <input class="groupcheckbox" value="{{ $item->code }}" type="checkbox">
+                                                <span>{{ $item->name }}</span>
+                                            </li>
+                                            @endforeach
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <button style="width: -webkit-fill-available;" type="button"
+                                            class="btn rhead btn-outline-secondary" name="itemlistbtn"
+                                            id="itemlistbtn">Items <i class="fa-solid fa-angle-down"></i></button>
+                                        <ul class="checkul" id="listeditems" style="display:none;">
+                                            <li> <input type="checkbox" id="checkallitems">
+                                                <span>Select All <span class="tcount"></span></span>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                </div>
+
+                                <div class="text-center mt-2 mb-2">
                                     <button type="button" id="refreshbutton" class="btn-refresh btn btn-success btn-sm">Refresh</button>
                                 </div>
 
-                                <div class="row mt-4">
-                                    <div class="col-md-6">
-                                        <div class="section-header">Item Groups</div>
-                                        <div class="table-wrapper">
-                                            <table id="itemGroupTable"
-                                                class="table table-sm table-bordered hover-highlight">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th><input type="checkbox" id="selectAllGroups">All</th>
-                                                        <th>Group Name</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody></tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="section-header">Items</div>
-                                        <div class="table-wrapper">
-                                            <table id="itemTable" class="table table-sm table-bordered hover-highlight">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th><input type="checkbox" id="selectAllItems">All</th>
-                                                        <th>Item Name</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody></tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="mt-4">
                                     <div class="custom-header" id="stockTableHeader">Stock Register</div>
                                     <div class="mt-3" id="stockTable"></div>
@@ -111,108 +123,74 @@
 
     <script>
         $(document).ready(function() {
-            const defaultStoreType = $('input[name="storeType"]:checked').val();
-            loadGodowns(defaultStoreType);
 
-            // Load Godowns
-            function loadGodowns(storeType) {
-                $.get(`/get-godowns?storeType=${storeType}`, function(data) {
-                    const dropdown = $('#godownDropdown');
-                    dropdown.empty();
-                    if (data.length > 1) {
-                        dropdown.append(`<option value="">All</option>`);
-                    }
-                    data.forEach(g => {
-                        dropdown.append(`<option value="${g.dcode}">${g.name}</option>`);
-                    });
-
-                    loadItemGroupsAndItems();
-                });
-            }
-
-            let allItems = [];
-
-            function loadItemGroupsAndItems() {
-                const godown = $('#godownDropdown').val();
-                const type = $('#type').val();
-                const valuation = $('#valuation').val();
-
-                if (!godown) return;
-
-                $.get('/get-items-and-groups', {
-                    godown,
-                    item_type: type,
-                    valuation
-                }, function(res) {
-                    const groupBody = $('#itemGroupTable tbody');
-                    groupBody.empty();
-                    $('#itemTable tbody').empty();
-
-                    res.groups.forEach(group => {
-                        groupBody.append(`
-                        <tr>
-                            <td><input type="checkbox" class="groupCheckbox" data-group-id="${group.id}" checked></td>
-                            <td>${group.name}</td>
-                        </tr>
-                    `);
-                    });
-
-                    allItems = res.items;
-
-                    $('#selectAllGroups').prop('checked', res.groups.length > 0);
-                    $('#selectAllItems').prop('checked', res.items.length > 0);
-
-                    bindGroupCheckboxEvent();
-                    filterItemsBySelectedGroups();
-                });
-            }
-
-            function filterItemsBySelectedGroups() {
-                const selectedGroupIds = $('.groupCheckbox:checked').map(function() {
-                    return $(this).data('group-id');
-                }).get();
-
-                const filteredItems = allItems.filter(item =>
-                    selectedGroupIds.includes(item.group_id || item.ItemGroup || item.item_group || item.group)
-                );
-
-                const itemBody = $('#itemTable tbody');
-                itemBody.empty();
-
-                filteredItems.forEach(item => {
-                    itemBody.append(`
-                    <tr>
-                        <td><input type="checkbox" class="itemCheckbox" data-item-id="${item.id}" checked></td>
-                        <td>${item.iname}</td>
-                    </tr>
-                `);
-                });
-
-                $('#selectAllItems').prop('checked',
-                    $('.itemCheckbox').length > 0 &&
-                    $('.itemCheckbox:checked').length === $('.itemCheckbox').length
-                );
-            }
-
-            $(document).on('change', '.itemCheckbox', function() {
-                const total = $('.itemCheckbox').length;
-                const checked = $('.itemCheckbox:checked').length;
-                $('#selectAllItems').prop('checked', total > 0 && total === checked);
+            $('#checkallitemgrps').change(function() {
+                let isChecked = $(this).is(':checked');
+                $('.groupcheckbox').prop('checked', isChecked);
+                fetchitembygroup();
             });
 
-            function bindGroupCheckboxEvent() {
-                $('.groupCheckbox').on('change', function() {
-                    const total = $('.groupCheckbox').length;
-                    const checked = $('.groupCheckbox:checked').length;
-                    $('#selectAllGroups').prop('checked', total > 0 && total === checked);
-                    filterItemsBySelectedGroups();
-                });
+            $('#checkallitems').change(function() {
+                let isChecked = $(this).is(':checked');
+                $('.itemcheckbox').prop('checked', isChecked);
+            });
 
-                $('#selectAllGroups').on('change', function() {
-                    $('.groupCheckbox').prop('checked', this.checked);
-                    filterItemsBySelectedGroups();
-                });
+            dynamicSearch('.groupsearch', 'itemgroup', '.itemgroupli');
+            dynamicSearch('.itemsearch', 'itemname', '.itemnameli');
+
+            toggleList("#itemgrplistbtn", "#listeditemgrp");
+            checkAllCheckboxes("#checkallitemgrps", ".groupcheckbox");
+
+            toggleList("#itemlistbtn", "#listeditems");
+            checkAllCheckboxes("#checkallitems", ".itemcheckbox");
+
+            function getcheckgroupcode() {
+                return $('.groupcheckbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
             }
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                }
+            });
+
+            $(document).on('change', '.groupcheckbox', function() {
+                fetchitembygroup();
+            });
+
+            function fetchitembygroup() {
+                let checkedgroupcode = getcheckgroupcode();
+
+                $('#listeditems li:not(:first-child)').remove();
+                if (checkedgroupcode.length > 0) {
+                    $.ajax({
+                        method: 'POST',
+                        url: 'getitemsbygroup',
+                        data: {
+                            checkedgroupcode: checkedgroupcode
+                        },
+                        success: function(response) {
+                            let items = response;
+                            $('#listeditems .tcount').text(items.length);
+                            items.forEach((idata, index) => {
+                                $('#listeditems').append(`
+                                    <li data-itemname="${idata.Name}" class="itemnameli">
+                                        <input class="itemcheckbox" value="${idata.Code}" type="checkbox" checked>
+                                        <span>${idata.Name}</span>
+                                    </li>
+                            `);
+                            });
+                        },
+                        error: function(errorres) {
+                            console.log(errorres);
+                        }
+                    })
+                }
+            }
+
+            const defaultStoreType = $('input[name="storeType"]:checked').val();
 
             // Refresh button click
             $('#refreshbutton').click(function() {
@@ -223,12 +201,14 @@
                 const storeType = $('input[name="storeType"]:checked').val();
                 const godown = $('#godownDropdown').val();
 
-                const selectedItemIds = $('.itemCheckbox:checked').map(function() {
-                    return $(this).data('item-id');
+                let allitems = $('.itemcheckbox').map(function() {
+                    if ($(this).is(':checked')) {
+                        return $(this).val();
+                    }
                 }).get();
 
-                if (selectedItemIds.length === 0) {
-                    alert("Please select at least one item.");
+                if (allitems.length === 0) {
+                    pushNotify('error', 'Item Wise Sale', 'Please Select Item', 'fade', 300, '', '', true, true, true, 2000, 20, 20, 'outline', 'right top');
                     return;
                 }
 
@@ -243,7 +223,7 @@
                         valuation,
                         storeType,
                         godown,
-                        items: selectedItemIds
+                        items: allitems
                     },
                     success: function(response) {
                         $('#stockTable').html('');
@@ -252,7 +232,6 @@
                         const finalData = [];
 
                         rawData.forEach(item => {
-                            // Set default values with proper .toFixed(2)
                             const opQty = Number(item.opqty || 0).toFixed(2);
                             const opAmt = Number(item.opamt || 0).toFixed(2);
                             const opIssQty = Number(item.opissuedqty || 0).toFixed(2);
@@ -397,21 +376,6 @@
 
 
                 });
-            });
-
-            // Store Type Change → Load Godowns
-            $('input[name="storeType"]').change(function() {
-                const storeType = $(this).val();
-                loadGodowns(storeType);
-            });
-
-            // Dropdown changes → load data
-            $('#godownDropdown, #type, #valuation').change(loadItemGroupsAndItems);
-
-            // Select All Items Checkbox Logic
-            $('#selectAllItems').on('change', function() {
-                const checked = $(this).is(':checked');
-                $('.itemCheckbox').prop('checked', checked);
             });
         });
     </script>

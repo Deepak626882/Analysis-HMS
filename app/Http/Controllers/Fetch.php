@@ -965,4 +965,21 @@ class Fetch extends Controller
 
         return $data;
     }
+
+    public function getitemsbygroup(Request $request)
+    {
+        $groupcodes = $request->input('checkedgroupcode');
+
+        $itemmast = DB::table('itemmast')->select('itemmast.*', 'depart.name as depname')
+            ->leftJoin('depart', 'depart.dcode', '=', 'itemmast.RestCode')
+            ->where('itemmast.Property_ID', $this->propertyid)
+            ->where('itemmast.RestCode', "PURC$this->propertyid")
+            ->whereIn('itemmast.ItemGroup', $groupcodes)
+            ->where('itemmast.ActiveYN', 'Y')
+            ->groupBy('itemmast.Code')
+            ->orderBy('itemmast.Name', 'ASC')
+            ->get();
+
+        return response()->json($itemmast);
+    }
 }

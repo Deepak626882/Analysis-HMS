@@ -979,8 +979,8 @@ Route::post('mergereverseroompost', [RoomController::class, 'mergereverseroompos
 Route::get('mrprinting/{docid}', [PrintController::class, 'mrprinting'])->name('mrprinting');
 // stock register
 Route::get('stockregister', [PrintController::class, 'stockregister'])->name('stockregister');
-Route::get('/get-godowns', [PrintController::class, 'getGodowns'])->name('getGodowns');
-Route::get('/get-items-and-groups', [PrintController::class, 'getItemsAndGroups'])->name('getItemsAndGroups');
+// Get Items By Group Name
+Route::post('getitemsbygroup', [Fetch::class, 'getitemsbygroup'])->name('getitemsbygroup');
 Route::get('actualdata', [PrintController::class, 'actualdata'])->name('actualdata');
 Route::get('lprdata', [PrintController::class, 'lprdata'])->name('lprdata');
 Route::post('/fetchValuationData', [PrintController::class, 'fetchValuationData'])->name('fetchValuationData');

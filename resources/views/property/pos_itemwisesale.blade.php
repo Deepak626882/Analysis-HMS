@@ -197,12 +197,12 @@
                 });
 
                 itemmast.forEach((element) => {
-                    $('#listeditems').append(`
-                <li data-itemname="${element.Name}" class="itemnameli">
-                    <input class="itemcheckbox" value="${element.Code}" type="checkbox" checked>
-                    <span>${element.Name}</span>
-                </li>
-            `);
+                            $('#listeditems').append(`
+                        <li data-itemname="${element.Name}" class="itemnameli">
+                            <input class="itemcheckbox" value="${element.Code}" type="checkbox" checked>
+                            <span>${element.Name}</span>
+                        </li>
+                    `);
                 });
 
             }
@@ -290,8 +290,7 @@
                 let nckot = $(this).val();
                 let itemdetails = $('#itemdetails').val();
                 if (fromdate == '') {
-                    pushNotify('error', 'Sale Register', 'Please Select From Date', 'fade', 300, '', '',
-                        true, true, true, 2000, 20, 20, 'outline', 'right top');
+                    pushNotify('error', 'Sale Register', 'Please Select From Date', 'fade', 300, '', '', true, true, true, 2000, 20, 20, 'outline', 'right top');
                     $('#fromdate').addClass('invalid');
                 }
                 if (todate == '') {
