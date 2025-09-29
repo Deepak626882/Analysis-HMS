@@ -36,6 +36,7 @@ use App\Http\Controllers\SmartCard\CardReFundController;
 use App\Http\Controllers\SmartCard\CardRegistrationController;
 use App\Http\Controllers\UserController; //created by ananya
 use App\Http\Controllers\WPParameter;
+use App\Http\Controllers\BookingFollowUp;
 use Carbon\Cli\Invoker;
 use League\Flysystem\Local\FallbackMimeTypeDetector;
 
@@ -1266,3 +1267,21 @@ Route::post('smartcard/cardrecharge/store', [CardRechargeController::class, 'sto
 Route::get('smartcard/cardrefund', [CardReFundController::class, 'index'])->name('smartcard.cardrefund');
 // // Submit Smart Card Refund
 Route::post('smartcard/cardrefund/store', [CardReFundController::class, 'store'])->name('smartcard.cardrefund.store');
+
+
+
+
+
+
+
+
+
+//////////////////// Deepak Routes ////////////////////////
+// Booking Followup 
+
+Route::middleware(['company'])->group(function () {
+    Route::get('inquiryfollup', [BookingFollowUp::class, 'index'])->name('inquiryfollup');
+    Route::get('get-inquiryfollup', [BookingFollowUp::class, 'data'])->name('get-inquiryfollup');
+});
+
+Route::get('/booking-followup/comments/{inqno}', [BookingFollowUp::class, 'comments'])->name('bookingfollowup.comments');

@@ -4652,4 +4652,239 @@ class Reporting extends Controller
 
       return json_encode($data);
    }
+
+   ///////////////////////////  Deepak Code Repport //////////////////////////
+
+   public function dailyFunctionSheet(Request $request)
+   {
+      $permission = revokeopen(141213);
+      if (is_null($permission) || $permission->view == 0) {
+         return redirect()->back()->with('error', 'You have no permission to execute this functionality!');
+      }
+      $fromdate = $this->ncurdate;
+      $company = Companyreg::where('propertyid', $this->propertyid)->first();
+      $statename = States::where('propertyid', $this->propertyid)->where('state_code', $company->state_code)->value('name');
+      $revheading = Revmast::where('propertyid', $this->propertyid)->where('field_type', 'P')->get();
+      $distinctuname = Paycharge::where('propertyid', $this->propertyid)->where('modeset', 'S')->distinct('u_name')->get(['u_name']);
+      return view('property.dailyfunctionsheet', [
+         'fromdate' => $fromdate,
+         'statename' => $statename,
+         'distinctuname' => $distinctuname,
+         'company' => $company,
+         'revheading' => $revheading
+      ]);
+   }
+
+   public function dailyFunctionSheetData(Request $request)
+   {
+      
+     // try {
+         $draw = $request->input('draw');
+         $start = $request->input('start', 0);
+         $length = $request->input('length', 10);
+         $fromdate = $request->input('fromdate');
+         $todate = $request->input('todate');
+         $type = $request->input('type');
+         $propertyid = $this->propertyid;
+
+         if ($type == 1) {
+            $query = $this->getFunctionData($fromdate, $todate, $propertyid);
+         } else if ($type == 2) {
+            $query = $this->getPendingData($fromdate, $todate, $propertyid);
+         } else if ($type == 3) {
+            $query = $this->getAdvanceData($fromdate, $todate, $propertyid);
+         } else {
+            // For type 3 or any other invalid type, return zero records
+            return response()->json([
+               'draw' => $draw,
+               'recordsTotal' => 0,
+               'recordsFiltered' => 0,
+               'data' => []
+            ]);
+         }
+
+         $total = $query->count();
+         $data = $query->offset($start)->limit($length)->get();
+
+         $result = [];
+         $sno = $start + 1;
+
+         foreach ($data as $row) {
+            $advances = $this->getAdvanceDetails($row->docid, $propertyid);
+            $advanceTotal  = $advances->sum('Advance');
+            $row->Adv_Date = $advances->isNotEmpty() ? $advances->first()->Adv_Date : null;
+            $row->Advance  = $advanceTotal;
+            $row->Adv_Type = $advances->isNotEmpty() ? $advances->first()->Adv_Type : null;
+            $row->rect_no  = $advances->isNotEmpty() ? $advances->first()->sno : null;
+
+            $result[] = [
+               'sno'           => $sno++,
+               'fpno'          => $row->vno,
+               'venue'         => $row->Venue ?? '',
+               'start_date'    => $row->fromdate ?? '',
+               'for_time'      => $row->ForTime ?? '',
+               'to_time'       => $row->ToTime ?? '',
+               'pax'           => $row->Pax ?? '',
+               'pax_rate'      => $row->Rate ?? '',
+               'function_type' => $row->FuncType ?? '',
+               'party_name'    => $row->PartyName ?? '',
+               'advance'       => $advanceTotal ?? '',
+               'type'          => $row->Adv_Type ?? '',
+               'rect_no'       => $row->rect_no ?? '',
+               'rect_date'     => $row->Adv_Date ?? '',
+            ];
+         }
+
+         return response()->json([
+            'draw' => $draw,
+            'recordsTotal' => $total,
+            'recordsFiltered' => $total,
+            'data' => $result
+         ]);
+
+   }
+
+
+   private function getAdvanceDetails($contradocid, $propertyid)
+   {
+      $query = DB::table('paychargeh as PH')
+         ->select([
+            'PH.sno',
+            'PH.vno as Adv_No',
+            'PH.vdate as Adv_Date',
+            DB::raw("CASE WHEN PH.Vtype = 'AD' THEN PH.AmtCr ELSE -PH.AmtDr END as Advance"),
+            'PH.paytype as Adv_Type',
+         ])
+         ->whereIn('PH.vtype', ['AD', 'AR'])
+         ->where('PH.restcode', 'BANQ' . $propertyid)
+         ->where('PH.contradocid', $contradocid)
+         ->where('PH.sno', 1)
+         ->orderBy('PH.vdate')
+         ->orderBy('PH.vno')
+         ->orderBy('PH.sno');
+
+      return $query->get();
+   }
+
+
+   private function getFunctionData($fromdate, $todate, $propertyid)
+   {
+      $query = DB::table('hallbook as S')
+         ->select([
+            'S.docid',
+            'S.vno',
+            DB::raw("CONCAT(
+                IF(TRIM(IFNULL(S.mobileno, '')) <> '', CONCAT(TRIM(S.mobileno), ', '), ''),
+                IF(TRIM(IFNULL(S.mobileno1, '')) <> '', CONCAT(TRIM(S.mobileno1), ', '), '')
+            ) as ContactNo"),
+            'VM.name as Venue',
+            'S.guaratt as Pax',
+            'S.coverrate as Rate',
+            'S.partyname as PartyName',
+            'functiontype.name as FuncType',
+            'VO.fromdate',
+            'VO.dromtime as ForTime',
+            'VO.todate',
+            'VO.totime as ToTime',
+         ])
+         ->leftJoin('functiontype', 'S.Func_Name', '=', 'functiontype.code')
+         ->join('venueocc as VO', 'S.DocId', '=', 'VO.fpdocid')
+         ->join('venuemast as VM', 'VO.VenuCode', '=', 'VM.code')
+         ->where('S.restcode', 'BANQ' . $propertyid)
+         ->where('S.propertyid', $propertyid)
+         ->whereBetween('VO.fromdate', [
+            DB::raw("STR_TO_DATE('$fromdate', '%Y-%m-%d')"),
+            DB::raw("STR_TO_DATE('$todate', '%Y-%m-%d')")
+         ])
+         ->orderBy('VO.fromdate')
+         ->orderBy('VO.dromtime');
+
+      return $query;
+   }
+
+   private function getPendingData($fromdate, $todate, $propertyid)
+   {
+      $query = DB::table('hallbook as S')
+         ->select([
+            'S.docid',
+            'S.vno',
+            DB::raw("CONCAT(
+                IF(TRIM(IFNULL(S.mobileno, '')) <> '', CONCAT(TRIM(S.mobileno), ', '), ''),
+                IF(TRIM(IFNULL(S.mobileno1, '')) <> '', CONCAT(TRIM(S.mobileno1), ', '), '')
+            ) as ContactNo"),
+            'VM.name as Venue',
+            'S.guaratt as Pax',
+            'S.coverrate as Rate',
+            'S.partyname as PartyName',
+            'functiontype.name as FuncType',
+            'VO.fromdate',
+            'VO.dromtime as ForTime',
+            'VO.todate',
+            'VO.totime as ToTime',
+         ])
+         ->leftJoin('functiontype', 'S.Func_Name', '=', 'functiontype.code')
+         ->join('venueocc as VO', 'S.DocId', '=', 'VO.fpdocid')
+         ->join('venuemast as VM', 'VO.VenuCode', '=', 'VM.code')
+         ->where('S.restcode', 'BANQ' . $propertyid)
+         ->where('S.propertyid', $propertyid)
+         ->whereNotIn('S.docid', function ($subquery) use ($propertyid) {
+            $subquery->select('bookdocid')
+               ->from('hallsale1')
+               ->where('restcode', 'BANQ.' . $propertyid)
+               ->where('propertyid', $propertyid);
+         })
+          ->whereBetween('VO.fromdate', [
+            DB::raw("STR_TO_DATE('$fromdate', '%Y-%m-%d')"),
+            DB::raw("STR_TO_DATE('$todate', '%Y-%m-%d')")
+         ])
+         ->orderBy('VO.fromdate')
+         ->orderBy('VO.dromtime');
+
+      return $query;
+   }
+
+   private function getAdvanceData($fromdate, $todate, $propertyid)
+   {
+      $query = DB::table('hallbook as S')
+         ->select([
+            'S.docid',
+            'S.vno',
+            DB::raw("CONCAT(
+                IF(TRIM(IFNULL(S.mobileno, '')) <> '', CONCAT(TRIM(S.mobileno), ', '), ''),
+                IF(TRIM(IFNULL(S.mobileno1, '')) <> '', CONCAT(TRIM(S.mobileno1), ', '), '')
+            ) as ContactNo"),
+            'VM.name as Venue',
+            'VO.fromdate',
+            'VO.dromtime as ForTime',
+            'VO.todate',
+            'VO.totime as ToTime',
+            'S.guaratt as Pax',
+            'S.coverrate as Rate',
+            'S.partyname as PartyName',
+            'functiontype.name as FuncType',
+            'PH.amtcr as Advance',
+            'PH.paytype as Adv_Type',
+            'PH.vno as Adv_No',
+            'PH.vdate as Adv_Date',
+         ])
+         ->leftJoin('functiontype', 'S.func_name', '=', 'functiontype.Code')
+         ->join('venueocc as VO', 'S.DocId', '=', 'VO.fpdocid')
+         ->join('venuemast as VM', 'VO.VenuCode', '=', 'VM.code')
+         ->leftJoin('paychargeh as PH', function ($join) {
+            $join->on('S.DocId', '=', 'PH.contradocid')
+               ->where('PH.VType', '=', 'AD');
+         })
+         ->where('S.restcode', 'BANQ' . $propertyid)
+         ->where('S.propertyid', $propertyid)
+         ->where('PH.sno', 1)
+         ->whereBetween('VO.fromdate', [
+            DB::raw("STR_TO_DATE('$fromdate', '%Y-%m-%d')"),
+            DB::raw("STR_TO_DATE('$todate', '%Y-%m-%d')")
+         ])
+         ->orderBy('PH.vdate')
+         ->orderBy('PH.vno')
+         ->orderBy('PH.sno');
+
+      return $query;
+   }
 }

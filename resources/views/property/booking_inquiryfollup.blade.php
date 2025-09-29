@@ -10,7 +10,7 @@
                             <div class="container-fluid">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <h3>Booking Inquiry Follow Up</h3>
+                                        <h3>Booking Enquiry Follow Up</h3>
                                         <button type="button" class="btn btn-primary btn-push active" id="btn-all"
                                             onclick="filterStatus()">All</button>
                                         <button type="button" class="btn btn-success btn-push" id="btn-running"
@@ -26,8 +26,8 @@
                                         <table class="table table-bordered table-hover " id="followupTable">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th width="5%">#</th> 
-                                                    <th width="15%">Name</th>  
+                                                    <th width="5%">#</th>
+                                                    <th width="15%">Name</th>
                                                     <th width="15%">Mobile</th>
                                                     <th width="15%">Hall</th>
                                                     <th width="15%">Date</th>
@@ -35,6 +35,7 @@
                                                     <th width="15%">Guaranteed Pax</th>
                                                     <th width="15%">Follow Up Date</th>
                                                     <th width="30%">Remark</th>
+                                                    <th width="5%"><i class="fa fa-eye"></i></th>
                                                     <th width="15%">Status</th>
                                                     <th width="15%">Action</th>
                                                 </tr>
@@ -78,7 +79,22 @@
                     { data: 'expected_pax', name: 'expected_pax' },
                     { data: 'guaranteed_pax', name: 'guaranteed_pax' },
                     { data: 'follow_up_date', name: 'follow_up_date' },
-                    { data: 'remark', name: 'remark' },
+                    {
+                        data: 'remark',
+                        name: 'remark',
+                        render: function (data, type, row, meta) {
+                            return '<span class="remark-cell" data-remark-id="' + row.id + '" style="cursor:pointer;">' + (data ? data : '') + '</span>';
+                        }
+                    },
+                    {
+                        data: null,
+                        name: 'eye',
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row, meta) {
+                            return '<i class="fa fa-eye remark-eye" data-remark-id="' + row.id + '" style="cursor:pointer; color:#007bff;"></i>';
+                        }
+                    },
                     { data: 'status', name: 'status' },
                     { data: 'action', name: 'action' }
                 ],
@@ -169,7 +185,7 @@
             var modal = new bootstrap.Modal(document.getElementById('followupUpdateModal'));
             modal.show();
         }
-       function closeUpdateModal() {
+        function closeUpdateModal() {
             document.getElementById('followupUpdateForm').reset();
             // Hide modal using vanilla JS (fallback for all Bootstrap versions)
             var modalEl = document.getElementById('followupUpdateModal');
@@ -185,6 +201,14 @@
         $(document).ready(function () {
             $('#followupUpdateForm').on('submit', function (e) {
                 e.preventDefault();
+                var statusVal = $('#status').val();
+                var proceed = true;
+                if (statusVal === '0') {
+                    proceed = confirm('Are you sure you want to close this follow up?');
+                }
+                if (!proceed) {
+                    return;
+                }
                 var formData = $(this).serialize();
                 var $btn = $(this).find('button[type="submit"]');
                 var originalText = $btn.html();
@@ -281,5 +305,39 @@
         function hideCustomToast() {
             document.getElementById('customToast').style.display = 'none';
         }
+    </script>
+
+    <script>
+        // Show comments box below the clicked remark cell
+        // Handle click on remark cell or eye icon to show comments
+        $(document).on('click', '.remark-cell, .remark-eye', function (e) {
+            var remarkId = $(this).data('remark-id');
+            var $row;
+            if (remarkId === undefined) {
+                // If clicked element doesn't have data-remark-id, try to get from parent .remark-cell
+                var $cell = $(this).closest('.remark-cell');
+                remarkId = $cell.data('remark-id');
+                $row = $cell.closest('tr');
+            } else {
+                $row = $(this).closest('tr');
+            }
+            if (!remarkId) return; // Prevent AJAX if no id
+            // Remove any open comment boxes
+            $('.comments-box-row').remove();
+            // Fetch comments via AJAX
+            $.get('/booking-followup/comments/' + remarkId, function (comments) {
+                var html = '<tr class="comments-box-row"><td colspan="12">';
+                html += '<div class="p-2 border rounded bg-light"><b>Comments:</b><ul class="mb-0">';
+                if (comments.length === 0) {
+                    html += '<li>No comments found.</li>';
+                } else {
+                    comments.forEach(function (c) {
+                        html += '<li><b>' + c.date + ':</b> ' + c.remark + '</li>';
+                    });
+                }
+                html += '</ul></div></td></tr>';
+                $row.after(html);
+            });
+        });
     </script>
 @endsection

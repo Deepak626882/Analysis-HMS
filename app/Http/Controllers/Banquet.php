@@ -2442,4 +2442,5 @@ class Banquet extends Controller
             'bookdetail' => $bookdetail
         ]);
     }
+    
 }

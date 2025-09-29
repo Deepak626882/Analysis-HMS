@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Pointofsale;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\BookingFollowUp;
 
 // Open Checkin Register
 Route::get('checkinreg', [Pointofsale::class, 'checkinreg']);
@@ -13,3 +14,4 @@ Route::post('fetchitemoldroomno', [Pointofsale::class, 'fetchitemoldroomno'])->n
 Route::post('salebillsubmit', [Pointofsale::class, 'salebillsubmit'])->name('salebillsubmit');
 // Update Sale Bill Entry
 Route::post('salebillupdate', [Pointofsale::class, 'salebillupdate'])->name('salebillupdate');
+

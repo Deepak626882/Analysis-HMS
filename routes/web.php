@@ -12,6 +12,7 @@ use App\Http\Controllers\Frontend\ContactController;
 use App\Http\Controllers\PropertyController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PythonAuth;
+use App\Http\Controllers\BookingFollowUp;
 
 
 /*
@@ -165,3 +166,5 @@ Route::get('contact', [HomeController::class, 'contact'])->name('contact');
 Route::post('contactsubmit', [ContactController::class, 'store'])->name('contact.submit');
 // Submit Demo Request
 Route::post('/demo-request', [DemoRequestController::class, 'store'])->name('demo-request.store');
+// Booking Follow Up
+Route::post('/booking-followup', [BookingFollowUp::class, 'store'])->name('booking-followup.store');

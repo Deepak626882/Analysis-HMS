@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('whatsapp_logs', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('recipient_phone_number');
+            $table->integer('propertyid');
+            $table->enum('type', ['Checkin', 'Checkout', 'Reservation', 'Reservation Cancel', 'KOT Bill']);
+            $table->string('template_id');
+            $table->text('parameters')->nullable();
+            $table->text('response')->nullable();
+            $table->integer('http_code');
+            $table->enum('status', ['success', 'failed']);
+            $table->string('u_name')->default('');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('whatsapp_logs');
+    }
+};
