@@ -30,10 +30,16 @@ class BookingFollowUp extends Controller
 
         // Filter by status if provided (for DataTables column search)
         if ($request->has('status')) {
-            $status = $request->input('status');
+           $status = $request->input('status');
 
             if ($status !== null && $status !== '' && $status !== 'undefined') {
-                $query->where('bookinginquiry.status', $status);
+               // echo "Status : " . $status;
+                // Status filter logic
+                if ($status == 0) {
+                    $query->where('bookinginquiry.status', 'Active');
+                } elseif ($status == 1) {
+                    $query->where('bookinginquiry.status', 'Inactive');
+                }
             }
         }
 
@@ -93,9 +99,9 @@ class BookingFollowUp extends Controller
             if (!empty($row->time)) {
                 $timeFormatted = date('h:i', strtotime($row->time));
             }
-            $statusText = ($row->status == 1) ? 'Running' : 'Closed';
-            $statusClass = ($row->status == 1) ? 'success' : 'warning';
-            $statusBadge = '<span class="badge bg-' . $statusClass . '">' . $statusText . '</span>';
+            $statusText = ($row->status == 0) ? 'Running' : 'Closed';
+            $statusClass = ($row->status == 0) ? 'success' : 'warning';
+            $statusBadge = '<span class="badge bg-' . $statusClass . '" style="font-size: 12px;">' . $statusText . '</span>';
             $actionButton = ($row->status == 1) ? '<button type="button" class="btn btn-success btn-sm" onclick="openUpdateModal(' . $row->id . ')">Update</button>' : '';
 
             $result[] = [

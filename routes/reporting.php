@@ -134,7 +134,4 @@ Route::get('contribuitionreportprint', function () {
 });
 
 
-////////////// Deepak Edit Start //////////////
 
-Route::get('dailyfunctionsheet', [Reporting::class, 'dailyFunctionSheet'])->name('dailyfunctionsheet');
-Route::post('dailyfunctionsheetdata', [Reporting::class, 'dailyFunctionSheetData'])->name('dailyfunctionsheetdata');

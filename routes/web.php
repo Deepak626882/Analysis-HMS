@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PythonAuth;
 use App\Http\Controllers\BookingFollowUp;
 
+use App\Http\Controllers\ReportController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -168,3 +170,20 @@ Route::post('contactsubmit', [ContactController::class, 'store'])->name('contact
 Route::post('/demo-request', [DemoRequestController::class, 'store'])->name('demo-request.store');
 // Booking Follow Up
 Route::post('/booking-followup', [BookingFollowUp::class, 'store'])->name('booking-followup.store');
+
+////////////// Deepak Edit Start //////////////
+
+//////////////////// Deepak Routes ////////////////////////
+// Booking Followup 
+
+Route::middleware(['company'])->group(function () {
+    Route::get('inquiryfollup', [BookingFollowUp::class, 'index'])->name('inquiryfollup');
+    Route::get('get-inquiryfollup', [BookingFollowUp::class, 'data'])->name('get-inquiryfollup');
+});
+
+Route::get('/booking-followup/comments/{inqno}', [BookingFollowUp::class, 'comments'])->name('bookingfollowup.comments');
+
+Route::get('dailyfunctionsheet', [ReportController::class, 'dailyFunctionSheet'])->name('dailyfunctionsheet');
+Route::post('dailyfunctionsheetdata', [ReportController::class, 'dailyFunctionSheetData'])->name('dailyfunctionsheetdata');
+Route::get('bookinginquirydetail', [ReportController::class, 'bookingEnquiryDetail'])->name('bookinginquirydetail');
+Route::post('bookinginquirydetailfetch', [ReportController::class, 'bookingEnquiryDetailFetch'])->name('bookinginquirydetailfetch');

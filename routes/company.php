@@ -1276,12 +1276,4 @@ Route::post('smartcard/cardrefund/store', [CardReFundController::class, 'store']
 
 
 
-//////////////////// Deepak Routes ////////////////////////
-// Booking Followup 
 
-Route::middleware(['company'])->group(function () {
-    Route::get('inquiryfollup', [BookingFollowUp::class, 'index'])->name('inquiryfollup');
-    Route::get('get-inquiryfollup', [BookingFollowUp::class, 'data'])->name('get-inquiryfollup');
-});
-
-Route::get('/booking-followup/comments/{inqno}', [BookingFollowUp::class, 'comments'])->name('bookingfollowup.comments');

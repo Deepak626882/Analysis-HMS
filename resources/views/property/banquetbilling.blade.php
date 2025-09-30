@@ -212,13 +212,20 @@
 
                         localStorage.setItem('banqrestcode', restcode);
 
+                       // alert(hallbook.vdate);
+
                         $('#partyname').val(hallbook.partyname);
                         $('#totalpax').val(hallbook.guaratt);
                         $('#paxrate').val(hallbook.coverrate);
                         $('#remark').val(hallbook.remark);
-                        $('#booking_date').attr('data-bookingdate', hallbook.vdate);
+                        // $('#booking_date').val(hallbook.vdate);
+                        // $('#booking_date').attr('max', hallbook.vdate);
                         $('#bookingdocid').val(hallbook.docid);
                         $('#company_name').val(hallbook.companycode).change();
+
+                        let vdate = new Date(hallbook.vdate).toISOString().split("T")[0];
+                        $('#booking_date').val(vdate);
+                        $('#booking_date').attr('max', vdate);
 
                         let paychargeh = response.paychargeh;
 
@@ -230,20 +237,20 @@
                         let tr = '';
                         venue.forEach((tdata, index) => {
                             tr += `<tr>
-                                                                                <td>${tdata.sno}</td>
-                                                                                <td>
-                                                                                    <select data-selected="${tdata.venucode}" class="form-control select2-multiple venunames" name="venue_name${tdata.sno}" id="venue_name${tdata.sno}" required>
-                                                                                        <option value="">Select</option>
-                                                                                            @foreach (venuemast() as $col)
-                                                                                                <option value="{{ $col->code }}" ${tdata.venucode == {{ $col->code }} ? 'selected' : ''} >{{ $col->name }}</option>
-                                                                                            @endforeach
-                                                                                    </select>
-                                                                                </td>
-                                                                                <td><input type="date" value="${tdata.fromdate}" class="form-control" name="from_date${tdata.sno}" id="from_date${tdata.sno}" readonly></td>
-                                                                                <td><input type="text" value="${tdata.dromtime}" class="form-control timeinput" name="from_time${tdata.sno}" id="from_time${tdata.sno}" readonly></td>
-                                                                                <td><input type="date" value="${tdata.todate}" class="form-control" name="to_date${tdata.sno}" id="to_date${tdata.sno}" readonly></td>
-                                                                                <td><input type="text" value="${tdata.totime}" class="form-control timeinput" name="to_time${tdata.sno}" id="to_time${tdata.sno}" readonly></td>
-                                                                            </tr>`
+                                                                                    <td>${tdata.sno}</td>
+                                                                                    <td>
+                                                                                        <select data-selected="${tdata.venucode}" class="form-control select2-multiple venunames" name="venue_name${tdata.sno}" id="venue_name${tdata.sno}" required>
+                                                                                            <option value="">Select</option>
+                                                                                                @foreach (venuemast() as $col)
+                                                                                                    <option value="{{ $col->code }}" ${tdata.venucode == {{ $col->code }} ? 'selected' : ''} >{{ $col->name }}</option>
+                                                                                                @endforeach
+                                                                                        </select>
+                                                                                    </td>
+                                                                                    <td><input type="date" value="${tdata.fromdate}" class="form-control" name="from_date${tdata.sno}" id="from_date${tdata.sno}" readonly></td>
+                                                                                    <td><input type="text" value="${tdata.dromtime}" class="form-control timeinput" name="from_time${tdata.sno}" id="from_time${tdata.sno}" readonly></td>
+                                                                                    <td><input type="date" value="${tdata.todate}" class="form-control" name="to_date${tdata.sno}" id="to_date${tdata.sno}" readonly></td>
+                                                                                    <td><input type="text" value="${tdata.totime}" class="form-control timeinput" name="to_time${tdata.sno}" id="to_time${tdata.sno}" readonly></td>
+                                                                                </tr>`
                         });
 
                         $('#venueTbody').append(tr);
@@ -261,97 +268,97 @@
 
                                 if (index === 0) {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="${bold}">${item.disp_name}</div>
-                                                                <div id="${prefix}${item.vtype}totalamount"></div>
-                                                            </div>`;
+                                                                    <div class="${bold}">${item.disp_name}</div>
+                                                                    <div id="${prefix}${item.vtype}totalamount"></div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'discount') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                    <input type="text" value="0.00" class="form-control discountfixm fiveem" name="${prefix}${item.vtype}discountfix" id="${prefix}${item.vtype}discountfix" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" class="form-control discountsundry" name="${prefix}${item.vtype}discountsundry" id="${prefix}${item.vtype}discountsundry" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                        <input type="text" value="0.00" class="form-control discountfixm fiveem" name="${prefix}${item.vtype}discountfix" id="${prefix}${item.vtype}discountfix" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" class="form-control discountsundry" name="${prefix}${item.vtype}discountsundry" id="${prefix}${item.vtype}discountsundry" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'service charge') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                    <input type="text" class="form-control servicechargefix" name="${prefix}${item.vtype}servicechargefix" id="${prefix}${item.vtype}servicechargefix" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" class="form-control servicechargeamount" name="${prefix}${item.vtype}servicechargeamount" id="${prefix}${item.vtype}servicechargeamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                        <input type="text" class="form-control servicechargefix" name="${prefix}${item.vtype}servicechargefix" id="${prefix}${item.vtype}servicechargefix" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" class="form-control servicechargeamount" name="${prefix}${item.vtype}servicechargeamount" id="${prefix}${item.vtype}servicechargeamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'cgst') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                ${prefix == '' ? `<input type="text" value="${item.svalue}" class="form-control fiveem" readonly>` : ''}
-                                                                </div>
-                                                                <div>
-                                                                    <input type="hidden" value="${item.svalue}" name="${prefix}${item.vtype}cgstrate" id="${prefix}${item.vtype}cgstrate">
-                                                                    <input type="text" data-${prefix}revcode="${prefix}${item.revcode}" class="form-control sevenem cgstamount" name="${prefix}${item.vtype}cgstamount" id="${prefix}${item.vtype}cgstamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                    ${prefix == '' ? `<input type="text" value="${item.svalue}" class="form-control fiveem" readonly>` : ''}
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="hidden" value="${item.svalue}" name="${prefix}${item.vtype}cgstrate" id="${prefix}${item.vtype}cgstrate">
+                                                                        <input type="text" data-${prefix}revcode="${prefix}${item.revcode}" class="form-control sevenem cgstamount" name="${prefix}${item.vtype}cgstamount" id="${prefix}${item.vtype}cgstamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'sgst') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                    ${prefix == '' ? `<input type="text" value="${item.svalue}" class="form-control fiveem" readonly>` : ''}
-                                                                </div>
-                                                                <div>
-                                                                    <input type="hidden" value="${item.svalue}" name="${prefix}${item.vtype}sgstrate" id="${prefix}${item.vtype}sgstrate">
-                                                                    <input type="text" data-${prefix}revcode="${prefix}${item.revcode}" class="form-control sevenem sgstamount" name="${prefix}${item.vtype}sgstamount" id="${prefix}${item.vtype}sgstamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                        ${prefix == '' ? `<input type="text" value="${item.svalue}" class="form-control fiveem" readonly>` : ''}
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="hidden" value="${item.svalue}" name="${prefix}${item.vtype}sgstrate" id="${prefix}${item.vtype}sgstrate">
+                                                                        <input type="text" data-${prefix}revcode="${prefix}${item.revcode}" class="form-control sevenem sgstamount" name="${prefix}${item.vtype}sgstamount" id="${prefix}${item.vtype}sgstamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'sale tax') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" class="form-control sevenem vatamount" name="${prefix}${item.vtype}vatamount" id="${prefix}${item.vtype}vatamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" class="form-control sevenem vatamount" name="${prefix}${item.vtype}vatamount" id="${prefix}${item.vtype}vatamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'round off') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" class="form-control sevenem roundoffamount" name="${prefix}${item.vtype}roundoffamount" id="${prefix}${item.vtype}roundoffamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" class="form-control sevenem roundoffamount" name="${prefix}${item.vtype}roundoffamount" id="${prefix}${item.vtype}roundoffamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'net amount') {
                                     totalnetamount += parseFloat(item.amount);
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" class="form-control sevenem netamount" name="${prefix}${item.vtype}netamount" id="${prefix}${item.vtype}netamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                    <input type="hidden" class="form-control totalamount" name="${prefix}${item.vtype}totalamountoutlet" id="${prefix}${item.vtype}totalamountoutlet" value="0.00">
-                                                                    <input type="hidden" value="${sundrytype.length}" name="${prefix}${item.vtype}sundrycount" id="${prefix}${item.vtype}sundrycount">
-                                                                    <input type="hidden" name="${prefix}${item.vtype}totaltaxable" id="${prefix}${item.vtype}totaltaxable" value="0.00">
-                                                                    <input type="hidden" name="${prefix}${item.vtype}totalnontaxable" id="${prefix}${item.vtype}totalnontaxable" value="0.00">
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" class="form-control sevenem netamount" name="${prefix}${item.vtype}netamount" id="${prefix}${item.vtype}netamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                        <input type="hidden" class="form-control totalamount" name="${prefix}${item.vtype}totalamountoutlet" id="${prefix}${item.vtype}totalamountoutlet" value="0.00">
+                                                                        <input type="hidden" value="${sundrytype.length}" name="${prefix}${item.vtype}sundrycount" id="${prefix}${item.vtype}sundrycount">
+                                                                        <input type="hidden" name="${prefix}${item.vtype}totaltaxable" id="${prefix}${item.vtype}totaltaxable" value="0.00">
+                                                                        <input type="hidden" name="${prefix}${item.vtype}totalnontaxable" id="${prefix}${item.vtype}totalnontaxable" value="0.00">
+                                                                    </div>
+                                                                </div>`;
                                 }
                             });
 
@@ -370,18 +377,18 @@
                         $('#bottomcalc thead').empty();
 
                         let rowsp = `
-                                                                        <tr>
-                                                                            <th class="p-2">Total Amount</th>
-                                                                            <td><input type="text" class="form-control fiveem" name="totalamt" id="totalamt" readonly></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <th class="p-2">Advance</th>
-                                                                            <td><input type="text" class="form-control fiveem" value="${advsum.toFixed(2)}" name="paidamt" id="paidamt" readonly></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <th class="p-2">Balance</th>
-                                                                            <td><input type="text" class="form-control fiveem" name="balanceamt" id="balanceamt" readonly></td>
-                                                                        </tr>`;
+                                                                            <tr>
+                                                                                <th class="p-2">Total Amount</th>
+                                                                                <td><input type="text" class="form-control fiveem" name="totalamt" id="totalamt" readonly></td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th class="p-2">Advance</th>
+                                                                                <td><input type="text" class="form-control fiveem" value="${advsum.toFixed(2)}" name="paidamt" id="paidamt" readonly></td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th class="p-2">Balance</th>
+                                                                                <td><input type="text" class="form-control fiveem" name="balanceamt" id="balanceamt" readonly></td>
+                                                                            </tr>`;
 
                         $('#bottomcalc thead').append(rowsp);
 
@@ -541,25 +548,25 @@
                             let newIndex = rowCount + 1;
                             $('#totalitem').val(newIndex);
                             let tr = `<tr>
-                                                                        <td><select class='form-control items' name='item${newIndex}' id='item${newIndex}' required>
-                                                                            <option value=''>Select Item</option>
-                                                                            ${items.map(item => `<option data-accode=${item.AcCode} data-strcode='${item.str_code}' data-taxrate='${item.taxrate}' data-taxcode='${item.taxcodes}' data-convratio='${item.ConvRatio}' data-unit='${item.Unit}' data-issueunit='${item.IssueUnit}' data-purchrate='${item.PurchRate}' value='${item.Code}'>${item.Name}</option>`).join('')}
-                                                                        </select>
-                                                                        <input type='hidden' class='form-control taxrates' name='taxrate${newIndex}' id='taxrate${newIndex}' placeholder='Tax Rate' readonly>
-                                                                        <input type='hidden' class='form-control taxeamts' name='taxamt${newIndex}' id='taxamt${newIndex}' placeholder='Tax Rate' readonly>
-                                                                        <input type='hidden' class='form-control taxcodes' name='taxcode${newIndex}' id='taxcode${newIndex}' placeholder='Tax Code' readonly>
-                                                                        <input type='hidden' class='form-control taxedrates' name='taxedrate${newIndex}' id='taxedrate${newIndex}' placeholder='Tax Code' readonly>
-                                                                        <input type='hidden' class='form-control taxrate_sums' name='taxrate_sum${newIndex}' id='taxrate_sum${newIndex}' placeholder='Tax Code' readonly>
-                                                                        </td>
-                                                                        <td><input readonly name="description${newIndex}" placeholder="Enter" id="description${newIndex}" class="form-control description inone" type="text"></td>
-                                                                        <td><input value='1' autocomplete="off" type='text' class='form-control qtyisss' name='qtyiss${newIndex}' id='qtyiss${newIndex}' placeholder='Item. Qty.'></td>
-                                                                        <td><input type='text' autocomplete="off" class='form-control rates' name='itemrate${newIndex}' id='itemrate${newIndex}' placeholder='Enter Rate'></td>
-                                                                        <td>
-                                                                            <input type='text' autocomplete="off" class='form-control amounts' name='amount${newIndex}' id='amount${newIndex}' placeholder='Amount'>
-                                                                            <input type='hidden' class='form-control discamts' name='discamt${newIndex}' id='discamt${newIndex}' placeholder='Amount'>
-                                                                        </td>
-                                                                        <td><span class='removerow'><i class="fa-solid fa-eraser"></i></span></td>
-                                                                        </tr>`;
+                                                                            <td><select class='form-control items' name='item${newIndex}' id='item${newIndex}' required>
+                                                                                <option value=''>Select Item</option>
+                                                                                ${items.map(item => `<option data-accode=${item.AcCode} data-strcode='${item.str_code}' data-taxrate='${item.taxrate}' data-taxcode='${item.taxcodes}' data-convratio='${item.ConvRatio}' data-unit='${item.Unit}' data-issueunit='${item.IssueUnit}' data-purchrate='${item.PurchRate}' value='${item.Code}'>${item.Name}</option>`).join('')}
+                                                                            </select>
+                                                                            <input type='hidden' class='form-control taxrates' name='taxrate${newIndex}' id='taxrate${newIndex}' placeholder='Tax Rate' readonly>
+                                                                            <input type='hidden' class='form-control taxeamts' name='taxamt${newIndex}' id='taxamt${newIndex}' placeholder='Tax Rate' readonly>
+                                                                            <input type='hidden' class='form-control taxcodes' name='taxcode${newIndex}' id='taxcode${newIndex}' placeholder='Tax Code' readonly>
+                                                                            <input type='hidden' class='form-control taxedrates' name='taxedrate${newIndex}' id='taxedrate${newIndex}' placeholder='Tax Code' readonly>
+                                                                            <input type='hidden' class='form-control taxrate_sums' name='taxrate_sum${newIndex}' id='taxrate_sum${newIndex}' placeholder='Tax Code' readonly>
+                                                                            </td>
+                                                                            <td><input readonly name="description${newIndex}" placeholder="Enter" id="description${newIndex}" class="form-control description inone" type="text"></td>
+                                                                            <td><input value='1' autocomplete="off" type='text' class='form-control qtyisss' name='qtyiss${newIndex}' id='qtyiss${newIndex}' placeholder='Item. Qty.'></td>
+                                                                            <td><input type='text' autocomplete="off" class='form-control rates' name='itemrate${newIndex}' id='itemrate${newIndex}' placeholder='Enter Rate'></td>
+                                                                            <td>
+                                                                                <input type='text' autocomplete="off" class='form-control amounts' name='amount${newIndex}' id='amount${newIndex}' placeholder='Amount'>
+                                                                                <input type='hidden' class='form-control discamts' name='discamt${newIndex}' id='discamt${newIndex}' placeholder='Amount'>
+                                                                            </td>
+                                                                            <td><span class='removerow'><i class="fa-solid fa-eraser"></i></span></td>
+                                                                            </tr>`;
                             $('#itemtable tbody').append(tr);
                             $('#exmrnodiv').fadeOut(1500);
                             calculatetaxes();
@@ -684,20 +691,20 @@
                         let tr = '';
                         venue.forEach((tdata, index) => {
                             tr += `<tr>
-                                                                                <td>${tdata.sno}</td>
-                                                                                <td>
-                                                                                    <select data-selected="${tdata.venucode}" class="form-control select2-multiple venunames" name="venue_name${tdata.sno}" id="venue_name${tdata.sno}" required>
-                                                                                        <option value="">Select</option>
-                                                                                            @foreach (venuemast() as $col)
-                                                                                                <option value="{{ $col->code }}" ${tdata.venucode == {{ $col->code }} ? 'selected' : ''} >{{ $col->name }}</option>
-                                                                                            @endforeach
-                                                                                    </select>
-                                                                                </td>
-                                                                                <td><input type="date" value="${tdata.fromdate}" class="form-control" name="from_date${tdata.sno}" id="from_date${tdata.sno}" readonly></td>
-                                                                                <td><input type="text" value="${tdata.dromtime}" class="form-control timeinput" name="from_time${tdata.sno}" id="from_time${tdata.sno}" readonly></td>
-                                                                                <td><input type="date" value="${tdata.todate}" class="form-control" name="to_date${tdata.sno}" id="to_date${tdata.sno}" readonly></td>
-                                                                                <td><input type="text" value="${tdata.totime}" class="form-control timeinput" name="to_time${tdata.sno}" id="to_time${tdata.sno}" readonly></td>
-                                                                            </tr>`
+                                                                                    <td>${tdata.sno}</td>
+                                                                                    <td>
+                                                                                        <select data-selected="${tdata.venucode}" class="form-control select2-multiple venunames" name="venue_name${tdata.sno}" id="venue_name${tdata.sno}" required>
+                                                                                            <option value="">Select</option>
+                                                                                                @foreach (venuemast() as $col)
+                                                                                                    <option value="{{ $col->code }}" ${tdata.venucode == {{ $col->code }} ? 'selected' : ''} >{{ $col->name }}</option>
+                                                                                                @endforeach
+                                                                                        </select>
+                                                                                    </td>
+                                                                                    <td><input type="date" value="${tdata.fromdate}" class="form-control" name="from_date${tdata.sno}" id="from_date${tdata.sno}" readonly></td>
+                                                                                    <td><input type="text" value="${tdata.dromtime}" class="form-control timeinput" name="from_time${tdata.sno}" id="from_time${tdata.sno}" readonly></td>
+                                                                                    <td><input type="date" value="${tdata.todate}" class="form-control" name="to_date${tdata.sno}" id="to_date${tdata.sno}" readonly></td>
+                                                                                    <td><input type="text" value="${tdata.totime}" class="form-control timeinput" name="to_time${tdata.sno}" id="to_time${tdata.sno}" readonly></td>
+                                                                                </tr>`
                         });
 
                         $('#venueTbody').append(tr);
@@ -715,97 +722,97 @@
 
                                 if (index === 0) {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="${bold}">${item.disp_name}</div>
-                                                                <div id="${prefix}${item.vtype}totalamount">${item.amount}</div>
-                                                            </div>`;
+                                                                    <div class="${bold}">${item.disp_name}</div>
+                                                                    <div id="${prefix}${item.vtype}totalamount">${item.amount}</div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'discount') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                    <input type="text" value="${item.svalue}" class="form-control discountfix fiveem" name="${prefix}${item.vtype}discountfix" id="${prefix}${item.vtype}discountfix" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" value="${item.amount}" class="form-control discountsundry" name="${prefix}${item.vtype}discountsundry" id="${prefix}${item.vtype}discountsundry" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                        <input type="text" value="${item.svalue}" class="form-control discountfix fiveem" name="${prefix}${item.vtype}discountfix" id="${prefix}${item.vtype}discountfix" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" value="${item.amount}" class="form-control discountsundry" name="${prefix}${item.vtype}discountsundry" id="${prefix}${item.vtype}discountsundry" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'service charge') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                    <input type="text" class="form-control servicechargefix" name="${prefix}${item.vtype}servicechargefix" id="${prefix}${item.vtype}servicechargefix" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" class="form-control servicechargeamount" name="${prefix}${item.vtype}servicechargeamount" id="${prefix}${item.vtype}servicechargeamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                        <input type="text" class="form-control servicechargefix" name="${prefix}${item.vtype}servicechargefix" id="${prefix}${item.vtype}servicechargefix" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" class="form-control servicechargeamount" name="${prefix}${item.vtype}servicechargeamount" id="${prefix}${item.vtype}servicechargeamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'cgst') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                    ${prefix == '' ? `<input type="text" value="${item.svalue}" class="form-control fiveem" readonly>` : ''}
-                                                                </div>
-                                                                <div>
-                                                                    <input type="hidden" value="${item.svalue}" name="${prefix}${item.vtype}cgstrate" id="${prefix}${item.vtype}cgstrate">
-                                                                    <input type="text" data-${prefix}revcode="${prefix}${item.revcode}" value="${item.amount}" class="form-control sevenem cgstamount" name="${prefix}${item.vtype}cgstamount" id="${prefix}${item.vtype}cgstamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                        ${prefix == '' ? `<input type="text" value="${item.svalue}" class="form-control fiveem" readonly>` : ''}
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="hidden" value="${item.svalue}" name="${prefix}${item.vtype}cgstrate" id="${prefix}${item.vtype}cgstrate">
+                                                                        <input type="text" data-${prefix}revcode="${prefix}${item.revcode}" value="${item.amount}" class="form-control sevenem cgstamount" name="${prefix}${item.vtype}cgstamount" id="${prefix}${item.vtype}cgstamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'sgst') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                    ${prefix == '' ? `<input type="text" value="${item.svalue}" class="form-control fiveem" readonly>` : ''}
-                                                                </div>
-                                                                <div>
-                                                                    <input type="hidden" value="${item.svalue}" name="${prefix}${item.vtype}sgstrate" id="${prefix}${item.vtype}sgstrate">
-                                                                    <input type="text" data-${prefix}revcode="${prefix}${item.revcode}" value="${item.amount}" class="form-control sevenem sgstamount" name="${prefix}${item.vtype}sgstamount" id="${prefix}${item.vtype}sgstamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                        ${prefix == '' ? `<input type="text" value="${item.svalue}" class="form-control fiveem" readonly>` : ''}
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="hidden" value="${item.svalue}" name="${prefix}${item.vtype}sgstrate" id="${prefix}${item.vtype}sgstrate">
+                                                                        <input type="text" data-${prefix}revcode="${prefix}${item.revcode}" value="${item.amount}" class="form-control sevenem sgstamount" name="${prefix}${item.vtype}sgstamount" id="${prefix}${item.vtype}sgstamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'sale tax') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" class="form-control sevenem vatamount" name="${prefix}${item.vtype}vatamount" id="${prefix}${item.vtype}vatamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" class="form-control sevenem vatamount" name="${prefix}${item.vtype}vatamount" id="${prefix}${item.vtype}vatamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'round off') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" value="${item.amount}" class="form-control sevenem roundoffamount" name="${prefix}${item.vtype}roundoffamount" id="${prefix}${item.vtype}roundoffamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" value="${item.amount}" class="form-control sevenem roundoffamount" name="${prefix}${item.vtype}roundoffamount" id="${prefix}${item.vtype}roundoffamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'net amount') {
                                     totalnetamount += parseFloat(item.amount);
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" value="${item.amount}" class="form-control sevenem netamount" name="${prefix}${item.vtype}netamount" id="${prefix}${item.vtype}netamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                    <input type="hidden" class="form-control totalamount" name="${prefix}${item.vtype}totalamountoutlet" id="${prefix}${item.vtype}totalamountoutlet" value="0.00">
-                                                                    <input type="hidden" value="${sundrytype.length}" name="${prefix}${item.vtype}sundrycount" id="${prefix}${item.vtype}sundrycount">
-                                                                    <input type="hidden" name="${prefix}${item.vtype}totaltaxable" id="${prefix}${item.vtype}totaltaxable" value="0.00">
-                                                                    <input type="hidden" name="${prefix}${item.vtype}totalnontaxable" id="${prefix}${item.vtype}totalnontaxable" value="0.00">
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" value="${item.amount}" class="form-control sevenem netamount" name="${prefix}${item.vtype}netamount" id="${prefix}${item.vtype}netamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                        <input type="hidden" class="form-control totalamount" name="${prefix}${item.vtype}totalamountoutlet" id="${prefix}${item.vtype}totalamountoutlet" value="0.00">
+                                                                        <input type="hidden" value="${sundrytype.length}" name="${prefix}${item.vtype}sundrycount" id="${prefix}${item.vtype}sundrycount">
+                                                                        <input type="hidden" name="${prefix}${item.vtype}totaltaxable" id="${prefix}${item.vtype}totaltaxable" value="0.00">
+                                                                        <input type="hidden" name="${prefix}${item.vtype}totalnontaxable" id="${prefix}${item.vtype}totalnontaxable" value="0.00">
+                                                                    </div>
+                                                                </div>`;
                                 }
                             });
 
@@ -823,97 +830,97 @@
 
                                 if (index === 0) {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="${bold}">${item.disp_name}</div>
-                                                                <div id="${prefix}${item.vtype}totalamount"></div>
-                                                            </div>`;
+                                                                    <div class="${bold}">${item.disp_name}</div>
+                                                                    <div id="${prefix}${item.vtype}totalamount"></div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'discount') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                    <input type="text" value="0.00" class="form-control discountfixm fiveem" name="${prefix}${item.vtype}discountfix" id="${prefix}${item.vtype}discountfix" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" class="form-control discountsundry" name="${prefix}${item.vtype}discountsundry" id="${prefix}${item.vtype}discountsundry" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                        <input type="text" value="0.00" class="form-control discountfixm fiveem" name="${prefix}${item.vtype}discountfix" id="${prefix}${item.vtype}discountfix" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" class="form-control discountsundry" name="${prefix}${item.vtype}discountsundry" id="${prefix}${item.vtype}discountsundry" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'service charge') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                    <input type="text" class="form-control servicechargefix" name="${prefix}${item.vtype}servicechargefix" id="${prefix}${item.vtype}servicechargefix" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" class="form-control servicechargeamount" name="${prefix}${item.vtype}servicechargeamount" id="${prefix}${item.vtype}servicechargeamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                        <input type="text" class="form-control servicechargefix" name="${prefix}${item.vtype}servicechargefix" id="${prefix}${item.vtype}servicechargefix" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" class="form-control servicechargeamount" name="${prefix}${item.vtype}servicechargeamount" id="${prefix}${item.vtype}servicechargeamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'cgst') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                ${prefix == '' ? `<input type="text" value="${item.svalue}" class="form-control fiveem" readonly>` : ''}
-                                                                </div>
-                                                                <div>
-                                                                    <input type="hidden" value="${item.svalue}" name="${prefix}${item.vtype}cgstrate" id="${prefix}${item.vtype}cgstrate">
-                                                                    <input type="text" data-${prefix}revcode="${prefix}${item.revcode}" class="form-control sevenem cgstamount" name="${prefix}${item.vtype}cgstamount" id="${prefix}${item.vtype}cgstamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                    ${prefix == '' ? `<input type="text" value="${item.svalue}" class="form-control fiveem" readonly>` : ''}
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="hidden" value="${item.svalue}" name="${prefix}${item.vtype}cgstrate" id="${prefix}${item.vtype}cgstrate">
+                                                                        <input type="text" data-${prefix}revcode="${prefix}${item.revcode}" class="form-control sevenem cgstamount" name="${prefix}${item.vtype}cgstamount" id="${prefix}${item.vtype}cgstamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'sgst') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                    ${prefix == '' ? `<input type="text" value="${item.svalue}" class="form-control fiveem" readonly>` : ''}
-                                                                </div>
-                                                                <div>
-                                                                    <input type="hidden" value="${item.svalue}" name="${prefix}${item.vtype}sgstrate" id="${prefix}${item.vtype}sgstrate">
-                                                                    <input type="text" data-${prefix}revcode="${prefix}${item.revcode}" class="form-control sevenem sgstamount" name="${prefix}${item.vtype}sgstamount" id="${prefix}${item.vtype}sgstamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                        ${prefix == '' ? `<input type="text" value="${item.svalue}" class="form-control fiveem" readonly>` : ''}
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="hidden" value="${item.svalue}" name="${prefix}${item.vtype}sgstrate" id="${prefix}${item.vtype}sgstrate">
+                                                                        <input type="text" data-${prefix}revcode="${prefix}${item.revcode}" class="form-control sevenem sgstamount" name="${prefix}${item.vtype}sgstamount" id="${prefix}${item.vtype}sgstamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'sale tax') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" class="form-control sevenem vatamount" name="${prefix}${item.vtype}vatamount" id="${prefix}${item.vtype}vatamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" class="form-control sevenem vatamount" name="${prefix}${item.vtype}vatamount" id="${prefix}${item.vtype}vatamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'round off') {
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" class="form-control sevenem roundoffamount" name="${prefix}${item.vtype}roundoffamount" id="${prefix}${item.vtype}roundoffamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" class="form-control sevenem roundoffamount" name="${prefix}${item.vtype}roundoffamount" id="${prefix}${item.vtype}roundoffamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                    </div>
+                                                                </div>`;
                                 }
 
                                 if (nature === 'net amount') {
                                     totalnetamount += parseFloat(item.amount);
                                     html += `<div class="d-flex justify-content-between mb-2">
-                                                                <div class="d-flex ${bold}">
-                                                                    <span class="mt-2 mr-1">${item.disp_name}</span>
-                                                                </div>
-                                                                <div>
-                                                                    <input type="text" class="form-control sevenem netamount" name="${prefix}${item.vtype}netamount" id="${prefix}${item.vtype}netamount" ${automanual == 'A' ? 'readonly' : ''}>
-                                                                    <input type="hidden" class="form-control totalamount" name="${prefix}${item.vtype}totalamountoutlet" id="${prefix}${item.vtype}totalamountoutlet" value="0.00">
-                                                                    <input type="hidden" value="${sundrytype.length}" name="${prefix}${item.vtype}sundrycount" id="${prefix}${item.vtype}sundrycount">
-                                                                    <input type="hidden" name="${prefix}${item.vtype}totaltaxable" id="${prefix}${item.vtype}totaltaxable" value="0.00">
-                                                                    <input type="hidden" name="${prefix}${item.vtype}totalnontaxable" id="${prefix}${item.vtype}totalnontaxable" value="0.00">
-                                                                </div>
-                                                            </div>`;
+                                                                    <div class="d-flex ${bold}">
+                                                                        <span class="mt-2 mr-1">${item.disp_name}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <input type="text" class="form-control sevenem netamount" name="${prefix}${item.vtype}netamount" id="${prefix}${item.vtype}netamount" ${automanual == 'A' ? 'readonly' : ''}>
+                                                                        <input type="hidden" class="form-control totalamount" name="${prefix}${item.vtype}totalamountoutlet" id="${prefix}${item.vtype}totalamountoutlet" value="0.00">
+                                                                        <input type="hidden" value="${sundrytype.length}" name="${prefix}${item.vtype}sundrycount" id="${prefix}${item.vtype}sundrycount">
+                                                                        <input type="hidden" name="${prefix}${item.vtype}totaltaxable" id="${prefix}${item.vtype}totaltaxable" value="0.00">
+                                                                        <input type="hidden" name="${prefix}${item.vtype}totalnontaxable" id="${prefix}${item.vtype}totalnontaxable" value="0.00">
+                                                                    </div>
+                                                                </div>`;
                                 }
                             });
 
@@ -942,24 +949,24 @@
                             stockitems.forEach((sitems, index) => {
                                 let newIndex = index + 1;
                                 tr += `<tr>
-                                                                                <td><select class='form-control items' name='item${newIndex}' id='item${newIndex}' required>
-                                                                                    <option value=''>Select Item</option>
-                                                                                    ${items.map(item => `<option  data-accode="${item.AcCode}"  data-strcode="${item.str_code}"  data-taxrate="${item.taxrate}"  data-taxcode="${item.taxcodes}"  data-convratio="${item.ConvRatio}"  data-unit="${item.Unit}" data-issueunit="${item.IssueUnit}"  data-purchrate="${item.PurchRate}"  data-srate="${sitems.rate}" value="${item.Code}"  ${sitems.item == item.Code ? 'selected' : ''}> ${item.Name} </option> `).join('')}
-                                                                                </select>
-                                                                                <input type='hidden' value='${sitems.taxper}' class='form-control taxrates' name='taxrate${newIndex}' id='taxrate${newIndex}' placeholder='Tax Rate' readonly>
-                                                                                <input type='hidden' class='form-control taxeamts' name='taxamt${newIndex}' id='taxamt${newIndex}' placeholder='Tax Rate' readonly>
-                                                                                <input type='hidden' class='form-control taxcodes' name='taxcode${newIndex}' id='taxcode${newIndex}' placeholder='Tax Code' readonly>
-                                                                                <input type='hidden' class='form-control taxedrates' name='taxedrate${newIndex}' id='taxedrate${newIndex}' placeholder='Tax Code' readonly>
-                                                                                <input type='hidden' class='form-control taxrate_sums' name='taxrate_sum${newIndex}' id='taxrate_sum${newIndex}' placeholder='Tax Code' readonly>
-                                                                                </td>
-                                                                                <td><input readonly value="${sitems.remarks}" name="description${newIndex}" placeholder="Enter" id="description${newIndex}" class="form-control description inone" type="text"></td>
-                                                                                <td><input value='${sitems.qtyiss}' autocomplete="off" type='text' class='form-control qtyisss' name='qtyiss${newIndex}' id='qtyiss${newIndex}' placeholder='Item. Qty.'></td>
-                                                                                <td><input type='text' value="${sitems.rate}" autocomplete="off" class='form-control rates' name='itemrate${newIndex}' id='itemrate${newIndex}' placeholder='Enter Rate'></td>
-                                                                                <td>
-                                                                                    <input type='text' value="${sitems.amount}" autocomplete="off" class='form-control amounts' name='amount${newIndex}' id='amount${newIndex}' placeholder='Amount'>
-                                                                                </td>
-                                                                                <td><span class='removerow'><i class="fa-solid fa-eraser"></i></span></td>
-                                                                            </tr>`;
+                                                                                    <td><select class='form-control items' name='item${newIndex}' id='item${newIndex}' required>
+                                                                                        <option value=''>Select Item</option>
+                                                                                        ${items.map(item => `<option  data-accode="${item.AcCode}"  data-strcode="${item.str_code}"  data-taxrate="${item.taxrate}"  data-taxcode="${item.taxcodes}"  data-convratio="${item.ConvRatio}"  data-unit="${item.Unit}" data-issueunit="${item.IssueUnit}"  data-purchrate="${item.PurchRate}"  data-srate="${sitems.rate}" value="${item.Code}"  ${sitems.item == item.Code ? 'selected' : ''}> ${item.Name} </option> `).join('')}
+                                                                                    </select>
+                                                                                    <input type='hidden' value='${sitems.taxper}' class='form-control taxrates' name='taxrate${newIndex}' id='taxrate${newIndex}' placeholder='Tax Rate' readonly>
+                                                                                    <input type='hidden' class='form-control taxeamts' name='taxamt${newIndex}' id='taxamt${newIndex}' placeholder='Tax Rate' readonly>
+                                                                                    <input type='hidden' class='form-control taxcodes' name='taxcode${newIndex}' id='taxcode${newIndex}' placeholder='Tax Code' readonly>
+                                                                                    <input type='hidden' class='form-control taxedrates' name='taxedrate${newIndex}' id='taxedrate${newIndex}' placeholder='Tax Code' readonly>
+                                                                                    <input type='hidden' class='form-control taxrate_sums' name='taxrate_sum${newIndex}' id='taxrate_sum${newIndex}' placeholder='Tax Code' readonly>
+                                                                                    </td>
+                                                                                    <td><input readonly value="${sitems.remarks}" name="description${newIndex}" placeholder="Enter" id="description${newIndex}" class="form-control description inone" type="text"></td>
+                                                                                    <td><input value='${sitems.qtyiss}' autocomplete="off" type='text' class='form-control qtyisss' name='qtyiss${newIndex}' id='qtyiss${newIndex}' placeholder='Item. Qty.'></td>
+                                                                                    <td><input type='text' value="${sitems.rate}" autocomplete="off" class='form-control rates' name='itemrate${newIndex}' id='itemrate${newIndex}' placeholder='Enter Rate'></td>
+                                                                                    <td>
+                                                                                        <input type='text' value="${sitems.amount}" autocomplete="off" class='form-control amounts' name='amount${newIndex}' id='amount${newIndex}' placeholder='Amount'>
+                                                                                    </td>
+                                                                                    <td><span class='removerow'><i class="fa-solid fa-eraser"></i></span></td>
+                                                                                </tr>`;
                             })
                             $('#itemtable tbody').append(tr);
                             calculatetaxes();
@@ -967,18 +974,18 @@
                         }
 
                         let rowsp = `
-                                                                        <tr>
-                                                                            <th class="p-2">Total Amount</th>
-                                                                            <td><input type="text" class="form-control fiveem" name="totalamt" id="totalamt" readonly></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <th class="p-2">Advance</th>
-                                                                            <td><input type="text" class="form-control fiveem" value="${advsum.toFixed(2)}" name="paidamt" id="paidamt" readonly></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <th class="p-2">Balance</th>
-                                                                            <td><input type="text" class="form-control fiveem" name="balanceamt" id="balanceamt" readonly></td>
-                                                                        </tr>`;
+                                                                            <tr>
+                                                                                <th class="p-2">Total Amount</th>
+                                                                                <td><input type="text" class="form-control fiveem" name="totalamt" id="totalamt" readonly></td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th class="p-2">Advance</th>
+                                                                                <td><input type="text" class="form-control fiveem" value="${advsum.toFixed(2)}" name="paidamt" id="paidamt" readonly></td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th class="p-2">Balance</th>
+                                                                                <td><input type="text" class="form-control fiveem" name="balanceamt" id="balanceamt" readonly></td>
+                                                                            </tr>`;
 
                         $('#bottomcalc thead').append(rowsp);
 

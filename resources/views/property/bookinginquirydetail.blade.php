@@ -114,7 +114,7 @@
                             <div class="container-fluid">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <h3>Daily Function Sheet</h3>
+                                        <h3>Booking Enquiry Detail</h3>
                                     </div>
                                 </div>
                             </div>
@@ -163,11 +163,11 @@
                                         </div>
                                     </div>
                                     <div class="">
-                                        <label for="users" class="col-form-label">Details</label>
-                                        <select class="form-control select2-multiple" name="type" id="type">
-                                            <option value="1">Function</option>
-                                            <option value="2">Pending</option>
-                                            <option value="3">Advance</option>
+                                        <label for="users" class="col-form-label">Status</label>
+                                        <select class="form-control select2-multiple" name="status" id="status"> 
+                                            <option value="Active">Active</option>
+                                            <option value="Inactive">Inactive</option>
+                                            <option value="All">All</option>
                                         </select>
                                     </div>
                                     <div style="margin-top: 30px;" class="">
@@ -179,45 +179,28 @@
                             </form>
 
                             <div class="row table-responsive">
-                                <table id="dailyfunctionsheet"
+                                <table id="bookinginquirydetail"
                                     class=" table table-border table-hover table striped border rounded">
                                     <thead>
                                         <tr>
                                             <th>SNo</th>
-                                            <th>FPNo</th>
-                                            <th>Party Name</th>
+                                            <th>Date</th>
+                                            <th>Time</th>
                                             <th>Venue</th>
-                                            <th>Function Date</th>
-                                            <th>For Time</th>
-                                            <th>To Time</th>
-                                            <th class="center">Pax</th>
-                                            <th class="right">Pax Rate</th>
                                             <th>Function Type</th>
-                                            {{-- <th class="right">Amount</th> --}}
-                                            <th class="right">Advance</th>
-                                            <th>Type</th>
-                                            <th>Rect.No.</th>
-                                            <th>Rect.Date</th>
-                                            {{-- <th>Status</th> --}}
+                                            <th>Party Name</th>
+                                            <th>Phone no</th>
+                                            <th>Mobile no</th>
+                                            <th>Contact Person</th>
+                                            <th>Booked By</th>
+                                            <th>Handel By</th>
+                                            <th>Status</th>
+                                            <th>User</th>
+                                            <th>Remark</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                     </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th colspan="6" style="text-align:right">Total:</th>
-                                            <th id="totalPax"></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            {{-- <th id="totalAmount"></th> --}}
-                                            <th id="totalAdvance"></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            {{-- <th></th> --}}
-                                        </tr>
-                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -230,22 +213,19 @@
 
     <script>
         $(document).ready(function () {
-            var fpnoColors = {};
-            var fpnoColorList = ['#f9f9e3', '#e3f9f9', '#f9e3f3', '#e3e9f9', '#e3f9e7', '#f9f3e3'];
-            var fpnoColorIndex = 0;
-            var table = $('#dailyfunctionsheet').DataTable({
+            var table = $('#bookinginquirydetail').DataTable({
                 processing: true,
                 serverSide: true,
                 searching: true,
                 paging: true,
                 ordering: true,
                 ajax: {
-                    url: '{{ route('dailyfunctionsheetdata') }}',
+                    url: '{{ route('bookinginquirydetailfetch') }}',
                     type: 'POST',
                     data: function (d) {
                         d.fromdate = $('#fromdate').val();
                         d.todate = $('#todate').val();
-                        d.type = $('#type').val();
+                        d.status = $('#status').val();
                         d._token = '{{ csrf_token() }}';
                     },
                     error: function (xhr) {
@@ -256,23 +236,21 @@
                         alert(msg);
                     }
                 },
-                columns: [
-                    { data: 'sno', name: 'sno' },
-                    { data: 'fpno', name: 'fpno' },
-                    { data: 'party_name', name: 'party_name' },
-                    { data: 'venue', name: 'venue' },
-                    { data: 'function_date', name: 'function_date' },
-                    { data: 'for_time', name: 'for_time' },
-                    { data: 'to_time', name: 'to_time' },
-                    { data: 'pax', name: 'pax' },
-                    { data: 'pax_rate', name: 'pax_rate' },
-                    { data: 'function_type', name: 'function_type' },
-                    //{ data: 'amount', name: 'amount' },
-                    { data: 'advance', name: 'advance' },
-                    { data: 'type', name: 'type' },
-                    { data: 'rect_no', name: 'rect_no' },
-                    { data: 'rect_date', name: 'rect_date' },
-                   // { data: 'status', name: 'status' }
+               columns: [
+                    { data: 'sno', name: 'sno', render: function(data, type, row, meta) { return meta.row + 1; } }, // SNo
+                    { data: 'fromdate', name: 'fromdate' },          // Date
+                    { data: 'fromtime', name: 'fromtime' },          // Time
+                    { data: 'VenueName', name: 'VenueName' },        // Venue
+                    { data: 'FunctionType', name: 'FunctionType' },  // Function Type
+                    { data: 'partyname', name: 'partyname' },        // Party Name
+                    { data: 'mobileno', name: 'mobileno' },          // Phone no (using mobileno as phone)
+                    { data: 'mobileno', name: 'mobileno' },          // Mobile no
+                    { data: 'conperson', name: 'conperson' },        // Contact Person
+                    { data: 'bookedby', name: 'bookedby' },          // Booked By
+                    { data: 'handledby', name: 'handledby' },        // Handel By
+                    { data: 'status', name: 'status' },              // Status
+                    { data: 'u_name', name: 'u_name' },              // User
+                    { data: 'remark', name: 'remark' }               // Remark
                 ],
                 dom: 'Bfrtip',
                 buttons: [
@@ -281,34 +259,26 @@
                     //'pdfHtml5',
                     'print'
                 ],
-                rowCallback: function(row, data, index) {
-                    var fpno = data.fpno;
-                    if (!fpnoColors[fpno]) {
-                        fpnoColors[fpno] = fpnoColorList[fpnoColorIndex % fpnoColorList.length];
-                        fpnoColorIndex++;
-                    }
-                    $(row).css('background-color', fpnoColors[fpno]);
-                },
-                drawCallback: function (settings) {
-                    var api = this.api();
-                    var totalAmount = 0, totalAdvance = 0, totalPax = 0;
-                    api.rows({ page: 'current' }).every(function (rowIdx, tableLoop, rowLoop) {
-                        var data = this.data();
-                      //  totalAmount += parseFloat(data.amount) || 0;
-                        totalAdvance += parseFloat(data.advance) || 0;
-                        totalPax += parseFloat(data.pax) || 0;
-                    });
-                   // $('#totalAmount').html(totalAmount.toLocaleString(undefined, { maximumFractionDigits: 2 }));
-                    $('#totalAdvance').html(totalAdvance.toLocaleString(undefined, { maximumFractionDigits: 2 }));
-                    $('#totalPax').html(totalPax.toLocaleString(undefined, { maximumFractionDigits: 0 }));
-                }
+                // drawCallback: function (settings) {
+                //     var api = this.api();
+                //     var totalAmount = 0, totalAdvance = 0, totalPax = 0;
+                //     api.rows({ page: 'current' }).every(function (rowIdx, tableLoop, rowLoop) {
+                //         var data = this.data();
+                //         //  totalAmount += parseFloat(data.amount) || 0;
+                //         totalAdvance += parseFloat(data.advance) || 0;
+                //         totalPax += parseFloat(data.pax) || 0;
+                //     });
+                //     // $('#totalAmount').html(totalAmount.toLocaleString(undefined, { maximumFractionDigits: 2 }));
+                //     $('#totalAdvance').html(totalAdvance.toLocaleString(undefined, { maximumFractionDigits: 2 }));
+                //     $('#totalPax').html(totalPax.toLocaleString(undefined, { maximumFractionDigits: 0 }));
+                // }
             });
 
             // Only load data when refresh is clicked or type is changed to Function
             $('#fetchbutton').on('click', function () {
                 table.ajax.reload();
             });
-            $('#type').on('change', function () {
+            $('#status').on('change', function () {
                 table.ajax.reload();
             });
         });
