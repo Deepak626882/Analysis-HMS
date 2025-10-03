@@ -16,7 +16,7 @@ class EnviroBanquet extends Model
     
     protected $fillable = [
         'propertyid',
-        'outdoorcatering',
+        'outdoorcatering', 
         'cataloglimit',
         'roundoffac',
         'discountac',
@@ -25,6 +25,7 @@ class EnviroBanquet extends Model
         'u_name',
         'u_ae',
         'u_entdt',
-        'u_updatedt'
+        'u_updatedt',
+        'banquet_edit_date'
     ];
 }

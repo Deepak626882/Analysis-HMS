@@ -216,6 +216,7 @@ class Banquet extends Controller
             $data->panrequiredyn = $request->panrequiredyn;
             $data->roundofftype = $request->roundofftype;
             $data->u_ae = 'e';
+            $data->banquet_edit_date =  $request->banquet_edit_date;
             $data->save();
 
             return back()->with('success', 'Banquet Parameter Updated Successfully');
@@ -497,7 +498,10 @@ class Banquet extends Controller
 
     public function banquetbilling(Request $request)
     {
-        return view('property.banquetbilling');
+
+        $banquet_edit_date = EnviroBanquet::where('propertyid', Auth::user()->propertyid)->first('banquet_edit_date');
+        $readonly = ($banquet_edit_date->banquet_edit_date === 1) ? 'readonly' : '';
+        return view('property.banquetbilling', compact('banquet_edit_date', 'readonly'));
     }
 
     public function advanceabanquet(Request $request, $docid)
@@ -2442,5 +2446,4 @@ class Banquet extends Controller
             'bookdetail' => $bookdetail
         ]);
     }
-    
 }

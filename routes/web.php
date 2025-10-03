@@ -187,3 +187,10 @@ Route::get('dailyfunctionsheet', [ReportController::class, 'dailyFunctionSheet']
 Route::post('dailyfunctionsheetdata', [ReportController::class, 'dailyFunctionSheetData'])->name('dailyfunctionsheetdata');
 Route::get('bookinginquirydetail', [ReportController::class, 'bookingEnquiryDetail'])->name('bookinginquirydetail');
 Route::post('bookinginquirydetailfetch', [ReportController::class, 'bookingEnquiryDetailFetch'])->name('bookinginquirydetailfetch');
+
+Route::get('outStandingreport', [ReportController::class, 'outStandingreport'])->name('outStandingreport');
+Route::post('outStandingreportdata', [ReportController::class, 'outStandingreportData'])->name('outStandingreportdata');
+
+
+Route::get('companywisesalereport', [ReportController::class, 'companyWiseSaleReport'])->name('companywisesalereport');
+Route::post('companywisesalereportdata', [ReportController::class, 'companyWiseSaleReportData'])->name('companywisesalereportdata');

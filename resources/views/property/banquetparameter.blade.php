@@ -63,6 +63,15 @@
                                                         <span class="text-danger">{{ $message }}</span>
                                                     @enderror
 
+                                                     <label for="banquet_edit_date" class="col-form-label">Banquet Edit Date</label>
+                                                    <select id="banquet_edit_date" name="banquet_edit_date" class="form-control">
+                                                        <option value="0" {{ (banquetparameter()->banquet_edit_date ?? '') == 0 ? 'selected' : '' }}>Yes</option>
+                                                        <option value="1" {{ (banquetparameter()->banquet_edit_date ?? '') == 1 ? 'selected' : '' }}>No</option>
+                                                    </select>
+                                                    @error('banquet_edit_date')
+                                                        <span class="text-danger">{{ $message }}</span>
+                                                    @enderror
+
                                                 </div>
 
                                                 <div class="col-md-6">
